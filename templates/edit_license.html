@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Edit License - {{ license.jurisdiction }}{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="page-header-compact">
+                    <div>
+                        <a href="/manage-licenses" class="btn btn-sm btn-outline-secondary mb-2">← Back</a>
+                        <h3>✏️ Edit License - {{ license.jurisdiction }}</h3>
+                        <small class="text-muted">{{ license.license_type }}</small>
+                    </div>
+                </div>
+
+                <div class="netsuite-table-card">
+                    <form method="POST" action="/settings/update-license/{{ license.license_id }}">
+                        <div class="p-3">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Status *</label>
+                                    <select class="form-select" name="status" required>
+                                        <option value="licensed" {% if license.status == 'licensed' %}selected{% endif %}>✓ Licensed</option>
+                                        <option value="in_progress" {% if license.status == 'in_progress' %}selected{% endif %}>⟳ In Progress</option>
+                                        <option value="not_licensed" {% if license.status == 'not_licensed' %}selected{% endif %}>○ Not Licensed</option>
+                                        <option value="overdue" {% if license.status == 'overdue' %}selected{% endif %}>! Overdue</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">License Type</label>
+                                    <input type="text" class="form-control" name="license_type" 
+                                           value="{{ license.license_type or '' }}" 
+                                           placeholder="e.g., Master Plumber">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">License Number</label>
+                                    <input type="text" class="form-control" name="license_number" 
+                                           value="{{ license.license_number or '' }}" 
+                                           placeholder="MP-123456">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Designated Role</label>
+                                    <select class="form-select" name="designated_role">
+                                        <option value="">None</option>
+                                        <option value="master_of_record" {% if license.designated_role == 'master_of_record' %}selected{% endif %}>Master of Record</option>
+                                        <option value="designated_employee" {% if license.designated_role == 'designated_employee' %}selected{% endif %}>Designated Employee</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Issue Date</label>
+                                    <input type="date" class="form-control" name="issued_on" 
+                                           value="{{ license.issued_on or '' }}">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Expiration Date</label>
+                                    <input type="date" class="form-control" name="expires_on" 
+                                           value="{{ license.expires_on or '' }}">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Application Date</label>
+                                    <input type="date" class="form-control" name="application_date" 
+                                           value="{{ license.application_date or '' }}">
+                                </div>
+
+                                <!-- Recurring Costs -->
+                                <div class="col-12">
+                                    <hr class="my-2">
+                                    <h6 class="text-muted mb-3">💰 Recurring Costs</h6>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Renewal Fee ($)</label>
+                                    <input type="number" class="form-control" name="renewal_fee" 
+                                           value="{{ license.recurring.renewal_fee or 0 }}" 
+                                           step="0.01">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Continuing Ed Fee ($)</label>
+                                    <input type="number" class="form-control" name="continuing_ed_fee" 
+                                           value="{{ license.recurring.continuing_ed_fee or 0 }}" 
+                                           step="0.01">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Renewal Period (years)</label>
+                                    <input type="number" class="form-control" name="renewal_period_years" 
+                                           value="{{ license.recurring.renewal_period_years or 2 }}">
+                                </div>
+
+                                <!-- Board Info -->
+                                <div class="col-12">
+                                    <hr class="my-2">
+                                    <h6 class="text-muted mb-3">Board Information</h6>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Board Name</label>
+                                    <input type="text" class="form-control" name="board_name" 
+                                           value="{{ license.board_name or '' }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Board Phone</label>
+                                    <input type="tel" class="form-control" name="board_phone" 
+                                           value="{{ license.board_phone or '' }}">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Board Website</label>
+                                    <input type="url" class="form-control" name="board_url" 
+                                           value="{{ license.board_url or '' }}">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Notes</label>
+                                    <textarea class="form-control" name="notes" rows="3">{{ license.notes or '' }}</textarea>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                                <a href="/manage-licenses" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+                <div class="compact-stats-card">
+                    <h6 class="mb-3">📋 Quick Reference</h6>
+                    <div class="small text-muted">
+                        <p><strong>License ID:</strong> {{ license.license_id }}</p>
+                        <p><strong>Status:</strong> {{ license.status.replace('_', ' ').title() }}</p>
+                        {% if license.expires_on %}
+                        <p><strong>Expires:</strong> {{ license.expires_on }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

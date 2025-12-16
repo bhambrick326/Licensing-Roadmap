@@ -1,0 +1,74 @@
+{
+  "roadmap_id": "master_plumber_southwest",
+  "title": "Master Plumber - Southwest Region",
+  "description": "Recommended licensing path for plumbers focusing on Southwest US markets",
+  "estimated_duration": "18-24 months",
+  "total_cost_estimate": "$15,000",
+  "path": [
+    {
+      "step": 1,
+      "state": "TX",
+      "license_type": "Journey Plumber",
+      "priority": "critical",
+      "reason": "Largest market, foundational license",
+      "estimated_timeline": "6 months",
+      "prerequisites": [
+        "4,000 hours experience",
+        "Pass TX exam"
+      ],
+      "cost_estimate": "$500"
+    },
+    {
+      "step": 2,
+      "state": "AZ",
+      "license_type": "Journey Plumber",
+      "priority": "high",
+      "reason": "Growing Phoenix market",
+      "estimated_timeline": "3 months",
+      "prerequisites": [
+        "Valid TX license",
+        "Pass AZ exam"
+      ],
+      "cost_estimate": "$400"
+    },
+    {
+      "step": 3,
+      "state": "NV",
+      "license_type": "Plumbing Contractor",
+      "priority": "high",
+      "reason": "Las Vegas expansion",
+      "estimated_timeline": "4 months",
+      "prerequisites": [
+        "2 years experience",
+        "Pass NV exam"
+      ],
+      "cost_estimate": "$800"
+    },
+    {
+      "step": 4,
+      "state": "CA",
+      "license_type": "C-36 Contractor",
+      "priority": "medium",
+      "reason": "West coast coverage",
+      "estimated_timeline": "6 months",
+      "prerequisites": [
+        "4 years experience",
+        "Pass CA exam",
+        "$15K bond"
+      ],
+      "cost_estimate": "$1,200"
+    },
+    {
+      "step": 5,
+      "state": "CO",
+      "license_type": "Journey Plumber",
+      "priority": "medium",
+      "reason": "Denver market opportunity",
+      "estimated_timeline": "3 months",
+      "prerequisites": [
+        "Pass CO exam"
+      ],
+      "cost_estimate": "$350"
+    }
+  ]
+}

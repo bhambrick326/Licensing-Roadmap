@@ -1,0 +1,23 @@
+{
+  "company_name": "Your Plumbing Company",
+  "total_license_holders": 1,
+  "total_states_covered": 3,
+  "total_states_in_progress": 2,
+  "covered_states": [
+    "TX",
+    "CA",
+    "FL"
+  ],
+  "in_progress_states": [
+    "WA",
+    "NV"
+  ],
+  "target_states": [
+    "AZ",
+    "NY",
+    "CO"
+  ],
+  "license_holders": [
+    "bhambrick"
+  ]
+}

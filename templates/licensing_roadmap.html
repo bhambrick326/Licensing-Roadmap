@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Map View - Licensing Roadmap{% endblock %}
+
+{% block content %}
+<!-- Map Page Content -->
+<div class="map-page">
+    <!-- Top Bar: Search + View Selector -->
+    <div class="map-controls-bar">
+        <!-- Search Bar -->
+        <div class="map-search-container">
+            <input type="text" 
+                   id="stateSearch" 
+                   class="map-search-input" 
+                   placeholder="Search states...">
+            <div id="searchResults" class="search-results"></div>
+        </div>
+
+        <!-- View Selector -->
+        <div class="view-selector">
+            <button class="view-tab active" data-view="status">
+                <span class="view-icon">📊</span>
+                <span class="view-label">License Status</span>
+            </button>
+            <button class="view-tab" data-view="expiration">
+                <span class="view-icon">⏰</span>
+                <span class="view-label">Expiration Tracker</span>
+            </button>
+            <button class="view-tab" data-view="leadership">
+                <span class="view-icon">👔</span>
+                <span class="view-label">Leadership View</span>
+            </button>
+            <button class="view-tab" data-view="training">
+                <span class="view-icon">🎓</span>
+                <span class="view-label">Training Roadmap</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div class="professional-map-container">
+        <div id="mapbox-map"></div>
+        
+        <!-- Dynamic Legend (changes based on view) -->
+        <div class="map-legend" id="mapLegend">
+            <div class="legend-header">License Status</div>
+            <div class="legend-items" id="legendItems">
+                <div class="legend-item">
+                    <span class="legend-dot legend-dot-licensed"></span>
+                    <span class="legend-text">Licensed</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot legend-dot-progress"></span>
+                    <span class="legend-text">In Progress</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot legend-dot-due"></span>
+                    <span class="legend-text">Due Soon</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot legend-dot-overdue"></span>
+                    <span class="legend-text">Overdue</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot legend-dot-none"></span>
+                    <span class="legend-text">Not Licensed</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Offcanvas Sidebar (pops from right) -->
+<div class="offcanvas offcanvas-end offcanvas-professional" tabindex="-1" id="stateOffcanvas">
+    <div class="offcanvas-header-professional">
+        <div>
+            <h5 class="offcanvas-title-professional" id="stateOffcanvasLabel">State Details</h5>
+            <p class="offcanvas-subtitle">License Information</p>
+        </div>
+        <button type="button" class="btn-close-professional" data-bs-dismiss="offcanvas">
+            <span>×</span>
+        </button>
+    </div>
+    <div class="offcanvas-body-professional" id="offcanvasContent">
+        <!-- Content populated by JavaScript -->
+    </div>
+</div>
+
+<!-- Pass data to JavaScript -->
+<script>
+    window.statesData = {{ states_json | safe }};
+    window.mapboxToken = '{{ mapbox_token }}';
+    window.trainingRoadmap = {{ training_roadmap | safe }};
+</script>
+{% endblock %}

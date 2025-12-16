@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Licensing Roadmap{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Mapbox GL JS CSS -->
+    <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet' />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body class="dashboard-layout">
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="top-nav-left">
+            <span class="top-nav-brand">🔧 Licensing Roadmap</span>
+            <span class="top-nav-subtitle">Professional License Tracking</span>
+        </div>
+        <div class="top-nav-right">
+            <!-- Brag Bar -->
+            <div class="brag-bar">
+                <div class="brag-item">
+                    <div class="brag-number">{% block brag_licenses %}{{ holder.total_licenses if holder else 29 }}{% endblock %}</div>
+                    <div class="brag-label">Licenses</div>
+                </div>
+                <div class="brag-divider"></div>
+                <div class="brag-item">
+                    <div class="brag-number">{% block brag_certs %}{{ holder.total_certificates if holder else 42 }}{% endblock %}</div>
+                    <div class="brag-label">Certificates</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout Container -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-content">
+                <!-- Account Selector -->
+                <div class="sidebar-section account-selector-section">
+                    <h6 class="sidebar-heading">Active Account</h6>
+                    <select id="accountSelector" class="account-selector">
+                        <option value="bhambrick" {% if holder and holder.user_id == 'bhambrick' %}selected{% endif %}>👤 Benjamin Hambrick</option>
+                        <option value="jsmith" {% if holder and holder.user_id == 'jsmith' %}selected{% endif %}>👤 John Smith</option>
+                        <option value="director" {% if not holder or holder.user_id == 'director' %}selected{% endif %}>👔 Director View</option>
+                    </select>
+                </div>
+                
+                <!-- Stats Section -->
+                <div class="sidebar-section">
+                    <h6 class="sidebar-heading">License Overview</h6>
+                    
+                    <div class="sidebar-stat">
+                        <div class="sidebar-stat-icon stat-success">✓</div>
+                        <div class="sidebar-stat-content">
+                            <div class="sidebar-stat-value">{% block stat_licensed %}{{ stats.licensed if stats else 0 }}{% endblock %}</div>
+                            <div class="sidebar-stat-label">Licensed</div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-stat">
+                        <div class="sidebar-stat-icon stat-primary">⟳</div>
+                        <div class="sidebar-stat-content">
+                            <div class="sidebar-stat-value">{% block stat_progress %}{{ stats.in_progress if stats else 0 }}{% endblock %}</div>
+                            <div class="sidebar-stat-label">In Progress</div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-stat">
+                        <div class="sidebar-stat-icon stat-warning">⚠</div>
+                        <div class="sidebar-stat-content">
+                            <div class="sidebar-stat-value">{% block stat_due %}{{ stats.due_soon if stats and stats.due_soon else 0 }}{% endblock %}</div>
+                            <div class="sidebar-stat-label">Due Soon</div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-stat">
+                        <div class="sidebar-stat-icon stat-danger">!</div>
+                        <div class="sidebar-stat-content">
+                            <div class="sidebar-stat-value">{% block stat_overdue %}{{ stats.overdue if stats and stats.overdue else 0 }}{% endblock %}</div>
+                            <div class="sidebar-stat-label">Overdue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Section -->
+                <div class="sidebar-section sidebar-nav">
+                    <h6 class="sidebar-heading">Navigation</h6>
+                    <a href="/?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">🏠</span>
+                        <span>Home</span>
+                    </a>
+                    <a href="/licensing-roadmap?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item active">
+                        <span class="sidebar-nav-icon">🗺️</span>
+                        <span>Map View</span>
+                    </a>
+                    <a href="/manage-licenses?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">📜</span>
+                        <span>Manage Licenses</span>
+                    </a>
+                    <a href="/cost-analytics?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">💰</span>
+                        <span>Cost Analytics</span>
+                    </a>
+                    <a href="/admin/licensing/states?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">📋</span>
+                        <span>Admin</span>
+                    </a>
+                    <a href="/settings?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">⚙️</span>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Mapbox GL JS -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
+    
+    <!-- TopoJSON -->
+    <script src="https://unpkg.com/topojson@3"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mapbox-map.js') }}"></script>
+    
+    <!-- Account Switcher -->
+    <script>
+        document.getElementById('accountSelector')?.addEventListener('change', function() {
+            const account = this.value;
+            // Preserve current page, just change account
+            const currentPath = window.location.pathname;
+            window.location.href = currentPath + '?account=' + account;
+        });
+    </script>
+</body>
+</html>

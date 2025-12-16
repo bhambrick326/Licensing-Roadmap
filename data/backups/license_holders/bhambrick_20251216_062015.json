@@ -1,0 +1,111 @@
+{
+  "user_id": "bhambrick",
+  "name": "Benjamin Hambrick",
+  "role": "Master Plumber",
+  "total_licenses": 29,
+  "total_certificates": 42,
+  "states": {
+    "TX": {
+      "name": "Texas",
+      "status": "licensed",
+      "license_type": "Master Plumber",
+      "license_number": "MP-123456",
+      "issued_on": "2020-03-15",
+      "expires_on": "2026-03-15",
+      "board_name": "Texas State Board of Plumbing Examiners",
+      "board_phone": "(512) 555-0100",
+      "board_url": "https://www.tsbpe.texas.gov",
+      "summary": "Master Plumber license in good standing. Covers residential and commercial work statewide.",
+      "coverage_level": "complete"
+    },
+    "CA": {
+      "name": "California",
+      "status": "licensed",
+      "license_type": "C-36 Plumbing Contractor",
+      "license_number": "C36-987654",
+      "issued_on": "2019-06-01",
+      "expires_on": "2025-05-31",
+      "board_name": "California Contractors State License Board",
+      "board_phone": "(800) 321-2752",
+      "board_url": "https://www.cslb.ca.gov",
+      "summary": "Active C-36 plumbing contractor license.",
+      "coverage_level": "complete"
+    },
+    "FL": {
+      "name": "Florida",
+      "status": "licensed",
+      "license_type": "Master Plumber",
+      "license_number": "CFC1234567",
+      "issued_on": "2021-01-10",
+      "expires_on": "2025-08-31",
+      "board_name": "Florida Department of Business and Professional Regulation",
+      "board_phone": "(850) 487-1395",
+      "board_url": "https://www.myfloridalicense.com",
+      "summary": "Statewide master plumber certification.",
+      "coverage_level": "complete"
+    },
+    "WA": {
+      "name": "Washington",
+      "status": "in_progress",
+      "license_type": "Journey Level Plumber",
+      "application_date": "2024-11-01",
+      "board_name": "Washington State Department of Labor & Industries",
+      "board_phone": "(360) 902-5270",
+      "board_url": "https://lni.wa.gov",
+      "summary": "Application submitted. Awaiting examination schedule.",
+      "coverage_level": "partial"
+    },
+    "NV": {
+      "name": "Nevada",
+      "status": "in_progress",
+      "license_type": "Plumbing Contractor",
+      "application_date": "2024-10-15",
+      "board_name": "Nevada State Contractors Board",
+      "board_phone": "(702) 486-1100",
+      "board_url": "https://www.nscb.nv.gov",
+      "summary": "Application in review.",
+      "coverage_level": "partial"
+    },
+    "AZ": {
+      "name": "Arizona",
+      "status": "not_licensed",
+      "board_name": "Arizona Registrar of Contractors",
+      "board_phone": "(602) 542-1525",
+      "board_url": "https://roc.az.gov",
+      "summary": "Target state for 2025 expansion.",
+      "coverage_level": "draft"
+    },
+    "NY": {
+      "name": "New York",
+      "status": "not_licensed",
+      "board_name": "NYC Department of Buildings",
+      "board_phone": "(212) 393-2000",
+      "board_url": "https://www1.nyc.gov/site/buildings",
+      "summary": "Planned for Q3 2025.",
+      "coverage_level": "draft"
+    },
+    "CO": {
+      "name": "Colorado",
+      "status": "not_licensed",
+      "board_name": "Colorado Department of Regulatory Agencies",
+      "board_phone": "(303) 894-7855",
+      "board_url": "https://dpo.colorado.gov",
+      "summary": "Future target market.",
+      "coverage_level": "draft"
+    },
+    "AL": {
+      "name": "Alabama",
+      "status": "in_progress",
+      "license_type": "journeyman",
+      "license_number": null,
+      "issued_on": "1985-09-20",
+      "expires_on": "1996-09-20",
+      "renewal_cost": null,
+      "board_name": "Alabama board",
+      "board_phone": "2816541985",
+      "board_url": null,
+      "notes": "test",
+      "coverage_level": "draft"
+    }
+  }
+}

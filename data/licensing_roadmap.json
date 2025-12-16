@@ -1,0 +1,101 @@
+{
+  "states": {
+    "TX": {
+      "name": "Texas",
+      "abbr": "TX",
+      "status": "licensed",
+      "license_type": "Master Plumber",
+      "license_number": "MP123456",
+      "expires_on": "2025-08-15",
+      "board_name": "Texas State Board of Plumbing Examiners",
+      "board_url": "https://www.tsbpe.texas.gov/",
+      "board_phone": "(512) 936-5200",
+      "summary": "Texas requires both exam passage and documented work experience. Reciprocity available from select states.",
+      "last_reviewed": "2024-12-01",
+      "coverage_level": "full"
+    },
+    "CA": {
+      "name": "California",
+      "abbr": "CA",
+      "status": "licensed",
+      "license_type": "Journeyman Plumber",
+      "license_number": "C36-987654",
+      "expires_on": "2026-03-30",
+      "board_name": "Contractors State License Board",
+      "board_url": "https://www.cslb.ca.gov/",
+      "board_phone": "(800) 321-2752",
+      "summary": "California uses a contractor license system. C-36 classification covers plumbing work.",
+      "last_reviewed": "2024-11-15",
+      "coverage_level": "full"
+    },
+    "FL": {
+      "name": "Florida",
+      "abbr": "FL",
+      "status": "in_progress",
+      "license_type": "Master Plumber",
+      "board_name": "Florida Department of Business and Professional Regulation",
+      "board_url": "https://www.myfloridalicense.com/",
+      "board_phone": "(850) 487-1395",
+      "summary": "Application submitted. Awaiting exam date. Florida requires state exam plus local jurisdiction permits.",
+      "last_reviewed": "2024-12-10",
+      "coverage_level": "partial"
+    },
+    "WA": {
+      "name": "Washington",
+      "abbr": "WA",
+      "status": "licensed",
+      "license_type": "Journey Level Plumber",
+      "license_number": "PLUMBJ*12345",
+      "expires_on": "2025-02-28",
+      "board_name": "Washington State Department of Labor & Industries",
+      "board_url": "https://lni.wa.gov/",
+      "board_phone": "(360) 902-5270",
+      "summary": "Washington has a journey level system. Requires passing state exam and 8,000 hours documented experience.",
+      "last_reviewed": "2024-12-05",
+      "coverage_level": "full"
+    },
+    "NY": {
+      "name": "New York",
+      "abbr": "NY",
+      "status": "not_licensed",
+      "board_name": "NYC Department of Buildings (varies by jurisdiction)",
+      "board_url": "https://www.nyc.gov/dob",
+      "summary": "New York licensing varies by jurisdiction. NYC has specific requirements. Research needed for target area.",
+      "last_reviewed": "2024-10-20",
+      "coverage_level": "draft"
+    },
+    "AZ": {
+      "name": "Arizona",
+      "abbr": "AZ",
+      "status": "not_licensed",
+      "board_name": "Arizona Registrar of Contractors",
+      "board_url": "https://roc.az.gov/",
+      "board_phone": "(602) 542-1525",
+      "summary": "Arizona requires contractor registration for residential and commercial work. Considering future expansion.",
+      "last_reviewed": "2024-09-30",
+      "coverage_level": "draft"
+    },
+    "CO": {
+      "name": "Colorado",
+      "abbr": "CO",
+      "status": "not_licensed",
+      "board_name": "Colorado Department of Regulatory Agencies",
+      "board_url": "https://dpo.colorado.gov/",
+      "summary": "Colorado has local jurisdiction licensing. Denver requires city license. Statewide license available for specific work types.",
+      "last_reviewed": "2024-11-01",
+      "coverage_level": "draft"
+    },
+    "NV": {
+      "name": "Nevada",
+      "abbr": "NV",
+      "status": "in_progress",
+      "license_type": "Plumbing Contractor",
+      "board_name": "Nevada State Contractors Board",
+      "board_url": "https://www.nscb.nv.gov/",
+      "board_phone": "(702) 486-1100",
+      "summary": "Currently gathering experience documentation for Nevada application. Requires 4 years verifiable experience.",
+      "last_reviewed": "2024-12-08",
+      "coverage_level": "partial"
+    }
+  }
+}

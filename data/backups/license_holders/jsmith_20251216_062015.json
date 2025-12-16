@@ -1,0 +1,111 @@
+{
+  "user_id": "jsmith",
+  "name": "John Smith",
+  "role": "Journey Plumber",
+  "total_licenses": 12,
+  "total_certificates": 18,
+  "states": {
+    "NY": {
+      "name": "New York",
+      "status": "licensed",
+      "license_type": "Master Plumber",
+      "license_number": "MP-NY-789012",
+      "issued_on": "2022-04-20",
+      "expires_on": "2026-01-15",
+      "renewal_cost": 450,
+      "board_name": "NYC Department of Buildings",
+      "board_phone": "(212) 393-2000",
+      "board_url": "https://www1.nyc.gov/site/buildings",
+      "summary": "Master plumber license - expires in 30 days! Renewal needed.",
+      "coverage_level": "complete",
+      "notes": "Renewal fee increased this year. Need to complete 8 hours CE."
+    },
+    "PA": {
+      "name": "Pennsylvania",
+      "status": "licensed",
+      "license_type": "Master Plumber",
+      "license_number": "PA-MP-456789",
+      "issued_on": "2021-08-10",
+      "expires_on": "2026-02-14",
+      "renewal_cost": 320,
+      "board_name": "Pennsylvania Department of Labor & Industry",
+      "board_phone": "(717) 787-3483",
+      "board_url": "https://www.dli.pa.gov",
+      "summary": "Active master plumber license. Renewal due in 60 days.",
+      "coverage_level": "complete"
+    },
+    "OH": {
+      "name": "Ohio",
+      "status": "licensed",
+      "license_type": "Plumbing Contractor",
+      "license_number": "OH-PC-321654",
+      "issued_on": "2023-02-15",
+      "expires_on": "2027-12-16",
+      "renewal_cost": 280,
+      "board_name": "Ohio Construction Industry Licensing Board",
+      "board_phone": "(614) 644-3493",
+      "board_url": "https://com.ohio.gov/divisions-and-programs/ocilb",
+      "summary": "Good standing, no renewal needed soon.",
+      "coverage_level": "complete"
+    },
+    "IL": {
+      "name": "Illinois",
+      "status": "overdue",
+      "license_type": "Plumbing Contractor",
+      "license_number": "IL-PC-987321",
+      "issued_on": "2020-06-01",
+      "expires_on": "2025-12-06",
+      "renewal_cost": 400,
+      "board_name": "Illinois Department of Public Health",
+      "board_phone": "(217) 782-5830",
+      "board_url": "https://dph.illinois.gov",
+      "summary": "LICENSE EXPIRED! Immediate renewal required. May need reinstatement.",
+      "coverage_level": "complete",
+      "notes": "URGENT: License lapsed. $150 late fee applies. Must renew within 30 days or retest."
+    },
+    "MI": {
+      "name": "Michigan",
+      "status": "in_progress",
+      "license_type": "Master Plumber",
+      "application_date": "2024-12-01",
+      "application_cost": 350,
+      "board_name": "Michigan Department of Licensing and Regulatory Affairs",
+      "board_phone": "(517) 241-9288",
+      "board_url": "https://www.michigan.gov/lara",
+      "summary": "Application submitted. Exam scheduled for January 2025.",
+      "coverage_level": "partial"
+    },
+    "GA": {
+      "name": "Georgia",
+      "status": "in_progress",
+      "license_type": "Master Plumber",
+      "application_date": "2024-11-15",
+      "application_cost": 275,
+      "board_name": "Georgia State Board of Construction",
+      "board_phone": "(478) 207-2440",
+      "board_url": "https://sos.ga.gov/construction",
+      "summary": "Waiting for background check approval.",
+      "coverage_level": "partial"
+    },
+    "WI": {
+      "name": "Wisconsin",
+      "status": "not_licensed",
+      "board_name": "Wisconsin Department of Safety and Professional Services",
+      "board_phone": "(608) 266-2112",
+      "board_url": "https://dsps.wi.gov",
+      "summary": "Target for Q2 2025 expansion.",
+      "coverage_level": "draft",
+      "estimated_cost": 320
+    },
+    "VA": {
+      "name": "Virginia",
+      "status": "not_licensed",
+      "board_name": "Virginia Department of Professional and Occupational Regulation",
+      "board_phone": "(804) 367-8511",
+      "board_url": "https://www.dpor.virginia.gov",
+      "summary": "Researching requirements.",
+      "coverage_level": "draft",
+      "estimated_cost": 290
+    }
+  }
+}

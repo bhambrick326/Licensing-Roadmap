@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Add New License{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Header -->
+                <div class="page-header-compact">
+                    <div>
+                        <a href="/manage-licenses" class="btn btn-sm btn-outline-secondary mb-2">← Back</a>
+                        <h3>➕ Add New License</h3>
+                    </div>
+                </div>
+
+                <!-- Add Form -->
+                <div class="netsuite-table-card">
+                    <form method="POST" action="/settings/add-license">
+                        <input type="hidden" name="account" value="{{ account }}">
+                        <div class="p-3">
+                            <div class="row g-3">
+                                <!-- State Selection -->
+                                <div class="col-md-6">
+                                    <label class="form-label">State *</label>
+                                    <select class="form-select" name="state_abbr" required>
+                                        <option value="">-- Select State --</option>
+                                        {% for abbr, name in all_states %}
+                                        <option value="{{ abbr }}">{{ name }} ({{ abbr }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Status *</label>
+                                    <select class="form-select" name="status" required>
+                                        <option value="not_licensed">○ Not Licensed</option>
+                                        <option value="in_progress">⟳ In Progress</option>
+                                        <option value="licensed">✓ Licensed</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">License Type</label>
+                                    <input type="text" class="form-control" name="license_type" 
+                                           placeholder="e.g., Master Plumber">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">License Number</label>
+                                    <input type="text" class="form-control" name="license_number" 
+                                           placeholder="MP-123456">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Issue Date</label>
+                                    <input type="date" class="form-control" name="issued_on">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Expiration Date</label>
+                                    <input type="date" class="form-control" name="expires_on">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Renewal Cost ($)</label>
+                                    <input type="number" class="form-control" name="renewal_cost" 
+                                           step="0.01" placeholder="450.00">
+                                </div>
+
+                                <!-- Board Info Section -->
+                                <div class="col-12">
+                                    <hr class="my-2">
+                                    <h6 class="text-muted mb-3">Board Information (Optional)</h6>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Board Name</label>
+                                    <input type="text" class="form-control" name="board_name" 
+                                           placeholder="State Board of Plumbing Examiners">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Board Phone</label>
+                                    <input type="tel" class="form-control" name="board_phone" 
+                                           placeholder="(555) 123-4567">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Board Website</label>
+                                    <input type="url" class="form-control" name="board_url" 
+                                           placeholder="https://...">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Notes</label>
+                                    <textarea class="form-control" name="notes" rows="3" 
+                                              placeholder="Add notes about this license..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-success">➕ Add License</button>
+                                <a href="/manage-licenses" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Right: Tips -->
+            <div class="col-lg-4">
+                <div class="compact-stats-card">
+                    <h6 class="mb-3">💡 Tips</h6>
+                    <div class="small text-muted">
+                        <p><strong>In Progress:</strong> Use this for licenses you're currently pursuing</p>
+                        <p><strong>Not Licensed:</strong> Target states you plan to pursue later</p>
+                        <p><strong>Licensed:</strong> Active licenses with expiration dates</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

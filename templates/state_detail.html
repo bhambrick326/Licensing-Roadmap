@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}{{ state.name }} Licensing Details{% endblock %}
+
+{% block extra_head %}
+<style>
+    .state-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3d5a7c 100%);
+        color: white;
+        padding: 3rem 0 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .status-badge-large {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .detail-content {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .detail-content h1 {
+        color: #2c3e50;
+        font-size: 2rem;
+        margin-top: 3rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 3px solid #3498db;
+    }
+    
+    .detail-content h2 {
+        color: #34495e;
+        font-size: 1.5rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .detail-content h3 {
+        color: #555;
+        font-size: 1.2rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .detail-content a {
+        color: #3498db;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.2s;
+    }
+    
+    .detail-content a:hover {
+        border-bottom-color: #3498db;
+    }
+    
+    .detail-content ul, 
+    .detail-content ol {
+        margin: 1rem 0;
+        padding-left: 1.5rem;
+    }
+    
+    .detail-content li {
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+    }
+    
+    .detail-content strong {
+        color: #2c3e50;
+    }
+    
+    .detail-content hr {
+        margin: 2rem 0;
+        border-color: #ddd;
+    }
+    
+    .last-reviewed {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 1rem;
+        margin: 2rem 0;
+        border-radius: 4px;
+    }
+    
+    .disclaimer-box {
+        background: #e8f4f8;
+        border-left: 4px solid #3498db;
+        padding: 1rem;
+        margin: 2rem 0;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- State Header -->
+<section class="state-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="display-5 fw-bold mb-2">{{ state.name }}</h1>
+                <p class="lead mb-0">{{ state.license_type or 'License Information' }}</p>
+                
+                <span class="status-badge-large status-{{ state.status_class }}">
+                    {{ state.badge_text }}
+                </span>
+            </div>
+            
+            <div class="text-end">
+                {% if state.expires_on %}
+                <div class="mb-2">
+                    <small class="text-white-50 d-block">Expires</small>
+                    <strong class="fs-5">{{ state.expires_on | format_date }}</strong>
+                    {% if state.days_remaining is not none %}
+                        {% if state.days_remaining > 0 %}
+                        <div class="small text-white-50">
+                            {{ state.days_remaining }} days remaining
+                        </div>
+                        {% elif state.days_remaining < 0 %}
+                        <div class="small text-danger">
+                            OVERDUE by {{ state.days_remaining|abs }} days
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                {% if state.license_number %}
+                <div>
+                    <small class="text-white-50 d-block">License #</small>
+                    <code class="text-white">{{ state.license_number }}</code>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Quick Links -->
+        <div class="mt-4">
+            <a href="{{ state.board_url }}" target="_blank" class="btn btn-light me-2">
+                Visit Board Website →
+            </a>
+            <a href="/licensing-roadmap" class="btn btn-outline-light">
+                ← Back to Map
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- State Detail Content -->
+<section class="py-4">
+    <div class="container">
+        <div class="detail-content">
+            <!-- Disclaimer -->
+            <div class="disclaimer-box">
+                <strong>⚠️ Important:</strong> This roadmap is a guidance tool maintained by a licensed plumber. 
+                Always verify current requirements with the {{ state.board_name }}.
+            </div>
+            
+            {% if state.last_reviewed %}
+            <div class="last-reviewed">
+                <strong>📅 Last Reviewed:</strong> {{ state.last_reviewed | format_date }}
+            </div>
+            {% endif %}
+            
+            <!-- Markdown Content -->
+            {% if detail_content %}
+                {{ detail_content | safe }}
+            {% else %}
+                <div class="alert alert-warning">
+                    <h4>⚠️ State Roadmap In Progress</h4>
+                    <p>Detailed licensing information for {{ state.name }} is currently being compiled.</p>
+                    <p>In the meantime, visit the official board website:</p>
+                    <p><a href="{{ state.board_url }}" target="_blank" class="btn btn-primary">
+                        {{ state.board_name }} →
+                    </a></p>
+                </div>
+            {% endif %}
+            
+            <!-- Feedback Section -->
+            <hr>
+            <div class="text-center py-4">
+                <h4>Spot an Error?</h4>
+                <p class="text-muted">Help keep this roadmap accurate by reporting updates.</p>
+                <a href="mailto:roadmap@yoursite.com?subject={{ state_abbr }}%20Licensing%20Update" 
+                   class="btn btn-outline-primary">
+                    Report an Update for {{ state.name }}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

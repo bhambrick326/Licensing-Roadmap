@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Licensing Roadmap{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="settings-header">
+                    <h2>⚙️ Application Settings</h2>
+                    <p class="text-muted">Configure your preferences and system options</p>
+                </div>
+
+                <!-- Notifications Card -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h5>🔔 Notifications</h5>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                            <label class="form-check-label" for="emailNotifications">
+                                Email notifications for expiring licenses
+                            </label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="expirationAlerts" checked>
+                            <label class="form-check-label" for="expirationAlerts">
+                                Alert when licenses expire within 90 days
+                            </label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="weeklyReport">
+                            <label class="form-check-label" for="weeklyReport">
+                                Weekly status report email
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Display Preferences -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h5>🎨 Display Preferences</h5>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Default Map View</label>
+                            <select class="form-select">
+                                <option value="status">License Status</option>
+                                <option value="expiration">Expiration Tracker</option>
+                                <option value="leadership">Leadership View</option>
+                                <option value="training">Training Roadmap</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date Format</label>
+                            <select class="form-select">
+                                <option value="mdy">MM/DD/YYYY</option>
+                                <option value="dmy">DD/MM/YYYY</option>
+                                <option value="ymd">YYYY-MM-DD</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Export -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h5>📥 Data Export</h5>
+                    </div>
+                    <div class="settings-card-body">
+                        <p class="text-muted mb-3">Download your licensing data</p>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary">📄 Export to CSV</button>
+                            <button class="btn btn-outline-primary">📊 Export to Excel</button>
+                            <button class="btn btn-outline-primary">📋 Generate PDF Report</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="settings-card border-danger">
+                    <div class="settings-card-header bg-danger bg-opacity-10">
+                        <h5 class="text-danger">⚠️ Danger Zone</h5>
+                    </div>
+                    <div class="settings-card-body">
+                        <p class="text-muted mb-3">These actions cannot be undone</p>
+                        <button class="btn btn-outline-danger">🗑️ Clear All Cache</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

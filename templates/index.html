@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h1 class="display-3 fw-bold mb-4">Licensing Roadmap</h1>
+            <p class="lead mb-4">
+                Track your plumbing licenses across the United States. 
+                Stay on top of renewals, requirements, and state-specific regulations.
+            </p>
+            <p class="mb-4">
+                Built by a licensed plumber for plumbers. Real-world guidance 
+                on what actually matters when getting licensed in new states.
+            </p>
+            <a href="/licensing-roadmap" class="btn btn-primary btn-lg">
+                View Interactive Map →
+            </a>
+        </div>
+        <div class="col-lg-6">
+            <div class="p-5 bg-white rounded shadow">
+                <h3 class="mb-4">Features</h3>
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <strong>�� Interactive U.S. Map</strong><br>
+                        <small class="text-muted">Visual status of all your licenses at a glance</small>
+                    </li>
+                    <li class="mb-3">
+                        <strong>📅 Renewal Tracking</strong><br>
+                        <small class="text-muted">Never miss a renewal deadline again</small>
+                    </li>
+                    <li class="mb-3">
+                        <strong>📚 State Requirements</strong><br>
+                        <small class="text-muted">Detailed guides for each state's licensing process</small>
+                    </li>
+                    <li class="mb-3">
+                        <strong>💡 Field Notes</strong><br>
+                        <small class="text-muted">Real insights on common pitfalls and what boards actually care about</small>
+                    </li>
+                    <li>
+                        <strong>🔗 Direct Resources</strong><br>
+                        <small class="text-muted">Links to board websites, exam providers, and study materials</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

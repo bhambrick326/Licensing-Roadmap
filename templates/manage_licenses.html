@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Licenses - Licensing Roadmap{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        <div class="row">
+            <div class="col-12">
+                <!-- Compact Header -->
+                <div class="page-header-compact">
+                    <h3>📜 Manage Licenses</h3>
+                    <a href="/settings/add-license" class="btn btn-sm btn-success">+ Add New License</a>
+                </div>
+
+                <div class="row g-3">
+                    <!-- Left: Profile Quick Stats (Compact Card) -->
+                    <div class="col-lg-3">
+                        <div class="compact-stats-card">
+                            <div class="compact-stat-row">
+                                <span class="compact-stat-label">License Holder</span>
+                                <span class="compact-stat-value">{{ holder.name }}</span>
+                            </div>
+                            <div class="compact-stat-row">
+                                <span class="compact-stat-label">Role</span>
+                                <span class="compact-stat-value">{{ holder.role }}</span>
+                            </div>
+                            <div class="compact-stat-divider"></div>
+                            <div class="compact-stat-grid">
+                                <div class="compact-stat-box">
+                                    <div class="compact-stat-number text-success">{{ holder.total_licenses }}</div>
+                                    <div class="compact-stat-text">Licenses</div>
+                                </div>
+                                <div class="compact-stat-box">
+                                    <div class="compact-stat-number text-primary">{{ holder.total_certificates }}</div>
+                                    <div class="compact-stat-text">Certificates</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: License Table (NetSuite Style) -->
+                    <div class="col-lg-9">
+                        <div class="netsuite-table-card">
+                            <table class="table table-sm table-hover netsuite-table">
+                                <thead>
+                                    <tr>
+                                        {% if is_director %}<th>Holder</th>{% endif %}
+                                        <th>State</th>
+                                        <th>Status</th>
+                                        <th>License #</th>
+                                        <th>Issued</th>
+                                        <th>Expires</th>
+                                        <th>Days Left</th>
+                                        <th style="width: 140px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for license in licenses %}
+                                    <tr class="license-row-{{ license.status }}">
+                                        {% if is_director %}
+                                        <td class="text-muted small">{{ license.holder_name }}</td>
+                                        {% endif %}
+                                        <td class="fw-semibold">
+                                            {{ license.jurisdiction }}
+                                            <span class="text-muted ms-1">({{ license.jurisdiction_abbr }})</span>
+                                            {% if license.license_type %}
+                                            <br><small class="text-muted">{{ license.license_type }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if license.status == 'licensed' %}
+                                            <span class="status-badge status-licensed">● Licensed</span>
+                                            {% elif license.status == 'in_progress' %}
+                                            <span class="status-badge status-progress">● In Progress</span>
+                                            {% elif license.status == 'overdue' %}
+                                            <span class="status-badge status-overdue">● Overdue</span>
+                                            {% else %}
+                                            <span class="status-badge status-none">○ Not Licensed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><code class="license-number">{{ license.license_number or '—' }}</code></td>
+                                        <td class="text-muted">{{ license.issued_on or '—' }}</td>
+                                        <td class="text-muted">{{ license.expires_on or '—' }}</td>
+                                        <td>
+                                            {% if license.days_remaining is not none %}
+                                            <span class="days-remaining">{{ license.days_remaining }} days</span>
+                                            {% else %}
+                                            —
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="/settings/edit-license/{{ license.license_id }}" class="btn-table-action">Edit</a>
+                                            <a href="/settings/cost-details/{{ license.license_id }}" class="btn-table-action text-success">💰 Costs</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

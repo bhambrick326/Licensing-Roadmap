@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Licensing Roadmap{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        <div class="row">
+            <div class="col-12">
+                <!-- Welcome Header -->
+                <div class="page-header-compact mb-4">
+                    <div>
+                        <h3>👋 Welcome back, {{ holder.name }}</h3>
+                        <p class="text-muted mb-0">{{ holder.role }}</p>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Row -->
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="home-stat-card stat-licensed">
+                            <div class="home-stat-icon">✓</div>
+                            <div class="home-stat-content">
+                                <div class="home-stat-number">{{ stats.licensed }}</div>
+                                <div class="home-stat-label">Active Licenses</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="home-stat-card stat-progress">
+                            <div class="home-stat-icon">⟳</div>
+                            <div class="home-stat-content">
+                                <div class="home-stat-number">{{ stats.in_progress }}</div>
+                                <div class="home-stat-label">In Progress</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="home-stat-card stat-warning">
+                            <div class="home-stat-icon">⚠</div>
+                            <div class="home-stat-content">
+                                <div class="home-stat-number">{{ urgent_items|length }}</div>
+                                <div class="home-stat-label">Needs Attention</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="home-stat-card stat-cost">
+                            <div class="home-stat-icon">💰</div>
+                            <div class="home-stat-content">
+                                <div class="home-stat-number">${{ "%.0f"|format(cost_summary.total_spent) }}</div>
+                                <div class="home-stat-label">Total Investment</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <!-- Left Column: Urgent Items -->
+                    <div class="col-lg-8">
+                        <!-- Urgent Actions -->
+                        {% if urgent_items %}
+                        <div class="netsuite-table-card mb-3">
+                            <div class="p-3 border-bottom bg-warning bg-opacity-10">
+                                <h6 class="mb-0 text-warning">⚠️ Urgent Items ({{ urgent_items|length }})</h6>
+                            </div>
+                            <table class="table table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>License</th>
+                                        <th>Issue</th>
+                                        <th>Action Needed</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in urgent_items %}
+                                    <tr>
+                                        <td class="fw-semibold">{{ item.jurisdiction }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ item.urgency }}">{{ item.issue }}</span>
+                                        </td>
+                                        <td class="text-muted">{{ item.action }}</td>
+                                        <td>
+                                            <a href="{{ item.link }}" class="btn-table-action">View</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+
+                        <!-- Recent Licenses -->
+                        <div class="netsuite-table-card">
+                            <div class="p-3 border-bottom">
+                                <h6 class="mb-0">📜 Your Licenses</h6>
+                            </div>
+                            <table class="table table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Jurisdiction</th>
+                                        <th>Status</th>
+                                        <th>Expires</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for license in recent_licenses[:8] %}
+                                    <tr>
+                                        <td class="fw-semibold">
+                                            {{ license.jurisdiction }}
+                                            <br><small class="text-muted">{{ license.license_type }}</small>
+                                        </td>
+                                        <td>
+                                            {% if license.status == 'licensed' %}
+                                            <span class="status-badge status-licensed">● Licensed</span>
+                                            {% elif license.status == 'in_progress' %}
+                                            <span class="status-badge status-progress">● In Progress</span>
+                                            {% else %}
+                                            <span class="status-badge status-none">○ Not Licensed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-muted">
+                                            {% if license.expires_on %}
+                                            {{ license.expires_on }}
+                                            {% if license.days_remaining is not none and license.days_remaining <= 90 %}
+                                            <br><small class="text-warning">({{ license.days_remaining }} days)</small>
+                                            {% endif %}
+                                            {% else %}
+                                            —
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="/settings/edit-license/{{ license.license_id }}" class="btn-table-action">Edit</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <div class="p-2 text-center border-top">
+                                <a href="/manage-licenses" class="btn btn-sm btn-outline-primary">View All Licenses →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Quick Actions & Summary -->
+                    <div class="col-lg-4">
+                        <!-- Quick Actions -->
+                        <div class="compact-stats-card mb-3">
+                            <h6 class="mb-3">⚡ Quick Actions</h6>
+                            <div class="d-grid gap-2">
+                                <a href="/licensing-roadmap" class="btn btn-outline-primary btn-sm">🗺️ View Map</a>
+                                <a href="/manage-licenses" class="btn btn-outline-primary btn-sm">📜 Manage Licenses</a>
+                                <a href="/cost-analytics" class="btn btn-outline-primary btn-sm">💰 Cost Analytics</a>
+                                <a href="/settings/add-license" class="btn btn-success btn-sm">+ Add License</a>
+                            </div>
+                        </div>
+
+                        <!-- Cost Summary -->
+                        <div class="compact-stats-card mb-3">
+                            <h6 class="mb-3">�� Cost Summary</h6>
+                            <div class="compact-stat-row">
+                                <span class="compact-stat-label">Total Spent</span>
+                                <span class="compact-stat-value text-success">${{ "%.2f"|format(cost_summary.total_spent) }}</span>
+                            </div>
+                            <div class="compact-stat-row">
+                                <span class="compact-stat-label">Budget</span>
+                                <span class="compact-stat-value text-primary">${{ "%.2f"|format(cost_summary.total_estimated) }}</span>
+                            </div>
+                            <div class="compact-stat-row">
+                                <span class="compact-stat-label">Annual Recurring</span>
+                                <span class="compact-stat-value text-warning">${{ "%.2f"|format(cost_summary.annual_recurring) }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Coverage Map -->
+                        <div class="compact-stats-card">
+                            <h6 class="mb-3">🗺️ Coverage Overview</h6>
+                            <div class="small">
+                                <p class="mb-2"><strong>{{ stats.licensed }}</strong> states with active licenses</p>
+                                <p class="mb-2"><strong>{{ stats.in_progress }}</strong> applications in progress</p>
+                                <p class="mb-0"><strong>{{ holder.total_certificates }}</strong> professional certificates</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Cost Analytics - Licensing Roadmap{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        <div class="row">
+            <div class="col-12">
+                <!-- Header -->
+                <div class="page-header-compact">
+                    <h3>📊 Cost Analytics Dashboard</h3>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="compact-stats-card">
+                            <div class="compact-stat-box text-center">
+                                <div class="compact-stat-number text-primary">${{ "%.2f"|format(totals.total_estimated) }}</div>
+                                <div class="compact-stat-text">Total Estimated</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="compact-stats-card">
+                            <div class="compact-stat-box text-center">
+                                <div class="compact-stat-number text-success">${{ "%.2f"|format(totals.total_actual) }}</div>
+                                <div class="compact-stat-text">Total Spent</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="compact-stats-card">
+                            <div class="compact-stat-box text-center">
+                                <div class="compact-stat-number {% if totals.total_variance >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    ${{ "%.2f"|format(totals.total_variance) }}
+                                </div>
+                                <div class="compact-stat-text">Variance</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="compact-stats-card">
+                            <div class="compact-stat-box text-center">
+                                <div class="compact-stat-number text-warning">${{ "%.2f"|format(totals.total_recurring) }}</div>
+                                <div class="compact-stat-text">Annual Recurring</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cost by State Table -->
+                <div class="netsuite-table-card mb-4">
+                    <div class="p-3 border-bottom">
+                        <h6 class="mb-0">💰 Costs by License</h6>
+                    </div>
+                    <table class="table table-sm table-hover mb-0 netsuite-table">
+                        <thead>
+                            <tr>
+                                <th>Jurisdiction</th>
+                                <th>License Type</th>
+                                <th class="text-end">Estimated</th>
+                                <th class="text-end">Actual Spent</th>
+                                <th class="text-end">Variance</th>
+                                <th class="text-end">Recurring/Year</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for license in licenses %}
+                            <tr>
+                                <td class="fw-semibold">{{ license.jurisdiction }}</td>
+                                <td class="text-muted">{{ license.license_type }}</td>
+                                <td class="text-end">${{ "%.2f"|format(license.cost_totals.initial_estimated) }}</td>
+                                <td class="text-end text-success fw-semibold">${{ "%.2f"|format(license.cost_totals.actual_spent) }}</td>
+                                <td class="text-end {% if license.cost_totals.variance >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    ${{ "%.2f"|format(license.cost_totals.variance) }}
+                                </td>
+                                <td class="text-end text-warning">${{ "%.2f"|format(license.cost_totals.recurring_cost) }}</td>
+                                <td>
+                                    <a href="/settings/cost-details/{{ license.license_id }}" class="btn-table-action">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr class="table-active fw-bold">
+                                <td colspan="2">TOTALS</td>
+                                <td class="text-end">${{ "%.2f"|format(totals.total_estimated) }}</td>
+                                <td class="text-end">${{ "%.2f"|format(totals.total_actual) }}</td>
+                                <td class="text-end">${{ "%.2f"|format(totals.total_variance) }}</td>
+                                <td class="text-end">${{ "%.2f"|format(totals.total_recurring) }}</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Cost by Category Table -->
+                <div class="netsuite-table-card">
+                    <div class="p-3 border-bottom">
+                        <h6 class="mb-0">📋 Costs by Category</h6>
+                    </div>
+                    <table class="table table-sm mb-0 netsuite-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th class="text-end">Total Spent</th>
+                                <th class="text-end">% of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category, amount in categories.items() %}
+                            <tr>
+                                <td>{{ category.replace('_', ' ').title() }}</td>
+                                <td class="text-end fw-semibold">${{ "%.2f"|format(amount) }}</td>
+                                <td class="text-end text-muted">
+                                    {{ "%.1f"|format((amount / totals.total_actual * 100) if totals.total_actual > 0 else 0) }}%
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

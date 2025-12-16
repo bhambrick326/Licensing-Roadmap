@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - State Content Review{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="mb-4">
+        <h1 class="display-5 fw-bold">State Content Review</h1>
+        <p class="text-muted">Track which state roadmaps need updates</p>
+    </div>
+    
+    <div class="admin-table">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>State</th>
+                    <th>Status</th>
+                    <th>Coverage</th>
+                    <th>Last Reviewed</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for state in states %}
+                <tr>
+                    <td>
+                        <strong>{{ state.name }}</strong>
+                        <small class="text-muted d-block">{{ state.abbr }}</small>
+                    </td>
+                    <td>
+                        {% if state.status == 'licensed' %}
+                            <span class="badge bg-success">Licensed</span>
+                        {% elif state.status == 'in_progress' %}
+                            <span class="badge bg-primary">In Progress</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Not Licensed</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="coverage-badge coverage-{{ state.coverage_level }}">
+                            {{ state.coverage_level }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if state.last_reviewed %}
+                            {{ state.last_reviewed | format_date }}
+                        {% else %}
+                            <em class="text-muted">Never</em>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="/licensing/{{ state.abbr | lower }}" 
+                           class="btn btn-sm btn-outline-primary">
+                            View Page
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="mt-4">
+        <div class="alert alert-info">
+            <h5>Review Guidelines:</h5>
+            <ul class="mb-0">
+                <li>States should be reviewed at least every <strong>90 days</strong></li>
+                <li>Check for law changes, board website updates, fee changes</li>
+                <li>Update <code>last_reviewed</code> date in JSON after review</li>
+                <li>Update <code>coverage_level</code> as content improves: draft → partial → full</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

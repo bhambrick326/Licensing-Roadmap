@@ -3121,3 +3121,60 @@ body.dashboard-layout {
     background: #f3f4f6;
     border-color: #d1d5db;
 }
+
+/* Compact offcanvas - no scrolling needed */
+.offcanvas-state-content {
+    font-size: 0.875rem;
+}
+
+.info-card-pro {
+    margin-bottom: 0.75rem !important;
+    padding: 0.75rem !important;
+}
+
+.info-card-header {
+    margin-bottom: 0.5rem !important;
+    font-size: 0.875rem !important;
+}
+
+.info-card-body {
+    font-size: 0.8125rem !important;
+}
+
+.info-row {
+    padding: 0.25rem 0 !important;
+}
+
+.status-badge-container {
+    margin-bottom: 0.75rem !important;
+}
+
+.status-badge-large {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+}
+
+.board-name {
+    font-size: 0.875rem !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.alert-card {
+    padding: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+    font-size: 0.8125rem !important;
+}
+
+.expiry-date {
+    font-size: 0.9375rem !important;
+}
+
+.expiry-countdown {
+    font-size: 0.8125rem !important;
+    margin: 0.25rem 0 !important;
+}
+
+.summary-text {
+    font-size: 0.8125rem !important;
+    margin-bottom: 0 !important;
+}

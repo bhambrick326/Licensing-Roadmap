@@ -20,6 +20,10 @@ app = Flask(__name__)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Login page"""
+    # If already logged in, go to home
+    if session.get('logged_in'):
+        return redirect('/home?account=bhambrick')
+    
     if request.method == 'POST':
         password = request.form.get('password')
         
@@ -35,20 +39,30 @@ def login():
 def logout():
     """Logout"""
     session.clear()
-    return redirect('/login')
+    return redirect('/landing')
 
 
 
 @app.before_request
 def require_login():
-    """Require login for all routes except /login"""
-    if request.endpoint not in ['login', 'static'] and not session.get('logged_in'):
-        return redirect('/login')
+    """Require login for all routes except /login and landing page"""
+    # Public routes
+    public_routes = ['login', 'static', 'landing_page']
+    
+    # If not logged in and trying to access protected route
+    if request.endpoint not in public_routes and not session.get('logged_in'):
+        # Show landing page for root, redirect to login for other protected routes
+        if request.path == '/':
+            return redirect('/landing')
+        else:
+            return redirect('/login')
 
 
 @app.context_processor
 def inject_current_account():
     """Make current account available to all templates"""
+    import os
+    
     account = request.args.get('account', 'bhambrick')
     
     # Load current user for navigation
@@ -58,10 +72,36 @@ def inject_current_account():
             'name': 'Team Overview',
             'role': 'Leadership View'
         }
+        
+        # Calculate team stats for brag bar
+        team_total_licenses = 0
+        team_total_states = set()
+        team_total_holders = 0
+        
+        holders_dir = 'data/license_holders'
+        if os.path.exists(holders_dir):
+            for filename in os.listdir(holders_dir):
+                if filename.endswith('.json') and filename != 'director.json':
+                    filepath = os.path.join(holders_dir, filename)
+                    with open(filepath, 'r') as f:
+                        holder = json.load(f)
+                        team_total_licenses += len(holder.get('licenses', []))
+                        for lic in holder.get('licenses', []):
+                            if lic.get('jurisdiction_abbr'):
+                                team_total_states.add(lic['jurisdiction_abbr'])
+                        team_total_holders += 1
+        
+        return dict(
+            current_account=account, 
+            holder=current_holder,
+            team_total_licenses=team_total_licenses,
+            team_total_states=len(team_total_states),
+            team_total_holders=team_total_holders
+        )
     else:
         current_holder = load_license_holder_data(account)
         if not current_holder:
-            current_holder = {'user_id': 'bhambrick', 'name': 'User', 'role': 'License Holder'}
+            current_holder = {'user_id': 'bhambrick', 'name': 'User', 'role': 'License Holder', 'licenses': []}
     
     return dict(current_account=account, holder=current_holder)
 
@@ -223,7 +263,18 @@ def load_state_detail(state_abbr):
         return None
 
 
+
 @app.route('/')
+@app.route('/landing')
+def landing_page():
+    """Landing page for non-logged-in users"""
+    # If already logged in, go to home
+    if session.get('logged_in'):
+        return redirect('/home?account=bhambrick')
+    
+    return render_template('landing.html')
+
+@app.route('/home')
 def home():
     """Home dashboard"""
     account = request.args.get('account', 'bhambrick')
@@ -356,20 +407,43 @@ def licensing_roadmap():
     
     states = holder_data.get("states", {})
     
-    # Convert licenses array to states dict for map compatibility
-    enhanced_states = {}
+    # Start with all 50 states (base data)
+    import os
+    base_states_path = 'data/base_data/all_states.json'
+    if os.path.exists(base_states_path):
+        with open(base_states_path, 'r') as f:
+            enhanced_states = json.load(f)
+            # Add default fields to each state
+            for abbr, state_data in enhanced_states.items():
+                state_data['state_abbr'] = abbr
+                state_data['status_class'] = 'not_licensed'
+                state_data['badge_text'] = 'Not Licensed'
+                state_data['days_remaining'] = None
+                state_data['board_name'] = f'{state_data["name"]} State Board'
+                state_data['board_url'] = '#'
+                state_data['summary'] = f'No license data available for {state_data["name"]} yet.'
+    else:
+        enhanced_states = {}
+    
+    # Overlay actual license data
     for license in holder_data.get('licenses', []):
         abbr = license.get('jurisdiction_abbr')
-        if abbr:
-            # Use the first license for each state (primary)
-            if abbr not in enhanced_states:
-                enhanced = license.copy()
-                enhanced["status_class"] = get_state_status_class(license)
-                enhanced["badge_text"] = get_state_badge_text(license)
-                enhanced["days_remaining"] = calculate_days_remaining(license.get("expires_on"))
-                enhanced["name"] = license.get("jurisdiction")
-                enhanced["state_abbr"] = abbr
-                enhanced_states[abbr] = enhanced
+        if abbr and abbr in enhanced_states:
+            # Overlay license data on top of base state
+            enhanced_states[abbr].update({
+                "status": license.get("status"),
+                "status_class": get_state_status_class(license),
+                "badge_text": get_state_badge_text(license),
+                "days_remaining": calculate_days_remaining(license.get("expires_on")),
+                "license_type": license.get("license_type"),
+                "license_number": license.get("license_number"),
+                "issued_on": license.get("issued_on"),
+                "expires_on": license.get("expires_on"),
+                "board_name": license.get("board_name", f'{enhanced_states[abbr]["name"]} State Board'),
+                "board_phone": license.get("board_phone"),
+                "board_url": license.get("board_url", "#"),
+                "summary": f'Licensed as {license.get("license_type", "Plumber")}'
+            })
     
     # Calculate stats
     licenses = holder_data.get('licenses', [])
@@ -1507,6 +1581,249 @@ def add_job_project(user_id):
         json.dump(holder_data, f, indent=2)
     
     return redirect(f'/bio/{user_id}#experience')
+
+
+
+@app.route('/import-csv-page')
+def import_csv_page():
+    """CSV import page"""
+    return render_template('csv_import.html')
+
+@app.route('/import-csv', methods=['POST'])
+def import_csv():
+    """Handle CSV file upload and import"""
+    import csv
+    import io
+    import os
+    import re
+    
+    if 'csv_file' not in request.files:
+        return "No file uploaded", 400
+    
+    file = request.files['csv_file']
+    license_holder = request.form.get('license_holder', 'bhambrick')
+    overwrite = 'overwrite_existing' in request.form
+    
+    if file.filename == '':
+        return "No file selected", 400
+    
+    # Read CSV
+    stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+    csv_reader = csv.DictReader(stream)
+    
+    # Load license holder data
+    holder_data = load_license_holder_data(license_holder)
+    if not holder_data:
+        return "License holder not found", 404
+    
+    # State name to abbreviation mapping
+    state_mapping = {
+        'alabama': 'AL', 'alaska': 'AK', 'arizona': 'AZ', 'arkansas': 'AR',
+        'california': 'CA', 'colorado': 'CO', 'connecticut': 'CT', 'delaware': 'DE',
+        'florida': 'FL', 'georgia': 'GA', 'hawaii': 'HI', 'idaho': 'ID',
+        'illinois': 'IL', 'indiana': 'IN', 'iowa': 'IA', 'kansas': 'KS',
+        'kentucky': 'KY', 'louisiana': 'LA', 'maine': 'ME', 'maryland': 'MD',
+        'massachusetts': 'MA', 'michigan': 'MI', 'minnesota': 'MN', 'mississippi': 'MS',
+        'missouri': 'MO', 'montana': 'MT', 'nebraska': 'NE', 'nevada': 'NV',
+        'new hampshire': 'NH', 'new jersey': 'NJ', 'new mexico': 'NM', 'new york': 'NY',
+        'north carolina': 'NC', 'north dakota': 'ND', 'ohio': 'OH', 'oklahoma': 'OK',
+        'oregon': 'OR', 'pennsylvania': 'PA', 'rhode island': 'RI', 'south carolina': 'SC',
+        'south dakota': 'SD', 'tennessee': 'TN', 'texas': 'TX', 'utah': 'UT',
+        'vermont': 'VT', 'virginia': 'VA', 'washington': 'WA', 'west virginia': 'WV',
+        'wisconsin': 'WI', 'wyoming': 'WY'
+    }
+    
+    def clean_currency(value):
+        """Remove $, commas and convert to float"""
+        if not value or value.strip() == '':
+            return 0.0
+        cleaned = re.sub(r'[\$,]', '', str(value))
+        try:
+            return float(cleaned)
+        except:
+            return 0.0
+    
+    def parse_renewal_period(value):
+        """Extract years from renewal period"""
+        if not value:
+            return 2
+        match = re.search(r'(\d+)', str(value))
+        return int(match.group(1)) if match else 2
+    
+    def parse_hours(value):
+        """Extract hours from string"""
+        if not value:
+            return 0
+        match = re.search(r'(\d+)', str(value))
+        return int(match.group(1)) if match else 0
+    
+    imported_count = 0
+    updated_count = 0
+    
+    for row in csv_reader:
+        # Get state info
+        state_raw = row.get('State', '').strip()
+        if not state_raw:
+            continue
+        
+        # Convert state name to abbreviation
+        state_abbr = state_raw.upper() if len(state_raw) == 2 else state_mapping.get(state_raw.lower(), state_raw[:2].upper())
+        
+        # Find or create license for this state
+        license_data = None
+        for lic in holder_data.get('licenses', []):
+            if lic.get('jurisdiction_abbr') == state_abbr:
+                license_data = lic
+                break
+        
+        if not license_data:
+            # Create new license
+            license_id = f"{state_abbr}-{len(holder_data.get('licenses', [])) + 1:03d}"
+            license_data = {
+                'license_id': license_id,
+                'jurisdiction': state_raw if len(state_raw) > 2 else state_abbr,
+                'jurisdiction_abbr': state_abbr,
+                'jurisdiction_type': 'state',
+                'license_type': row.get('License Type', 'Master Plumber'),
+                'status': 'not_licensed',
+                'estimated_costs': {},
+                'actual_costs': [],
+                'recurring': {},
+                'planning': {}
+            }
+            holder_data['licenses'].append(license_data)
+            imported_count += 1
+        else:
+            updated_count += 1
+        
+        # Update estimated costs (only if overwrite is true OR field is empty)
+        if overwrite or not license_data.get('estimated_costs'):
+            license_data['estimated_costs'] = {}
+        
+        costs = license_data['estimated_costs']
+        
+        if overwrite or not costs.get('application_fee'):
+            costs['application_fee'] = clean_currency(row.get('Application Fees', 0))
+        if overwrite or not costs.get('test_fee'):
+            costs['test_fee'] = clean_currency(row.get('Test Fees', 0))
+        if overwrite or not costs.get('trade_book_fee'):
+            costs['trade_book_fee'] = clean_currency(row.get('Trade Book fees', 0))
+        if overwrite or not costs.get('business_law_book_fee'):
+            costs['business_law_book_fee'] = clean_currency(row.get('Bus. & Law Book Fee', 0))
+        if overwrite or not costs.get('activation_fee'):
+            costs['activation_fee'] = clean_currency(row.get('Lic. Activation Fee', 0))
+        if overwrite or not costs.get('prep_course_fee'):
+            costs['prep_course_fee'] = clean_currency(row.get('Prep Course fees', 0))
+        if overwrite or not costs.get('travel_fee'):
+            costs['travel_fee'] = clean_currency(row.get('Travel Fees', 0))
+        if overwrite or not costs.get('shipping_fee'):
+            costs['shipping_fee'] = clean_currency(row.get('Shipping Fees', 0))
+        
+        # Update recurring costs
+        if overwrite or not license_data.get('recurring'):
+            license_data['recurring'] = {}
+        
+        recurring = license_data['recurring']
+        if overwrite or not recurring.get('renewal_fee'):
+            recurring['renewal_fee'] = clean_currency(row.get('Renewal Fees', 0))
+        if overwrite or not recurring.get('continuing_ed_fee'):
+            recurring['continuing_ed_fee'] = clean_currency(row.get('Cont. Ed. Fees', 0))
+        if overwrite or not recurring.get('renewal_period_years'):
+            recurring['renewal_period_years'] = parse_renewal_period(row.get('Renewal Period', '2 Years'))
+        
+        # Update planning
+        if overwrite or not license_data.get('planning'):
+            license_data['planning'] = {}
+        
+        planning = license_data['planning']
+        if overwrite or not planning.get('est_study_hours'):
+            planning['est_study_hours'] = parse_hours(row.get('Est. Study Hrs.', 0))
+        if overwrite or not planning.get('test_duration_hours'):
+            planning['test_duration_hours'] = parse_hours(row.get('Test Duration', 0))
+    
+    # Save to file
+    file_path = os.path.join('data', 'license_holders', f'{license_holder}.json')
+    with open(file_path, 'w') as f:
+        json.dump(holder_data, f, indent=2)
+    
+    # Redirect to cost analytics with success message
+    return f'''
+    <html>
+    <head>
+        <meta http-equiv="refresh" content="3;url=/cost-analytics?account={license_holder}">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-light">
+        <div class="container mt-5">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="text-success">✅ Import Successful!</h3>
+                    <p class="lead">{imported_count} new licenses created</p>
+                    <p class="lead">{updated_count} existing licenses updated</p>
+                    <p class="text-muted">Redirecting to Cost Analytics...</p>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    '''
+
+@app.route('/download-csv-template')
+def download_csv_template():
+    """Download CSV template"""
+    import csv
+    import io
+    from flask import make_response
+    
+    # Create CSV template
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Headers
+    writer.writerow([
+        'State', 'License Type', 'Application Fees', 'Test Fees', 
+        'Trade Book fees', 'Bus. & Law Book Fee', 'Lic. Activation Fee',
+        'Prep Course fees', 'Travel Fees', 'Shipping Fees', 
+        'Renewal Fees', 'Cont. Ed. Fees', 'Renewal Period', 
+        'Est. Study Hrs.', 'Test Duration'
+    ])
+    
+    # Example rows
+    writer.writerow([
+        'Texas', 'Master Plumber', '$225.00', '$0.00', '$126.73', '$0.00',
+        '$225.00', '$550.00', '$0.00', '$0.00', '$300.00', '$100.00',
+        '1 Years', '24', '8 Hours'
+    ])
+    writer.writerow([
+        'California', 'C-36 Plumbing Contractor', '$235.00', '$0.00', '$0.00', '$0.00',
+        '$0.00', '$482.50', '$850.00', '$0.00', '$400.00', '$0.00',
+        '2 Years', '10', '10 Hours'
+    ])
+    
+    # Create response
+    response = make_response(output.getvalue())
+    response.headers['Content-Disposition'] = 'attachment; filename=licensing_costs_template.csv'
+    response.headers['Content-Type'] = 'text/csv'
+    
+    return response
+
+
+
+@app.route('/state/<state_abbr>')
+def state_detail(state_abbr):
+    """Display detailed state licensing information"""
+    import os
+    
+    # Load state detail data
+    state_file = os.path.join('data', 'state_details', f'{state_abbr.upper()}.json')
+    
+    if not os.path.exists(state_file):
+        return f"State information for {state_abbr.upper()} not yet available. We're building this database state by state!", 404
+    
+    with open(state_file, 'r') as f:
+        state_data = json.load(f)
+    
+    return render_template('state_detail.html', state=state_data)
 
 
 @app.errorhandler(404)

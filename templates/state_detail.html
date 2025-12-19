@@ -1,197 +1,384 @@
 {% extends "base.html" %}
 
-{% block title %}{{ state.name }} Licensing Details{% endblock %}
-
-{% block extra_head %}
-<style>
-    .state-header {
-        background: linear-gradient(135deg, #2c3e50 0%, #3d5a7c 100%);
-        color: white;
-        padding: 3rem 0 2rem;
-        margin-bottom: 2rem;
-    }
-    
-    .status-badge-large {
-        display: inline-block;
-        padding: 0.5rem 1.5rem;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 1rem;
-        margin-top: 1rem;
-    }
-    
-    .detail-content {
-        max-width: 900px;
-        margin: 0 auto;
-    }
-    
-    .detail-content h1 {
-        color: #2c3e50;
-        font-size: 2rem;
-        margin-top: 3rem;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 3px solid #3498db;
-    }
-    
-    .detail-content h2 {
-        color: #34495e;
-        font-size: 1.5rem;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-    }
-    
-    .detail-content h3 {
-        color: #555;
-        font-size: 1.2rem;
-        margin-top: 1.5rem;
-        margin-bottom: 0.75rem;
-    }
-    
-    .detail-content a {
-        color: #3498db;
-        text-decoration: none;
-        border-bottom: 1px solid transparent;
-        transition: border-color 0.2s;
-    }
-    
-    .detail-content a:hover {
-        border-bottom-color: #3498db;
-    }
-    
-    .detail-content ul, 
-    .detail-content ol {
-        margin: 1rem 0;
-        padding-left: 1.5rem;
-    }
-    
-    .detail-content li {
-        margin-bottom: 0.5rem;
-        line-height: 1.6;
-    }
-    
-    .detail-content strong {
-        color: #2c3e50;
-    }
-    
-    .detail-content hr {
-        margin: 2rem 0;
-        border-color: #ddd;
-    }
-    
-    .last-reviewed {
-        background: #fff3cd;
-        border-left: 4px solid #ffc107;
-        padding: 1rem;
-        margin: 2rem 0;
-        border-radius: 4px;
-    }
-    
-    .disclaimer-box {
-        background: #e8f4f8;
-        border-left: 4px solid #3498db;
-        padding: 1rem;
-        margin: 2rem 0;
-        border-radius: 4px;
-    }
-</style>
-{% endblock %}
+{% block title %}{{ state.state }} - Licensing Requirements{% endblock %}
 
 {% block content %}
-<!-- State Header -->
-<section class="state-header">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-start">
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        
+        <!-- Header -->
+        <div class="page-header-compact mb-3">
             <div>
-                <h1 class="display-5 fw-bold mb-2">{{ state.name }}</h1>
-                <p class="lead mb-0">{{ state.license_type or 'License Information' }}</p>
-                
-                <span class="status-badge-large status-{{ state.status_class }}">
-                    {{ state.badge_text }}
-                </span>
+                <a href="/licensing-roadmap?account={{ holder.user_id if holder else 'bhambrick' }}" class="btn btn-sm btn-outline-secondary mb-2">← Back to Map</a>
+                <h3>{{ state.state }} ({{ state.state_abbr }}) Licensing Guide</h3>
+                <p class="text-muted mb-0">{{ state.governing_body }}</p>
             </div>
-            
-            <div class="text-end">
-                {% if state.expires_on %}
-                <div class="mb-2">
-                    <small class="text-white-50 d-block">Expires</small>
-                    <strong class="fs-5">{{ state.expires_on | format_date }}</strong>
-                    {% if state.days_remaining is not none %}
-                        {% if state.days_remaining > 0 %}
-                        <div class="small text-white-50">
-                            {{ state.days_remaining }} days remaining
+        </div>
+
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                
+                <!-- Quick Stats -->
+                <div class="row g-2 mb-3">
+                    <div class="col-md-3">
+                        <div class="compact-stats-card text-center">
+                            <div class="stat-value">{{ state.license_types|length }}</div>
+                            <div class="stat-label">License Types</div>
                         </div>
-                        {% elif state.days_remaining < 0 %}
-                        <div class="small text-danger">
-                            OVERDUE by {{ state.days_remaining|abs }} days
+                    </div>
+                    <div class="col-md-3">
+                        <div class="compact-stats-card text-center">
+                            <div class="stat-value">{{ state.requirements.minimum_age }}</div>
+                            <div class="stat-label">Min. Age</div>
                         </div>
-                        {% endif %}
+                    </div>
+                    <div class="col-md-3">
+                        <div class="compact-stats-card text-center">
+                            <div class="stat-value">{{ state.renewal.continuing_education_hours }}</div>
+                            <div class="stat-label">CE Hours/Year</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="compact-stats-card text-center">
+                            <div class="stat-value">${{ state.renewal.renewal_fee }}</div>
+                            <div class="stat-label">Renewal Fee</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- License Types -->
+                <div class="netsuite-table-card mb-3">
+                    <div class="p-3 border-bottom">
+                        <h6 class="mb-0">📜 Available License Types</h6>
+                    </div>
+                    <div class="p-3">
+                        {% for license in state.license_types %}
+                        <div class="license-type-card mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ license.name }}</h6>
+                                    <p class="text-muted small mb-2">{{ license.description }}</p>
+                                    <div class="row g-2 small">
+                                        <div class="col-md-6">
+                                            <strong>Experience:</strong> {{ license.experience_required }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Exam:</strong> {{ 'Required (' + license.exam_type + ')' if license.exam_required else 'Not Required' }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Application:</strong> ${{ "%.2f"|format(license.application_fee) }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Exam:</strong> ${{ "%.2f"|format(license.exam_fee) }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>License:</strong> ${{ "%.2f"|format(license.license_fee) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Requirements -->
+                <div class="netsuite-table-card mb-3">
+                    <div class="p-3 border-bottom">
+                        <h6 class="mb-0">✅ Basic Requirements</h6>
+                    </div>
+                    <div class="p-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <strong>Minimum Age:</strong> {{ state.requirements.minimum_age }} years old
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Residency Required:</strong> {{ 'Yes' if state.requirements.residency_required else 'No' }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Background Check:</strong> {{ 'Yes' if state.requirements.background_check else 'No' }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Education:</strong> {{ state.requirements.education }}
+                            </div>
+                            {% if state.requirements.experience_breakdown %}
+                            <div class="col-12">
+                                <strong>Experience Breakdown:</strong>
+                                <ul class="mb-0 mt-1">
+                                    {% for key, value in state.requirements.experience_breakdown.items() %}
+                                    <li>{{ key.replace('_', ' ').title() }}: {{ value }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Examination -->
+                <div class="netsuite-table-card mb-3">
+                    <div class="p-3 border-bottom">
+                        <h6 class="mb-0">📝 Examination Details</h6>
+                    </div>
+                    <div class="p-3">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <strong>Test Provider:</strong> {{ state.examination.provider }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Format:</strong> {{ state.examination.test_format }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Reference Materials:</strong> {{ state.examination.reference_materials }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Scheduling:</strong> {{ state.examination.scheduling }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Results:</strong> {{ state.examination.results }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Retake Policy:</strong> {{ state.examination.retake_policy }}
+                            </div>
+                        </div>
+
+                        <h6 class="mb-2">Required Books</h6>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Book</th>
+                                    <th>Cost</th>
+                                    <th>Vendor</th>
+                                    <th>Required For</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for book in state.examination.required_books %}
+                                <tr>
+                                    <td>{{ book.name }}</td>
+                                    <td>${{ "%.2f"|format(book.cost) }}</td>
+                                    <td>{{ book.vendor }}</td>
+                                    <td>{{ book.required_for|join(', ') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <h6 class="mb-2 mt-3">Test Details by License Type</h6>
+                        {% for license_key, details in state.examination.test_details.items() %}
+                        <div class="mb-2">
+                            <strong>{{ license_key.title() }}:</strong>
+                            {{ details.duration_hours }} hours, {{ details.questions }} questions, 
+                            {{ details.passing_score }} passing score
+                            <div class="small text-muted">Sections: {{ details.sections|join(' | ') }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Application Process -->
+                <div class="netsuite-table-card mb-3">
+                    <div class="p-3 border-bottom">
+                        <h6 class="mb-0">📋 Application Process (Step-by-Step)</h6>
+                    </div>
+                    <div class="p-3">
+                        {% for step in state.application_process %}
+                        <div class="application-step mb-3">
+                            <div class="d-flex align-items-start">
+                                <div class="step-number me-3">{{ step.step }}</div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ step.title }}</h6>
+                                    <p class="mb-1">{{ step.description }}</p>
+                                    {% if step.forms_required %}
+                                    <div class="small text-muted">Forms: {{ step.forms_required|join(', ') }}</div>
+                                    {% endif %}
+                                    {% if step.fees %}
+                                    <div class="small text-muted">Fee: ${{ "%.2f"|format(step.fees) }}</div>
+                                    {% endif %}
+                                    <div class="small"><strong>Timeline:</strong> {{ step.timeline }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Insurance & Bonding -->
+                <div class="netsuite-table-card mb-3">
+                    <div class="p-3 border-bottom">
+                        <h6 class="mb-0">🛡️ Insurance & Bonding Requirements</h6>
+                    </div>
+                    <div class="p-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <strong>Liability Insurance Required:</strong> {{ 'Yes' if state.insurance_bonding.liability_insurance_required else 'No' }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Bond Required:</strong> {{ 'Yes' if state.insurance_bonding.bond_required else 'No' }}
+                            </div>
+                            <div class="col-12">
+                                <strong>Notes:</strong> {{ state.insurance_bonding.notes }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Renewal -->
+                <div class="netsuite-table-card mb-3">
+                    <div class="p-3 border-bottom">
+                        <h6 class="mb-0">🔄 Renewal Requirements</h6>
+                    </div>
+                    <div class="p-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <strong>Renewal Period:</strong> {{ state.renewal.period }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Renewal Fee:</strong> ${{ "%.2f"|format(state.renewal.renewal_fee) }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>CE Hours Required:</strong> {{ state.renewal.continuing_education_hours }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>CE Topics:</strong> {{ state.renewal.ce_topics|join(', ') }}
+                            </div>
+                            <div class="col-12">
+                                <strong>CE Providers:</strong> {{ state.renewal.ce_providers|join(', ') }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Late Renewal:</strong> {{ state.renewal.late_renewal }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Inactive Status:</strong> {{ state.renewal.inactive_status }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reciprocity -->
+                <div class="netsuite-table-card mb-3">
+                    <div class="p-3 border-bottom">
+                        <h6 class="mb-0">🤝 Reciprocity & Endorsement</h6>
+                    </div>
+                    <div class="p-3">
+                        <div class="mb-2">
+                            <strong>Accepts Licenses From:</strong> {{ state.reciprocity.accepts_from|join(', ') }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Endorsement Process:</strong> {{ state.reciprocity.endorsement_process }}
+                        </div>
+                        <div class="alert alert-info mb-0">
+                            {{ state.reciprocity.notes }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                
+                <!-- Contact Info -->
+                <div class="compact-stats-card mb-3">
+                    <h6 class="mb-3">📞 Board Contact</h6>
+                    <div class="small">
+                        <p><strong>{{ state.governing_body }}</strong></p>
+                        <p class="mb-1">{{ state.board_address }}</p>
+                        <p class="mb-1">Phone: {{ state.board_phone }}</p>
+                        <p class="mb-1"><a href="{{ state.board_website }}" target="_blank">{{ state.board_website }}</a></p>
+                    </div>
+                </div>
+
+                <!-- Pro Tips -->
+                <div class="compact-stats-card mb-3 bg-success bg-opacity-10 border-success">
+                    <h6 class="mb-3">💡 Pro Tips</h6>
+                    <ul class="small mb-0">
+                        {% for tip in state.pro_tips %}
+                        <li class="mb-2">{{ tip }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Common Pitfalls -->
+                <div class="compact-stats-card mb-3 bg-warning bg-opacity-10 border-warning">
+                    <h6 class="mb-3">⚠️ Common Pitfalls</h6>
+                    <ul class="small mb-0">
+                        {% for pitfall in state.common_pitfalls %}
+                        <li class="mb-2">{{ pitfall }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Resources -->
+                <div class="compact-stats-card">
+                    <h6 class="mb-3">📚 Resources</h6>
+                    
+                    <div class="mb-3">
+                        <strong class="small">Official Links</strong>
+                        <ul class="small mb-0 mt-1">
+                            {% for link in state.resources.official_links %}
+                            <li><a href="{{ link.url }}" target="_blank">{{ link.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong class="small">Study Materials</strong>
+                        <ul class="small mb-0 mt-1">
+                            {% for material in state.resources.study_materials %}
+                            <li>
+                                <a href="{{ material.url }}" target="_blank">{{ material.name }}</a>
+                                {% if material.cost > 0 %} - ${{ "%.2f"|format(material.cost) }}{% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    {% if state.resources.prep_courses %}
+                    <div>
+                        <strong class="small">Prep Courses</strong>
+                        <ul class="small mb-0 mt-1">
+                            {% for course in state.resources.prep_courses %}
+                            <li>
+                                {{ course.name }} - {{ course.provider }}
+                                <div class="text-muted">{{ course.cost }} | {{ course.notes }}</div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                     {% endif %}
                 </div>
-                {% endif %}
-                
-                {% if state.license_number %}
-                <div>
-                    <small class="text-white-50 d-block">License #</small>
-                    <code class="text-white">{{ state.license_number }}</code>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        
-        <!-- Quick Links -->
-        <div class="mt-4">
-            <a href="{{ state.board_url }}" target="_blank" class="btn btn-light me-2">
-                Visit Board Website →
-            </a>
-            <a href="/licensing-roadmap" class="btn btn-outline-light">
-                ← Back to Map
-            </a>
-        </div>
-    </div>
-</section>
 
-<!-- State Detail Content -->
-<section class="py-4">
-    <div class="container">
-        <div class="detail-content">
-            <!-- Disclaimer -->
-            <div class="disclaimer-box">
-                <strong>⚠️ Important:</strong> This roadmap is a guidance tool maintained by a licensed plumber. 
-                Always verify current requirements with the {{ state.board_name }}.
-            </div>
-            
-            {% if state.last_reviewed %}
-            <div class="last-reviewed">
-                <strong>📅 Last Reviewed:</strong> {{ state.last_reviewed | format_date }}
-            </div>
-            {% endif %}
-            
-            <!-- Markdown Content -->
-            {% if detail_content %}
-                {{ detail_content | safe }}
-            {% else %}
-                <div class="alert alert-warning">
-                    <h4>⚠️ State Roadmap In Progress</h4>
-                    <p>Detailed licensing information for {{ state.name }} is currently being compiled.</p>
-                    <p>In the meantime, visit the official board website:</p>
-                    <p><a href="{{ state.board_url }}" target="_blank" class="btn btn-primary">
-                        {{ state.board_name }} →
-                    </a></p>
-                </div>
-            {% endif %}
-            
-            <!-- Feedback Section -->
-            <hr>
-            <div class="text-center py-4">
-                <h4>Spot an Error?</h4>
-                <p class="text-muted">Help keep this roadmap accurate by reporting updates.</p>
-                <a href="mailto:roadmap@yoursite.com?subject={{ state_abbr }}%20Licensing%20Update" 
-                   class="btn btn-outline-primary">
-                    Report an Update for {{ state.name }}
-                </a>
             </div>
         </div>
     </div>
-</section>
+</div>
+
+<style>
+.license-type-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.application-step {
+    border-left: 3px solid var(--accent-copper);
+    padding-left: 1rem;
+}
+
+.step-number {
+    background: var(--accent-copper);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+</style>
 {% endblock %}

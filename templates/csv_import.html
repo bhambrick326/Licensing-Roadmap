@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}CSV Import - Licensing Roadmap{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Header -->
+                <div class="page-header-compact">
+                    <div>
+                        <h3>📥 CSV Import - Cost Data</h3>
+                        <p class="text-muted mb-0">Import your existing spreadsheet to populate estimated costs</p>
+                    </div>
+                </div>
+
+                <!-- Instructions -->
+                <div class="alert alert-info mb-3">
+                    <h6>📋 How to Import Your Spreadsheet</h6>
+                    <ol class="mb-0 small">
+                        <li>Export your Excel/Google Sheets as CSV</li>
+                        <li>Make sure columns match the template below</li>
+                        <li>Upload the CSV file</li>
+                        <li>Review the preview</li>
+                        <li>Click "Import Data" to populate costs</li>
+                    </ol>
+                </div>
+
+                <!-- Upload Form -->
+                <div class="netsuite-table-card mb-3">
+                    <div class="p-3 border-bottom">
+                        <h6 class="mb-0">1️⃣ Upload CSV File</h6>
+                    </div>
+                    <div class="p-3">
+                        <form method="POST" action="/import-csv" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label class="form-label">Select CSV File</label>
+                                <input type="file" class="form-control" name="csv_file" accept=".csv" required>
+                                <small class="text-muted">File must be in CSV format with headers matching the template</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Import For License Holder</label>
+                                <select class="form-select" name="license_holder" required>
+                                    <option value="bhambrick">Benjamin Hambrick</option>
+                                    <option value="jsmith">John Smith</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="overwrite_existing" id="overwrite">
+                                <label class="form-check-label" for="overwrite">
+                                    <strong>Overwrite existing cost data</strong> (if unchecked, will only add to empty fields)
+                                </label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">📤 Upload & Preview</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Expected Format -->
+                <div class="netsuite-table-card">
+                    <div class="p-3 border-bottom">
+                        <h6 class="mb-0">2️⃣ Expected CSV Format</h6>
+                    </div>
+                    <div class="p-3">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>State</th>
+                                        <th>License Type</th>
+                                        <th>Application Fees</th>
+                                        <th>Test Fees</th>
+                                        <th>Trade Book fees</th>
+                                        <th>Bus. & Law Book Fee</th>
+                                        <th>Lic. Activation Fee</th>
+                                        <th>Prep Course fees</th>
+                                        <th>Travel Fees</th>
+                                        <th>Shipping Fees</th>
+                                        <th>Renewal Fees</th>
+                                        <th>Cont. Ed. Fees</th>
+                                        <th>Renewal Period</th>
+                                        <th>Est. Study Hrs.</th>
+                                        <th>Test Duration</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Washington</td>
+                                        <td>Journey Level</td>
+                                        <td>$189.80</td>
+                                        <td>$80.00</td>
+                                        <td>$126.73</td>
+                                        <td>$0.00</td>
+                                        <td>$227.90</td>
+                                        <td>$0.00</td>
+                                        <td>$0.00</td>
+                                        <td>$0.00</td>
+                                        <td>$227.90</td>
+                                        <td>$224.91</td>
+                                        <td>2 Years</td>
+                                        <td>16</td>
+                                        <td>4 Hours</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Texas</td>
+                                        <td>Master Plumber</td>
+                                        <td>$225.00</td>
+                                        <td>$0.00</td>
+                                        <td>$126.73</td>
+                                        <td>$0.00</td>
+                                        <td>$225.00</td>
+                                        <td>$550.00</td>
+                                        <td>$0.00</td>
+                                        <td>$0.00</td>
+                                        <td>$300.00</td>
+                                        <td>$100.00</td>
+                                        <td>1 Years</td>
+                                        <td>24</td>
+                                        <td>8 Hours</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3">
+                            <a href="/download-csv-template" class="btn btn-sm btn-outline-success">⬇️ Download Template CSV</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Sidebar Help -->
+            <div class="col-lg-4">
+                <div class="compact-stats-card mb-3">
+                    <h6 class="mb-3">💡 Import Tips</h6>
+                    <div class="small">
+                        <p><strong>Dollar signs ($) are optional</strong> - the import will strip them out</p>
+                        <p><strong>Use state names OR abbreviations</strong> - TX, Texas, both work</p>
+                        <p><strong>Empty cells are OK</strong> - they'll be set to $0.00</p>
+                        <p><strong>Renewal Period:</strong> "2 Years", "1 Year", or just "2", "1"</p>
+                        <p><strong>Test Duration:</strong> "4 Hours", "8 Hours", or just "4", "8"</p>
+                    </div>
+                </div>
+
+                <div class="compact-stats-card">
+                    <h6 class="mb-3">⚠️ Important Notes</h6>
+                    <div class="small text-muted">
+                        <p>This imports <strong>estimated costs only</strong> - your budgets/planning data.</p>
+                        <p>To track actual expenses, use the "Add Cost" button on each license's cost details page.</p>
+                        <p>The import will create licenses if they don't exist, or update existing ones.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

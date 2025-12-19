@@ -181,46 +181,31 @@ function populateOffcanvas(stateAbbr, stateData) {
         }
     }
     
-    // Board Information Card
-    html += `
-        <div class="info-card-pro">
-            <div class="info-card-header">
-                <span class="info-card-icon">🏛️</span>
-                <span class="info-card-title">Licensing Board</span>
+    // For not licensed states, show minimal info
+    if (stateData.status === 'not_licensed' || !stateData.license_number) {
+        html += `
+            <div class="text-center py-3">
+                <p class="text-muted mb-3">Not licensed in ${stateData.name} yet.</p>
+                <p class="small text-muted">Click below to view complete licensing requirements, costs, and application process.</p>
             </div>
-            <div class="info-card-body">
-                <div class="board-name">${stateData.board_name}</div>
-                ${stateData.board_phone ? `
-                <div class="board-contact">
-                    <span class="contact-icon">📞</span>
-                    <span>${stateData.board_phone}</span>
-                </div>
-                ` : ''}
-            </div>
-        </div>
-    `;
-    
-    // Summary
-    if (stateData.summary) {
+        `;
+    } else {
+        // For licensed states, show full details
         html += `
             <div class="info-card-pro">
                 <div class="info-card-header">
-                    <span class="info-card-icon">ℹ️</span>
-                    <span class="info-card-title">Summary</span>
+                    <span class="info-card-icon">🏛️</span>
+                    <span class="info-card-title">Licensing Board</span>
                 </div>
                 <div class="info-card-body">
-                    <p class="summary-text">${stateData.summary}</p>
+                    <div class="board-name">${stateData.board_name}</div>
+                    ${stateData.board_phone ? `
+                    <div class="board-contact">
+                        <span class="contact-icon">📞</span>
+                        <span>${stateData.board_phone}</span>
+                    </div>
+                    ` : ''}
                 </div>
-            </div>
-        `;
-    }
-    
-    // Coverage Warning
-    if (stateData.coverage_level === 'draft' || stateData.coverage_level === 'partial') {
-        html += `
-            <div class="alert-card ${stateData.coverage_level === 'draft' ? 'alert-warning' : 'alert-info'}">
-                <strong>⚠️ Note:</strong> State roadmap ${stateData.coverage_level === 'draft' ? 'in progress' : 'partially complete'}. 
-                Verify details with the state board.
             </div>
         `;
     }
@@ -228,8 +213,8 @@ function populateOffcanvas(stateAbbr, stateData) {
     // Action Buttons
     html += `
         <div class="action-buttons">
-            <a href="/licensing/${stateAbbr.toLowerCase()}" class="btn-action btn-primary-action">
-                <span>📋</span> View Full Roadmap
+            <a href="/state/${stateAbbr}" class="btn-action btn-primary-action">
+                <span>📖</span> Complete Licensing Guide
             </a>
             <a href="${stateData.board_url}" target="_blank" class="btn-action btn-secondary-action">
                 <span>🔗</span> Visit Board Website
@@ -372,9 +357,12 @@ function populateTrainingRoadmapOffcanvas(stateAbbr, stateData, trainingStep, ro
             </div>
             ` : ''}
             
-            <!-- Action Button -->
+            <!-- Action Buttons -->
             <div class="action-buttons">
-                <a href="${stateData.board_url || '#'}" target="_blank" class="btn-action btn-primary-action">
+                <a href="/state/${stateAbbr}" class="btn-action btn-primary-action">
+                    <span>📖</span> Complete Licensing Guide
+                </a>
+                <a href="${stateData.board_url || '#'}" target="_blank" class="btn-action btn-secondary-action">
                     <span>🔗</span> Visit Licensing Board
                 </a>
             </div>

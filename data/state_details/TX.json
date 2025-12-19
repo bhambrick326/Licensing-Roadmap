@@ -1,0 +1,253 @@
+{
+  "state": "Texas",
+  "state_abbr": "TX",
+  "governing_body": "Texas State Board of Plumbing Examiners",
+  "board_phone": "(512) 936-5200",
+  "board_website": "https://www.tsbpe.texas.gov",
+  "board_address": "929 E. 41st Street, Austin, TX 78751",
+  "license_types": [
+    {
+      "name": "Tradesman Plumber-Limited",
+      "description": "Entry-level license for basic plumbing work under supervision",
+      "experience_required": "4,000 hours (minimum 2 years)",
+      "exam_required": true,
+      "exam_type": "Open Book",
+      "application_fee": 50.0,
+      "exam_fee": 0.0,
+      "license_fee": 50.0
+    },
+    {
+      "name": "Journeyman Plumber",
+      "description": "Standard commercial and residential plumbing license",
+      "experience_required": "8,000 hours (minimum 4 years)",
+      "exam_required": true,
+      "exam_type": "Open Book",
+      "application_fee": 50.0,
+      "exam_fee": 0.0,
+      "license_fee": 50.0
+    },
+    {
+      "name": "Master Plumber",
+      "description": "Highest level - can supervise others, pull permits, run business",
+      "experience_required": "12,000 hours (minimum 4 years as Journeyman + 2 years additional)",
+      "exam_required": true,
+      "exam_type": "Open Book",
+      "application_fee": 225.0,
+      "exam_fee": 0.0,
+      "license_fee": 225.0
+    },
+    {
+      "name": "Plumbing Inspector",
+      "description": "Municipal/county inspector license",
+      "experience_required": "Journeyman + 2 years inspection experience",
+      "exam_required": true,
+      "exam_type": "Open Book",
+      "application_fee": 100.0,
+      "exam_fee": 0.0,
+      "license_fee": 100.0
+    }
+  ],
+  "requirements": {
+    "minimum_age": 18,
+    "residency_required": false,
+    "background_check": true,
+    "education": "High school diploma or GED recommended but not required",
+    "experience_breakdown": {
+      "residential": "At least 2,000 hours recommended",
+      "commercial": "At least 2,000 hours recommended",
+      "supervision": "Must be under licensed Master Plumber"
+    }
+  },
+  "examination": {
+    "provider": "Texas State Board (in-house)",
+    "test_format": "Open book, multiple choice",
+    "reference_materials": "IPC, UPC, Texas Plumbing License Law & Rules",
+    "required_books": [
+      {
+        "name": "2018 International Plumbing Code (IPC)",
+        "cost": 126.73,
+        "vendor": "ICC",
+        "required_for": [
+          "Tradesman",
+          "Journeyman",
+          "Master"
+        ]
+      },
+      {
+        "name": "Texas Plumbing License Law & Rules",
+        "cost": 0.0,
+        "vendor": "TSBPE (free download)",
+        "required_for": [
+          "Tradesman",
+          "Journeyman",
+          "Master"
+        ]
+      }
+    ],
+    "test_details": {
+      "tradesman": {
+        "duration_hours": 4,
+        "questions": 80,
+        "passing_score": "70%",
+        "sections": [
+          "IPC (60 questions)",
+          "Texas Law (20 questions)"
+        ]
+      },
+      "journeyman": {
+        "duration_hours": 6,
+        "questions": 100,
+        "passing_score": "70%",
+        "sections": [
+          "IPC (75 questions)",
+          "Texas Law (25 questions)"
+        ]
+      },
+      "master": {
+        "duration_hours": 8,
+        "questions": 120,
+        "passing_score": "70%",
+        "sections": [
+          "IPC (80 questions)",
+          "Texas Law (40 questions)"
+        ]
+      }
+    },
+    "scheduling": "Call TSBPE to schedule - tests given monthly in Austin",
+    "results": "Immediate (given at test site)",
+    "retake_policy": "Can retake after 30 days, unlimited attempts"
+  },
+  "application_process": [
+    {
+      "step": 1,
+      "title": "Gather Experience Documentation",
+      "description": "Get employer verification forms signed for all work experience. Need detailed hour breakdowns.",
+      "forms_required": [
+        "Work Experience Verification Form (Form A)"
+      ],
+      "timeline": "2-4 weeks"
+    },
+    {
+      "step": 2,
+      "title": "Submit Application",
+      "description": "Complete online application or mail paper application with all supporting documents",
+      "forms_required": [
+        "Application for Plumbing License",
+        "Criminal Background Consent"
+      ],
+      "fees": 50.0,
+      "timeline": "Submit at least 45 days before desired test date"
+    },
+    {
+      "step": 3,
+      "title": "Background Check",
+      "description": "TSBPE conducts criminal background check",
+      "timeline": "2-3 weeks"
+    },
+    {
+      "step": 4,
+      "title": "Application Approval",
+      "description": "Board reviews and approves application. You'll receive approval letter with test authorization.",
+      "timeline": "2-4 weeks after submission"
+    },
+    {
+      "step": 5,
+      "title": "Schedule Exam",
+      "description": "Call TSBPE to schedule your exam date. Bring required books and photo ID.",
+      "timeline": "Tests offered monthly"
+    },
+    {
+      "step": 6,
+      "title": "Take Exam",
+      "description": "Open book exam at TSBPE headquarters in Austin. Results given immediately.",
+      "timeline": "1 day"
+    },
+    {
+      "step": 7,
+      "title": "Pay License Fee & Receive License",
+      "description": "If you pass, pay license activation fee. License card mailed within 2 weeks.",
+      "fees": 50.0,
+      "timeline": "2 weeks"
+    }
+  ],
+  "insurance_bonding": {
+    "liability_insurance_required": false,
+    "bond_required": false,
+    "notes": "Insurance/bonds not required for individual licensure, but may be required by employers or for contractor licenses"
+  },
+  "renewal": {
+    "period": "Annual (every year on birthday)",
+    "renewal_fee": 300.0,
+    "continuing_education_hours": 6,
+    "ce_topics": [
+      "Texas Plumbing Code updates",
+      "Safety",
+      "Business/Law"
+    ],
+    "ce_providers": [
+      "Approved by TSBPE - list on website"
+    ],
+    "late_renewal": "Can renew up to 2 years late with penalty fees",
+    "inactive_status": "Available - reduced fee, cannot practice"
+  },
+  "reciprocity": {
+    "accepts_from": [
+      "None - Texas does not have reciprocity agreements"
+    ],
+    "endorsement_process": "Out-of-state plumbers must meet Texas experience requirements and pass TX exam",
+    "notes": "Texas has unique requirements - most states do not qualify for endorsement"
+  },
+  "resources": {
+    "official_links": [
+      {
+        "name": "TSBPE Homepage",
+        "url": "https://www.tsbpe.texas.gov"
+      },
+      {
+        "name": "Online Application Portal",
+        "url": "https://www.tsbpe.texas.gov/applications"
+      },
+      {
+        "name": "License Verification",
+        "url": "https://www.tsbpe.texas.gov/verify"
+      }
+    ],
+    "study_materials": [
+      {
+        "name": "2018 IPC Code Book",
+        "vendor": "ICC",
+        "url": "https://www.iccsafe.org",
+        "cost": 126.73
+      },
+      {
+        "name": "Texas Plumbing License Law",
+        "vendor": "TSBPE",
+        "url": "https://www.tsbpe.texas.gov",
+        "cost": 0.0
+      }
+    ],
+    "prep_courses": [
+      {
+        "name": "Texas Plumbing Exam Prep",
+        "provider": "Various (not board-approved)",
+        "cost": "500-800",
+        "notes": "Optional - not required"
+      }
+    ]
+  },
+  "pro_tips": [
+    "Texas exams are OPEN BOOK - tab your code book extensively",
+    "Focus on knowing WHERE to find answers, not memorizing codes",
+    "The Texas Law section is NOT in the IPC - study the TSBPE rules booklet",
+    "Experience hours must be verified by a Texas-licensed Master Plumber",
+    "Apply 60 days before you want to test - processing takes time",
+    "Austin is the ONLY test location - plan travel if needed"
+  ],
+  "common_pitfalls": [
+    "Not having experience properly documented - get signatures BEFORE employer leaves",
+    "Thinking you can substitute education for experience - you cannot",
+    "Not bringing required code books to exam - you'll be turned away",
+    "Waiting until last minute to renew - can take 2 weeks to process",
+    "Not understanding that Texas doesn't recognize most out-of-state licenses"
+  ]
+}

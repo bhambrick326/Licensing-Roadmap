@@ -1,0 +1,202 @@
+{
+  "AL": {
+    "name": "Alabama",
+    "status": "not_licensed"
+  },
+  "AK": {
+    "name": "Alaska",
+    "status": "not_licensed"
+  },
+  "AZ": {
+    "name": "Arizona",
+    "status": "not_licensed"
+  },
+  "AR": {
+    "name": "Arkansas",
+    "status": "not_licensed"
+  },
+  "CA": {
+    "name": "California",
+    "status": "not_licensed"
+  },
+  "CO": {
+    "name": "Colorado",
+    "status": "not_licensed"
+  },
+  "CT": {
+    "name": "Connecticut",
+    "status": "not_licensed"
+  },
+  "DE": {
+    "name": "Delaware",
+    "status": "not_licensed"
+  },
+  "FL": {
+    "name": "Florida",
+    "status": "not_licensed"
+  },
+  "GA": {
+    "name": "Georgia",
+    "status": "not_licensed"
+  },
+  "HI": {
+    "name": "Hawaii",
+    "status": "not_licensed"
+  },
+  "ID": {
+    "name": "Idaho",
+    "status": "not_licensed"
+  },
+  "IL": {
+    "name": "Illinois",
+    "status": "not_licensed"
+  },
+  "IN": {
+    "name": "Indiana",
+    "status": "not_licensed"
+  },
+  "IA": {
+    "name": "Iowa",
+    "status": "not_licensed"
+  },
+  "KS": {
+    "name": "Kansas",
+    "status": "not_licensed"
+  },
+  "KY": {
+    "name": "Kentucky",
+    "status": "not_licensed"
+  },
+  "LA": {
+    "name": "Louisiana",
+    "status": "not_licensed"
+  },
+  "ME": {
+    "name": "Maine",
+    "status": "not_licensed"
+  },
+  "MD": {
+    "name": "Maryland",
+    "status": "not_licensed"
+  },
+  "MA": {
+    "name": "Massachusetts",
+    "status": "not_licensed"
+  },
+  "MI": {
+    "name": "Michigan",
+    "status": "not_licensed"
+  },
+  "MN": {
+    "name": "Minnesota",
+    "status": "not_licensed"
+  },
+  "MS": {
+    "name": "Mississippi",
+    "status": "not_licensed"
+  },
+  "MO": {
+    "name": "Missouri",
+    "status": "not_licensed"
+  },
+  "MT": {
+    "name": "Montana",
+    "status": "not_licensed"
+  },
+  "NE": {
+    "name": "Nebraska",
+    "status": "not_licensed"
+  },
+  "NV": {
+    "name": "Nevada",
+    "status": "not_licensed"
+  },
+  "NH": {
+    "name": "New Hampshire",
+    "status": "not_licensed"
+  },
+  "NJ": {
+    "name": "New Jersey",
+    "status": "not_licensed"
+  },
+  "NM": {
+    "name": "New Mexico",
+    "status": "not_licensed"
+  },
+  "NY": {
+    "name": "New York",
+    "status": "not_licensed"
+  },
+  "NC": {
+    "name": "North Carolina",
+    "status": "not_licensed"
+  },
+  "ND": {
+    "name": "North Dakota",
+    "status": "not_licensed"
+  },
+  "OH": {
+    "name": "Ohio",
+    "status": "not_licensed"
+  },
+  "OK": {
+    "name": "Oklahoma",
+    "status": "not_licensed"
+  },
+  "OR": {
+    "name": "Oregon",
+    "status": "not_licensed"
+  },
+  "PA": {
+    "name": "Pennsylvania",
+    "status": "not_licensed"
+  },
+  "RI": {
+    "name": "Rhode Island",
+    "status": "not_licensed"
+  },
+  "SC": {
+    "name": "South Carolina",
+    "status": "not_licensed"
+  },
+  "SD": {
+    "name": "South Dakota",
+    "status": "not_licensed"
+  },
+  "TN": {
+    "name": "Tennessee",
+    "status": "not_licensed"
+  },
+  "TX": {
+    "name": "Texas",
+    "status": "not_licensed"
+  },
+  "UT": {
+    "name": "Utah",
+    "status": "not_licensed"
+  },
+  "VT": {
+    "name": "Vermont",
+    "status": "not_licensed"
+  },
+  "VA": {
+    "name": "Virginia",
+    "status": "not_licensed"
+  },
+  "WA": {
+    "name": "Washington",
+    "status": "not_licensed"
+  },
+  "WV": {
+    "name": "West Virginia",
+    "status": "not_licensed"
+  },
+  "WI": {
+    "name": "Wisconsin",
+    "status": "not_licensed"
+  },
+  "WY": {
+    "name": "Wyoming",
+    "status": "not_licensed"
+  }
+}

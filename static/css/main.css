@@ -3032,3 +3032,92 @@ body.dashboard-layout {
     margin-top: 0.25rem;
     font-weight: 600;
 }
+
+/* Next Target State */
+.next-target-state {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #d97706;
+    font-family: var(--font-mono);
+    padding: 0.5rem;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.border-warning {
+    border-color: #f59e0b !important;
+}
+
+/* Bio Builder Styles */
+
+.bio-sections {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.bio-section-btn {
+    padding: 0.625rem 1rem;
+    background: #f3f4f6;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.bio-section-btn:hover {
+    background: #e5e7eb;
+    color: var(--primary-dark);
+}
+
+.bio-section-btn.active {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+    color: white;
+    border-color: var(--primary-blue);
+}
+
+.bio-content {
+    margin-top: 1.5rem;
+}
+
+.bio-section-content {
+    display: none;
+}
+
+.bio-section-content.active {
+    display: block;
+}
+
+/* Work Entry Cards */
+.work-entry-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.work-entry-card:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+/* Reference Cards */
+.reference-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.reference-card:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}

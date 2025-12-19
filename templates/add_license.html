@@ -27,7 +27,7 @@
                                     <select class="form-select" name="state_abbr" required>
                                         <option value="">-- Select State --</option>
                                         {% for abbr, name in all_states %}
-                                        <option value="{{ abbr }}">{{ name }} ({{ abbr }})</option>
+                                        <option value="{{ abbr }}" {% if prefill_state == abbr %}selected{% endif %}>{{ name }} ({{ abbr }})</option>
                                         {% endfor %}
                                     </select>
                                 </div>

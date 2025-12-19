@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Edit License Holder - {{ holder.name }}{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="page-header-compact">
+                    <div>
+                        <a href="/team/manage" class="btn btn-sm btn-outline-secondary mb-2">← Back to Team</a>
+                        <h3>✏️ Edit License Holder - {{ holder.name }}</h3>
+                    </div>
+                </div>
+
+                <div class="netsuite-table-card">
+                    <form method="POST" action="/team/update-holder/{{ holder.user_id }}">
+                        <div class="p-3">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Full Name *</label>
+                                    <input type="text" class="form-control" name="name" value="{{ holder.name }}" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Role/Title</label>
+                                    <input type="text" class="form-control" name="role" value="{{ holder.role or '' }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Total Licenses</label>
+                                    <input type="number" class="form-control" name="total_licenses" value="{{ holder.total_licenses or 0 }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Total Certificates</label>
+                                    <input type="number" class="form-control" name="total_certificates" value="{{ holder.total_certificates or 0 }}">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Next Target State</label>
+                                    <select class="form-select" name="next_target_state">
+                                        <option value="" {% if not holder.next_target_state %}selected{% endif %}>Not set</option>
+                                        <option value="TX" {% if holder.next_target_state == 'TX' %}selected{% endif %}>Texas</option>
+                                        <option value="CA" {% if holder.next_target_state == 'CA' %}selected{% endif %}>California</option>
+                                        <option value="FL" {% if holder.next_target_state == 'FL' %}selected{% endif %}>Florida</option>
+                                        <option value="NY" {% if holder.next_target_state == 'NY' %}selected{% endif %}>New York</option>
+                                        <option value="VA" {% if holder.next_target_state == 'VA' %}selected{% endif %}>Virginia</option>
+                                        <option value="AZ" {% if holder.next_target_state == 'AZ' %}selected{% endif %}>Arizona</option>
+                                        <option value="CO" {% if holder.next_target_state == 'CO' %}selected{% endif %}>Colorado</option>
+                                        <option value="WA" {% if holder.next_target_state == 'WA' %}selected{% endif %}>Washington</option>
+                                        <option value="NV" {% if holder.next_target_state == 'NV' %}selected{% endif %}>Nevada</option>
+                                    </select>
+                                    <small class="text-muted">The next state this license holder should pursue</small>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                                <a href="/team/manage" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+                <div class="compact-stats-card">
+                    <h6 class="mb-3">📋 Quick Info</h6>
+                    <div class="small text-muted">
+                        <p><strong>User ID:</strong> {{ holder.user_id }}</p>
+                        <p><strong>Total Licenses:</strong> {{ holder.licenses|length }}</p>
+                        <p><strong>Active:</strong> {{ holder.licenses|selectattr('status', 'equalto', 'licensed')|list|length }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

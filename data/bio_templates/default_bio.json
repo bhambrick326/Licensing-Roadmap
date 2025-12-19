@@ -1,0 +1,70 @@
+{
+  "personal_info": {
+    "full_legal_name": "",
+    "middle_name": "",
+    "suffix": "",
+    "date_of_birth": "",
+    "ssn_last_4": "",
+    "drivers_license": "",
+    "current_address": {
+      "street": "",
+      "city": "",
+      "state": "",
+      "zip": "",
+      "years_at_address": ""
+    },
+    "previous_addresses": [],
+    "phone_cell": "",
+    "phone_home": "",
+    "email_primary": "",
+    "email_secondary": ""
+  },
+  "work_history": [],
+  "education": {
+    "high_school": {
+      "name": "",
+      "city": "",
+      "state": "",
+      "graduation_year": ""
+    },
+    "trade_school": [],
+    "college": []
+  },
+  "plumbing_experience": {
+    "total_years": 0,
+    "residential_hours": 0,
+    "commercial_hours": 0,
+    "industrial_hours": 0,
+    "service_repair_hours": 0,
+    "new_construction_hours": 0,
+    "systems_experience": {
+      "water_supply": true,
+      "drainage": true,
+      "gas_piping": true,
+      "medical_gas": false,
+      "backflow": true,
+      "fire_sprinkler": false
+    },
+    "experience_narrative": ""
+  },
+  "licenses_certifications": {
+    "current_licenses": [],
+    "expired_licenses": [],
+    "certifications": [],
+    "ceu_history": []
+  },
+  "references": [],
+  "background": {
+    "criminal_history": [],
+    "disciplinary_actions": [],
+    "explanations": {}
+  },
+  "military": {
+    "has_served": false,
+    "branch": "",
+    "dates": "",
+    "rank": "",
+    "discharge_type": "",
+    "mos": ""
+  }
+}

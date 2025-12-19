@@ -3,13 +3,68 @@ Licensing Roadmap Flask Application
 A plumber-focused state licensing tracking system
 """
 
-from flask import Flask, render_template, jsonify, abort, request, redirect, redirect
+from flask import Flask, render_template, jsonify, abort, request, redirect, session
 import json
 import os
 from datetime import datetime, timedelta
 import markdown
 
+# Simple password authentication
+ACCESS_CODE = "TeamLicense2024"  # Change this to your team's password
+
+
+
 app = Flask(__name__)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Login page"""
+    if request.method == 'POST':
+        password = request.form.get('password')
+        
+        if password == ACCESS_CODE:
+            session['logged_in'] = True
+            return redirect('/')
+        else:
+            return render_template('login.html', error='Invalid access code')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    """Logout"""
+    session.clear()
+    return redirect('/login')
+
+
+
+@app.before_request
+def require_login():
+    """Require login for all routes except /login"""
+    if request.endpoint not in ['login', 'static'] and not session.get('logged_in'):
+        return redirect('/login')
+
+
+@app.context_processor
+def inject_current_account():
+    """Make current account available to all templates"""
+    account = request.args.get('account', 'bhambrick')
+    
+    # Load current user for navigation
+    if account == 'director':
+        current_holder = {
+            'user_id': 'director',
+            'name': 'Team Overview',
+            'role': 'Leadership View'
+        }
+    else:
+        current_holder = load_license_holder_data(account)
+        if not current_holder:
+            current_holder = {'user_id': 'bhambrick', 'name': 'User', 'role': 'License Holder'}
+    
+    return dict(current_account=account, holder=current_holder)
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 # Configuration
@@ -445,29 +500,6 @@ def render_director_view():
 
 
 @app.route('/licensing/<state_abbrev>')
-def state_detail(state_abbrev):
-    """State-specific detail page"""
-    state_abbr = state_abbrev.upper()
-    data = load_licensing_data()
-    states = data.get('states', {})
-    
-    if state_abbr not in states:
-        abort(404)
-    
-    state_data = states[state_abbr].copy()
-    state_data['status_class'] = get_state_status_class(state_data)
-    state_data['badge_text'] = get_state_badge_text(state_data)
-    state_data['days_remaining'] = calculate_days_remaining(state_data.get('expires_on'))
-    
-    # Load detailed content from markdown
-    detail_content = load_state_detail(state_abbr)
-    
-    return render_template('state_detail.html',
-                         state=state_data,
-                         state_abbr=state_abbr,
-                         detail_content=detail_content)
-
-
 @app.route('/api/states')
 def api_states():
     """API endpoint for state data (for AJAX/JS usage)"""
@@ -775,6 +807,7 @@ def update_license(license_id):
 def add_license_form():
     """Show add license form"""
     account = request.args.get('account', 'bhambrick')
+    prefill_state = request.args.get('prefill')  # Prefill from next target
     
     # All 50 US states
     all_states = [
@@ -795,7 +828,8 @@ def add_license_form():
     
     return render_template('add_license.html', 
                          all_states=all_states,
-                         account=account)
+                         account=account,
+                         prefill_state=prefill_state)
 
 @app.route('/settings/add-license', methods=['POST'])
 def add_license():
@@ -1060,6 +1094,421 @@ def cost_analytics():
                          holder=holder_data)
 
 
+
+@app.route('/team/manage')
+def manage_team():
+    """Manage license holders"""
+    import glob
+    
+    holders = []
+    holder_files = glob.glob('data/license_holders/*.json')
+    
+    for holder_file in holder_files:
+        with open(holder_file, 'r') as f:
+            holder = json.load(f)
+            holders.append(holder)
+    
+    # Sort by name
+    holders.sort(key=lambda x: x.get('name', ''))
+    
+    return render_template('manage_team.html', holders=holders)
+
+@app.route('/team/add-holder', methods=['POST'])
+def add_holder():
+    """Add a new license holder"""
+    import os
+    
+    user_id = request.form.get('user_id').lower().strip()
+    name = request.form.get('name')
+    role = request.form.get('role') or 'License Holder'
+    next_target = request.form.get('next_target_state')
+    
+    # Create new holder structure
+    new_holder = {
+        'user_id': user_id,
+        'name': name,
+        'role': role,
+        'total_licenses': 0,
+        'total_certificates': 0,
+        'next_target_state': next_target if next_target else None,
+        'licenses': []
+    }
+    
+    # Save to file
+    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
+    
+    # Check if already exists
+    if os.path.exists(file_path):
+        return "User ID already exists", 400
+    
+    with open(file_path, 'w') as f:
+        json.dump(new_holder, f, indent=2)
+    
+    return redirect('/team/manage')
+
+
+
+@app.route('/team/edit-holder/<user_id>')
+def edit_holder(user_id):
+    """Edit a license holder"""
+    holder_data = load_license_holder_data(user_id)
+    
+    if not holder_data:
+        return "License holder not found", 404
+    
+    return render_template('edit_holder.html', holder=holder_data)
+
+@app.route('/team/update-holder/<user_id>', methods=['POST'])
+def update_holder(user_id):
+    """Update license holder info"""
+    import os
+    
+    holder_data = load_license_holder_data(user_id)
+    
+    if not holder_data:
+        return "License holder not found", 404
+    
+    # Update fields
+    holder_data['name'] = request.form.get('name')
+    holder_data['role'] = request.form.get('role')
+    holder_data['total_licenses'] = int(request.form.get('total_licenses') or 0)
+    holder_data['total_certificates'] = int(request.form.get('total_certificates') or 0)
+    holder_data['next_target_state'] = request.form.get('next_target_state') if request.form.get('next_target_state') else None
+    
+    # Save to file
+    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
+    with open(file_path, 'w') as f:
+        json.dump(holder_data, f, indent=2)
+    
+    return redirect('/team/manage')
+
+
+
+@app.route('/bio/<user_id>')
+def bio_builder(user_id):
+    """Bio builder page for a license holder"""
+    holder_data = load_license_holder_data(user_id)
+    
+    if not holder_data:
+        return "License holder not found", 404
+    
+    # Load or initialize bio
+    if 'bio' not in holder_data:
+        # Load default bio structure
+        import os
+        template_path = 'data/bio_templates/default_bio.json'
+        if os.path.exists(template_path):
+            with open(template_path, 'r') as f:
+                holder_data['bio'] = json.load(f)
+        else:
+            holder_data['bio'] = {
+                'personal_info': {},
+                'work_history': [],
+                'education': {},
+                'plumbing_experience': {},
+                'licenses_certifications': {},
+                'references': [],
+                'background': {},
+                'military': {}
+            }
+    
+    # Calculate completion percentage
+    completion = calculate_bio_completion(holder_data['bio'])
+    
+    return render_template('bio_builder.html',
+                         holder=holder_data,
+                         bio=holder_data['bio'],
+                         completion_percentage=completion)
+
+@app.route('/bio/update/<user_id>/<section>', methods=['POST'])
+def update_bio_section(user_id, section):
+    """Update a section of the bio"""
+    import os
+    
+    holder_data = load_license_holder_data(user_id)
+    
+    if not holder_data:
+        return "License holder not found", 404
+    
+    # Initialize bio if not exists
+    if 'bio' not in holder_data:
+        holder_data['bio'] = {
+            'personal_info': {},
+            'work_history': [],
+            'education': {},
+            'plumbing_experience': {},
+            'licenses_certifications': {},
+            'references': [],
+            'background': {},
+            'military': {}
+        }
+    
+    # Update plumbing experience section
+    if section == 'experience':
+        holder_data['bio']['plumbing_experience'] = {
+            'total_years': float(request.form.get('total_years') or 0),
+            'residential_hours': int(request.form.get('residential_hours') or 0),
+            'commercial_hours': int(request.form.get('commercial_hours') or 0),
+            'industrial_hours': int(request.form.get('industrial_hours') or 0),
+            'service_repair_hours': int(request.form.get('service_repair_hours') or 0),
+            'new_construction_hours': int(request.form.get('new_construction_hours') or 0),
+            'systems_experience': {
+                'water_supply': 'water_supply' in request.form,
+                'drainage': 'drainage' in request.form,
+                'gas_piping': 'gas_piping' in request.form,
+                'medical_gas': 'medical_gas' in request.form,
+                'backflow': 'backflow' in request.form,
+                'fire_sprinkler': 'fire_sprinkler' in request.form
+            },
+            'experience_narrative': request.form.get('experience_narrative')
+        }
+    
+    # Update personal info section
+    elif section == 'personal':
+        holder_data['bio']['personal_info'] = {
+            'full_legal_name': request.form.get('full_legal_name'),
+            'middle_name': request.form.get('middle_name'),
+            'suffix': request.form.get('suffix'),
+            'date_of_birth': request.form.get('date_of_birth'),
+            'ssn_last_4': request.form.get('ssn_last_4'),
+            'drivers_license': request.form.get('drivers_license'),
+            'current_address': {
+                'street': request.form.get('address_street'),
+                'city': request.form.get('address_city'),
+                'state': request.form.get('address_state'),
+                'zip': request.form.get('address_zip')
+            },
+            'phone_cell': request.form.get('phone_cell'),
+            'email_primary': request.form.get('email_primary')
+        }
+    
+    # Save to file
+    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
+    with open(file_path, 'w') as f:
+        json.dump(holder_data, f, indent=2)
+    
+    return redirect(f'/bio/{user_id}')
+
+
+@app.route('/bio/add-work/<user_id>', methods=['POST'])
+def add_work_history(user_id):
+    """Add a comprehensive work history entry"""
+    import os
+    
+    holder_data = load_license_holder_data(user_id)
+    
+    if not holder_data:
+        return "License holder not found", 404
+    
+    # Initialize bio if not exists
+    if 'bio' not in holder_data:
+        holder_data['bio'] = {'work_history': []}
+    
+    if 'work_history' not in holder_data['bio']:
+        holder_data['bio']['work_history'] = []
+    
+    # Create comprehensive work entry
+    work_entry = {
+        # Company info
+        'company_name': request.form.get('company_name'),
+        'company_phone': request.form.get('company_phone'),
+        'address': request.form.get('address'),
+        'address_unit': request.form.get('address_unit'),
+        'city': request.form.get('city'),
+        'state': request.form.get('state'),
+        'zip': request.form.get('zip'),
+        'county': request.form.get('county'),
+        
+        # Position info
+        'position': request.form.get('position'),
+        'employment_type': request.form.get('employment_type'),
+        'start_date': request.form.get('start_date'),
+        'end_date': request.form.get('end_date') or None,
+        'duration': request.form.get('duration'),
+        'total_hours': request.form.get('total_hours'),
+        
+        # Supervisor info
+        'supervisor_name': request.form.get('supervisor_name'),
+        'supervisor_title': request.form.get('supervisor_title'),
+        'supervisor_phone': request.form.get('supervisor_phone'),
+        'supervisor_email': request.form.get('supervisor_email'),
+        'may_contact': request.form.get('may_contact'),
+        
+        # Job details
+        'responsibilities': request.form.get('responsibilities'),
+        'reason_leaving': request.form.get('reason_leaving'),
+        'starting_wage': request.form.get('starting_wage'),
+        'ending_wage': request.form.get('ending_wage'),
+        
+        # Work types
+        'work_types': {
+            'residential': 'work_residential' in request.form,
+            'commercial': 'work_commercial' in request.form,
+            'industrial': 'work_industrial' in request.form,
+            'service': 'work_service' in request.form,
+            'new_construction': 'work_new_construction' in request.form,
+            'remodel': 'work_remodel' in request.form
+        }
+    }
+    
+    # Add to work history (most recent first)
+    holder_data['bio']['work_history'].insert(0, work_entry)
+    
+    # Save to file
+    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
+    with open(file_path, 'w') as f:
+        json.dump(holder_data, f, indent=2)
+    
+    return redirect(f'/bio/{user_id}#work')
+
+
+def calculate_bio_completion(bio):
+    """Calculate how complete the bio is (0-100%)"""
+    total_fields = 0
+    filled_fields = 0
+    
+    # Personal info (8 key fields)
+    personal = bio.get('personal_info', {})
+    personal_fields = ['full_legal_name', 'date_of_birth', 'phone_cell', 'email_primary']
+    total_fields += len(personal_fields)
+    filled_fields += sum(1 for f in personal_fields if personal.get(f))
+    
+    # Address (4 fields)
+    addr = personal.get('current_address', {})
+    addr_fields = ['street', 'city', 'state', 'zip']
+    total_fields += len(addr_fields)
+    filled_fields += sum(1 for f in addr_fields if addr.get(f))
+    
+    # Work history (count as 1 major section)
+    total_fields += 1
+    if bio.get('work_history') and len(bio['work_history']) > 0:
+        filled_fields += 1
+    
+    # Education (count as 1 major section)
+    total_fields += 1
+    edu = bio.get('education', {})
+    if edu.get('high_school', {}).get('name'):
+        filled_fields += 1
+    
+    # Plumbing experience (count as 1 major section)
+    total_fields += 1
+    if bio.get('plumbing_experience', {}).get('total_years'):
+        filled_fields += 1
+    
+    # References (count as 1 major section)
+    total_fields += 1
+    if bio.get('references') and len(bio['references']) >= 3:
+        filled_fields += 1
+    
+    return int((filled_fields / total_fields) * 100) if total_fields > 0 else 0
+
+
+
+@app.route('/bio/add-reference/<user_id>', methods=['POST'])
+def add_reference(user_id):
+    """Add a professional reference"""
+    import os
+    
+    holder_data = load_license_holder_data(user_id)
+    
+    if not holder_data:
+        return "License holder not found", 404
+    
+    # Initialize bio if not exists
+    if 'bio' not in holder_data:
+        holder_data['bio'] = {'references': []}
+    
+    if 'references' not in holder_data['bio']:
+        holder_data['bio']['references'] = []
+    
+    # Create reference entry
+    reference = {
+        'name': request.form.get('name'),
+        'title': request.form.get('title'),
+        'relationship': request.form.get('relationship'),
+        'years_known': request.form.get('years_known'),
+        'company': request.form.get('company'),
+        'company_address': request.form.get('company_address'),
+        'city': request.form.get('city'),
+        'state': request.form.get('state'),
+        'zip': request.form.get('zip'),
+        'county': request.form.get('county'),
+        'phone': request.form.get('phone'),
+        'alternate_phone': request.form.get('alternate_phone'),
+        'email': request.form.get('email'),
+        'best_time_to_call': request.form.get('best_time_to_call'),
+        'can_contact_anytime': 'can_contact_anytime' in request.form,
+        'has_letter': 'has_letter' in request.form,
+        'notes': request.form.get('notes')
+    }
+    
+    # Add to references
+    holder_data['bio']['references'].append(reference)
+    
+    # Save to file
+    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
+    with open(file_path, 'w') as f:
+        json.dump(holder_data, f, indent=2)
+    
+    return redirect(f'/bio/{user_id}#references')
+
+
+
+@app.route('/bio/add-job-project/<user_id>', methods=['POST'])
+def add_job_project(user_id):
+    """Add a job project to the library"""
+    import os
+    
+    holder_data = load_license_holder_data(user_id)
+    
+    if not holder_data:
+        return "License holder not found", 404
+    
+    # Initialize bio/plumbing_experience if needed
+    if 'bio' not in holder_data:
+        holder_data['bio'] = {'plumbing_experience': {}}
+    
+    if 'plumbing_experience' not in holder_data['bio']:
+        holder_data['bio']['plumbing_experience'] = {}
+    
+    if 'job_projects' not in holder_data['bio']['plumbing_experience']:
+        holder_data['bio']['plumbing_experience']['job_projects'] = []
+    
+    # Create job project entry
+    job_project = {
+        'project_name': request.form.get('project_name'),
+        'location': request.form.get('location'),
+        'completion_date': request.form.get('completion_date'),
+        'job_type': request.form.get('job_type'),
+        'project_value': request.form.get('project_value'),
+        'hours_on_project': request.form.get('hours_on_project'),
+        'client_name': request.form.get('client_name'),
+        'client_contact': request.form.get('client_contact'),
+        'client_phone': request.form.get('client_phone'),
+        'client_email': request.form.get('client_email'),
+        'scope_summary': request.form.get('scope_summary'),
+        'detailed_description': request.form.get('detailed_description'),
+        'systems_worked': request.form.get('systems_worked'),
+        'your_role': request.form.get('your_role'),
+        'permits_required': request.form.get('permits_required'),
+        'supervised_others': 'supervised_others' in request.form,
+        'crew_size': request.form.get('crew_size'),
+        'special_notes': request.form.get('special_notes'),
+        'can_use_as_reference': 'can_use_as_reference' in request.form,
+        'have_photos': 'have_photos' in request.form
+    }
+    
+    # Add to job projects (most recent first)
+    holder_data['bio']['plumbing_experience']['job_projects'].insert(0, job_project)
+    
+    # Save to file
+    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
+    with open(file_path, 'w') as f:
+        json.dump(holder_data, f, indent=2)
+    
+    return redirect(f'/bio/{user_id}#experience')
+
+
 @app.errorhandler(404)
 def not_found(e):
     """Custom 404 page"""
@@ -1068,6 +1517,9 @@ def not_found(e):
 
 # Mapbox configuration
 MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiYmhhbWJyaWNrIiwiYSI6ImNtZzhiZjU1cTA1eHIya3EzdmI2c3Y0bHQifQ.iMTr0v9G_VIPWtJe6S7tkQ'
+
+app.secret_key = 'your-secret-key-change-this-in-production-12345'  # For sessions
+
 
 @app.context_processor
 def inject_mapbox_token():

@@ -401,5 +401,6 @@
       "summary": null,
       "coverage_level": "draft"
     }
-  ]
+  ],
+  "next_target_state": "NV"
 }

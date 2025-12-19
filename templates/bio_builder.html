@@ -1,0 +1,1698 @@
+{% extends "base.html" %}
+
+{% block title %}Bio Builder - {{ holder.name }}{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        <div class="row">
+            <div class="col-12">
+                <!-- Header -->
+                <div class="page-header-compact">
+                    <div>
+                        <h3>📝 Professional Bio Builder</h3>
+                        <p class="text-muted mb-0">Fill this out once, copy/paste into any state application</p>
+                    </div>
+                    <div>
+                        <span class="badge bg-info">{{ completion_percentage }}% Complete</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress mb-4" style="height: 8px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: {{ completion_percentage }}%"></div>
+                </div>
+
+                <!-- Section Navigation -->
+                <div class="bio-sections mb-4">
+                    <a href="#personal" class="bio-section-btn active" data-section="personal">
+                        👤 Personal Info
+                    </a>
+                    <a href="#work" class="bio-section-btn" data-section="work">
+                        💼 Work History
+                    </a>
+                    <a href="#experience" class="bio-section-btn" data-section="experience">
+                        🔧 Plumbing Experience
+                    </a>
+                    <a href="#education" class="bio-section-btn" data-section="education">
+                        🎓 Education
+                    </a>
+                    <a href="#licenses" class="bio-section-btn" data-section="licenses">
+                        📜 Licenses
+                    </a>
+                    <a href="#references" class="bio-section-btn" data-section="references">
+                        👥 References
+                    </a>
+                    <a href="#background" class="bio-section-btn" data-section="background">
+                        📋 Background
+                    </a>
+                    <a href="#military" class="bio-section-btn" data-section="military">
+                        🎖️ Military
+                    </a>
+                </div>
+
+                <!-- Bio Content -->
+                <div class="bio-content">
+                    
+                    <!-- PERSONAL INFO -->
+                    <div class="bio-section-content active" id="personal-section">
+                        <div class="netsuite-table-card">
+                            <div class="p-3 border-bottom d-flex justify-content-between">
+                                <h6 class="mb-0">👤 Personal Information</h6>
+                                <button class="btn btn-sm btn-outline-primary" onclick="copyPersonalInfo()">
+                                    📋 Copy Full Profile
+                                </button>
+                            </div>
+                            <div class="p-3">
+                                <form method="POST" action="/bio/update/{{ holder.user_id }}/personal">
+                                    <!-- LEGAL NAME -->
+                                    <h6 class="mb-3">Legal Name</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-3">
+                                            <label class="form-label">First Name *</label>
+                                            <input type="text" class="form-control" name="first_name" 
+                                                   value="{{ bio.personal_info.first_name or '' }}" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Middle Name</label>
+                                            <input type="text" class="form-control" name="middle_name" 
+                                                   value="{{ bio.personal_info.middle_name or '' }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Last Name *</label>
+                                            <input type="text" class="form-control" name="last_name" 
+                                                   value="{{ bio.personal_info.last_name or '' }}" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Suffix</label>
+                                            <input type="text" class="form-control" name="suffix" 
+                                                   value="{{ bio.personal_info.suffix or '' }}" placeholder="Jr., Sr., III">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Other Names Used</label>
+                                            <input type="text" class="form-control" name="other_names" 
+                                                   value="{{ bio.personal_info.other_names or '' }}" 
+                                                   placeholder="Maiden name, previous married name, etc.">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- PERSONAL IDENTIFIERS -->
+                                    <h6 class="mb-3">Personal Identifiers</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Date of Birth *</label>
+                                            <input type="date" class="form-control" name="date_of_birth" 
+                                                   value="{{ bio.personal_info.date_of_birth or '' }}" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Place of Birth</label>
+                                            <input type="text" class="form-control" name="place_of_birth" 
+                                                   value="{{ bio.personal_info.place_of_birth or '' }}" placeholder="City, State">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">SSN (Last 4)</label>
+                                            <input type="text" class="form-control" name="ssn_last_4" 
+                                                   value="{{ bio.personal_info.ssn_last_4 or '' }}" maxlength="4">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Height</label>
+                                            <input type="text" class="form-control" name="height" 
+                                                   value="{{ bio.personal_info.height or '' }}" placeholder="e.g., 5'10"">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Weight (lbs)</label>
+                                            <input type="number" class="form-control" name="weight" 
+                                                   value="{{ bio.personal_info.weight or '' }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Eye Color</label>
+                                            <select class="form-select" name="eye_color">
+                                                <option value="">Select...</option>
+                                                <option>Brown</option>
+                                                <option>Blue</option>
+                                                <option>Green</option>
+                                                <option>Hazel</option>
+                                                <option>Gray</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Hair Color</label>
+                                            <select class="form-select" name="hair_color">
+                                                <option value="">Select...</option>
+                                                <option>Black</option>
+                                                <option>Brown</option>
+                                                <option>Blonde</option>
+                                                <option>Red</option>
+                                                <option>Gray</option>
+                                                <option>Bald</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- DRIVER'S LICENSE -->
+                                    <h6 class="mb-3">Driver's License</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Driver's License Number</label>
+                                            <input type="text" class="form-control" name="drivers_license" 
+                                                   value="{{ bio.personal_info.drivers_license or '' }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Issuing State</label>
+                                            <input type="text" class="form-control" name="dl_state" 
+                                                   value="{{ bio.personal_info.dl_state or '' }}" maxlength="2">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Expiration Date</label>
+                                            <input type="date" class="form-control" name="dl_expiration" 
+                                                   value="{{ bio.personal_info.dl_expiration or '' }}">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- CONTACT INFORMATION -->
+                                    <h6 class="mb-3">Contact Information</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Cell Phone *</label>
+                                            <input type="tel" class="form-control" name="phone_cell" 
+                                                   value="{{ bio.personal_info.phone_cell or '' }}" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Home Phone</label>
+                                            <input type="tel" class="form-control" name="phone_home" 
+                                                   value="{{ bio.personal_info.phone_home or '' }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Work Phone</label>
+                                            <input type="tel" class="form-control" name="phone_work" 
+                                                   value="{{ bio.personal_info.phone_work or '' }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Primary Email *</label>
+                                            <input type="email" class="form-control" name="email_primary" 
+                                                   value="{{ bio.personal_info.email_primary or '' }}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Secondary Email</label>
+                                            <input type="email" class="form-control" name="email_secondary" 
+                                                   value="{{ bio.personal_info.email_secondary or '' }}">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- CURRENT ADDRESS -->
+                                    <h6 class="mb-3">Current Residential Address</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-8">
+                                            <label class="form-label">Street Address *</label>
+                                            <input type="text" class="form-control" name="address_street" 
+                                                   value="{{ bio.personal_info.current_address.street or '' }}" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Apt/Unit</label>
+                                            <input type="text" class="form-control" name="address_unit" 
+                                                   value="{{ bio.personal_info.current_address.unit or '' }}">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label class="form-label">City *</label>
+                                            <input type="text" class="form-control" name="address_city" 
+                                                   value="{{ bio.personal_info.current_address.city or '' }}" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">State *</label>
+                                            <input type="text" class="form-control" name="address_state" 
+                                                   value="{{ bio.personal_info.current_address.state or '' }}" maxlength="2" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">ZIP Code *</label>
+                                            <input type="text" class="form-control" name="address_zip" 
+                                                   value="{{ bio.personal_info.current_address.zip or '' }}" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">County</label>
+                                            <input type="text" class="form-control" name="address_county" 
+                                                   value="{{ bio.personal_info.current_address.county or '' }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">How long at this address?</label>
+                                            <input type="text" class="form-control" name="years_at_address" 
+                                                   value="{{ bio.personal_info.current_address.years_at_address or '' }}" 
+                                                   placeholder="e.g., 3 years 2 months">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Own or Rent?</label>
+                                            <select class="form-select" name="own_or_rent">
+                                                <option value="">Select...</option>
+                                                <option>Own</option>
+                                                <option>Rent</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- PREVIOUS ADDRESSES (5 year history) -->
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="mb-0">Previous Addresses (Last 5 Years)</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-success" onclick="addPreviousAddress()">
+                                            + Add Address
+                                        </button>
+                                    </div>
+                                    <div id="previous-addresses">
+                                        <p class="text-muted small">Click "+ Add Address" if you've lived at other addresses in the past 5 years</p>
+                                    </div>
+                                    
+                                    <!-- CITIZENSHIP -->
+                                    <h6 class="mb-3 mt-4">Citizenship & Immigration</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label">U.S. Citizen?</label>
+                                            <select class="form-select" name="us_citizen">
+                                                <option value="Yes">Yes</option>
+                                                <option value="No">No - Permanent Resident</option>
+                                                <option value="No">No - Work Visa</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">If not citizen, Alien Registration #</label>
+                                            <input type="text" class="form-control" name="alien_registration" 
+                                                   value="{{ bio.personal_info.alien_registration or '' }}">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- EMERGENCY CONTACT -->
+                                    <h6 class="mb-3">Emergency Contact</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Name</label>
+                                            <input type="text" class="form-control" name="emergency_name" 
+                                                   value="{{ bio.personal_info.emergency_name or '' }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Relationship</label>
+                                            <input type="text" class="form-control" name="emergency_relationship" 
+                                                   value="{{ bio.personal_info.emergency_relationship or '' }}" placeholder="Spouse, Parent, etc.">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Phone</label>
+                                            <input type="tel" class="form-control" name="emergency_phone" 
+                                                   value="{{ bio.personal_info.emergency_phone or '' }}">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-success">💾 Save Personal Info</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WORK HISTORY -->
+                    <div class="bio-section-content" id="work-section">
+                        <div class="alert alert-info mb-3">
+                            <strong>📌 Pro Tip:</strong> Most boards want 5-10 years of work history. Add EVERY plumbing job, even short-term ones. 
+                            Include supervisors you can use as references.
+                        </div>
+                        
+                        <div class="netsuite-table-card mb-3">
+                            <div class="p-3 border-bottom d-flex justify-content-between">
+                                <h6 class="mb-0">💼 Employment History</h6>
+                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addWorkModal">
+                                    + Add Job
+                                </button>
+                            </div>
+                            
+                            {% if bio.work_history and bio.work_history|length > 0 %}
+                            <div class="p-3">
+                                {% for job in bio.work_history %}
+                                <div class="work-entry-card mb-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ job.company_name }}</h6>
+                                            <p class="text-muted mb-1">
+                                                <strong>{{ job.position }}</strong> | 
+                                                {{ job.start_date }} - {{ job.end_date or 'Present' }}
+                                                {% if job.duration %} ({{ job.duration }}){% endif %}
+                                            </p>
+                                            <p class="text-muted small mb-2">
+                                                {{ job.city }}, {{ job.state }} | 
+                                                {% if job.employment_type %}{{ job.employment_type }}{% endif %}
+                                                {% if job.total_hours %} | {{ job.total_hours }} hours{% endif %}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-primary me-1" onclick="copyJob({{ loop.index0 }})">
+                                                📋 Copy
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="editJob({{ loop.index0 }})">
+                                                ✏️
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if job.responsibilities %}
+                                    <div class="mt-2">
+                                        <strong class="small">Responsibilities:</strong>
+                                        <p class="small mb-1">{{ job.responsibilities }}</p>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="row g-2 mt-2 small text-muted">
+                                        {% if job.supervisor_name %}
+                                        <div class="col-md-6">
+                                            <strong>Supervisor:</strong> {{ job.supervisor_name }}
+                                            {% if job.supervisor_phone %} ({{ job.supervisor_phone }}){% endif %}
+                                        </div>
+                                        {% endif %}
+                                        {% if job.reason_leaving %}
+                                        <div class="col-md-6">
+                                            <strong>Reason for leaving:</strong> {{ job.reason_leaving }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="p-4 text-center text-muted">
+                                <p>No work history added yet. Click "+ Add Job" to start building your employment record.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Copy-Paste Ready Format -->
+                        <div class="netsuite-table-card">
+                            <div class="p-3 border-bottom d-flex justify-content-between">
+                                <h6 class="mb-0">📋 Complete Work History (Application Format)</h6>
+                                <button class="btn btn-sm btn-primary" onclick="copyAllWorkHistory()">
+                                    📋 Copy All
+                                </button>
+                            </div>
+                            <div class="p-3">
+                                <textarea id="work-history-formatted" class="form-control" rows="15" readonly style="font-family: monospace; font-size: 0.875rem;">{% for job in bio.work_history %}
+EMPLOYER #{{ loop.index }}
+
+Company Name: {{ job.company_name }}
+Address: {{ job.address }}
+City, State ZIP: {{ job.city }}, {{ job.state }} {{ job.zip }}
+Company Phone: {{ job.company_phone }}
+
+Position/Title: {{ job.position }}
+Employment Type: {{ job.employment_type }}
+Start Date: {{ job.start_date }}
+End Date: {{ job.end_date or 'Present' }}
+Duration: {{ job.duration }}
+Hours Worked: {{ job.total_hours }}
+
+Supervisor Name: {{ job.supervisor_name }}
+Supervisor Title: {{ job.supervisor_title }}
+Supervisor Phone: {{ job.supervisor_phone }}
+Supervisor Email: {{ job.supervisor_email }}
+
+Duties & Responsibilities:
+{{ job.responsibilities }}
+
+Reason for Leaving: {{ job.reason_leaving }}
+May we contact this employer? {{ job.may_contact }}
+Starting Wage: {{ job.starting_wage }}
+Ending Wage: {{ job.ending_wage }}
+
+---
+{% endfor %}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PLUMBING EXPERIENCE -->
+                    <div class="bio-section-content" id="experience-section">
+                        <div class="netsuite-table-card">
+                            <div class="p-3 border-bottom">
+                                <h6 class="mb-0">🔧 Plumbing Experience Summary</h6>
+                            </div>
+                            <div class="p-3">
+                                <form method="POST" action="/bio/update/{{ holder.user_id }}/experience">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Total Years *</label>
+                                            <input type="number" class="form-control" name="total_years" 
+                                                   value="{{ bio.plumbing_experience.total_years or 0 }}" step="0.5">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Residential Hours</label>
+                                            <input type="number" class="form-control" name="residential_hours" 
+                                                   value="{{ bio.plumbing_experience.residential_hours or 0 }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Commercial Hours</label>
+                                            <input type="number" class="form-control" name="commercial_hours" 
+                                                   value="{{ bio.plumbing_experience.commercial_hours or 0 }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Service Hours</label>
+                                            <input type="number" class="form-control" name="service_repair_hours" 
+                                                   value="{{ bio.plumbing_experience.service_repair_hours or 0 }}">
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <label class="form-label">Experience Description</label>
+                                            <textarea class="form-control" name="experience_narrative" rows="6">{{ bio.plumbing_experience.experience_narrative or '' }}</textarea>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-success">💾 Save Experience</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- JOB PROJECTS LIBRARY -->
+                        <div class="netsuite-table-card mt-3">
+                            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">🏗️ Job Projects Library</h6>
+                                    <small class="text-muted">Add individual jobs - filter by date when applications ask for specific time periods</small>
+                                </div>
+                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addJobProjectModal">
+                                    + Add Job/Project
+                                </button>
+                            </div>
+                            
+                            {% if bio.plumbing_experience.job_projects and bio.plumbing_experience.job_projects|length > 0 %}
+                            <div class="p-3">
+                                <!-- Filter Controls -->
+                                <div class="row g-2 mb-3 align-items-end">
+                                    <div class="col-md-3">
+                                        <label class="form-label small mb-1">Filter by Date Range</label>
+                                        <select class="form-select form-select-sm" id="dateRangeFilter" onchange="filterJobs()">
+                                            <option value="all">All Jobs</option>
+                                            <option value="1year">Last 1 Year</option>
+                                            <option value="2years">Last 2 Years</option>
+                                            <option value="4years">Last 4 Years (Hawaii!)</option>
+                                            <option value="5years">Last 5 Years</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small mb-1">Filter by Type</label>
+                                        <select class="form-select form-select-sm" id="jobTypeFilter" onchange="filterJobs()">
+                                            <option value="all">All Types</option>
+                                            <option value="residential">Residential</option>
+                                            <option value="commercial">Commercial</option>
+                                            <option value="industrial">Industrial</option>
+                                            <option value="service">Service/Repair</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <button class="btn btn-sm btn-primary" onclick="copyFilteredJobs()">
+                                            📋 Copy Filtered Jobs (<span id="jobCount">{{ bio.plumbing_experience.job_projects|length }}</span>)
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Job Projects Table -->
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover mb-0" id="jobProjectsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Project Name</th>
+                                                <th>Location</th>
+                                                <th>Type</th>
+                                                <th>Value</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for job in bio.plumbing_experience.job_projects %}
+                                            <tr data-job-date="{{ job.completion_date }}" data-job-type="{{ job.job_type }}">
+                                                <td class="text-nowrap small">{{ job.completion_date }}</td>
+                                                <td class="fw-semibold">{{ job.project_name }}</td>
+                                                <td class="small text-muted">{{ job.location }}</td>
+                                                <td><span class="badge bg-secondary">{{ job.job_type }}</span></td>
+                                                <td class="text-nowrap small">
+                                                    {% if job.project_value %}${{ "{:,.0f}".format(job.project_value|float) }}{% else %}—{% endif %}
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="copyJob({{ loop.index0 }})">📋</button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="p-4 text-center text-muted">
+                                <p class="mb-2"><strong>No jobs added yet.</strong></p>
+                                <p class="small">Click "+ Add Job/Project" to build your library. When applications ask for "List all jobs in the last 4 years", 
+                                you can filter and copy exactly what they need!</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- REFERENCES -->
+                    <div class="bio-section-content" id="references-section">
+                        <div class="alert alert-info mb-3">
+                            <strong>📌 Pro Tip:</strong> Most boards require 3-5 professional references. Choose supervisors, master plumbers, 
+                            or business owners who know your work well. Get their permission BEFORE listing them!
+                        </div>
+                        
+                        <div class="netsuite-table-card mb-3">
+                            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">👥 Professional References</h6>
+                                    <small class="text-muted">Add 3-5 references who can vouch for your plumbing experience</small>
+                                </div>
+                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addReferenceModal">
+                                    + Add Reference
+                                </button>
+                            </div>
+                            
+                            {% if bio.references and bio.references|length > 0 %}
+                            <div class="p-3">
+                                {% for ref in bio.references %}
+                                <div class="reference-card mb-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ ref.name }}</h6>
+                                            <p class="text-muted mb-1">
+                                                <strong>{{ ref.title }}</strong> at {{ ref.company }}
+                                            </p>
+                                            <div class="row g-2 small">
+                                                <div class="col-md-6">
+                                                    <strong>Relationship:</strong> {{ ref.relationship }}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>Years Known:</strong> {{ ref.years_known }}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>Phone:</strong> {{ ref.phone }}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>Email:</strong> {{ ref.email or 'N/A' }}
+                                                </div>
+                                                {% if ref.can_contact_anytime %}
+                                                <div class="col-12">
+                                                    <span class="badge bg-success">✓ OK to contact anytime</span>
+                                                </div>
+                                                {% else %}
+                                                <div class="col-12">
+                                                    <span class="badge bg-warning">⚠️ Contact only after notification</span>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="ms-3">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="copyReference({{ loop.index0 }})">
+                                                📋 Copy
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% if ref.notes %}
+                                    <div class="mt-2 pt-2 border-top">
+                                        <small class="text-muted"><strong>Notes:</strong> {{ ref.notes }}</small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                                
+                                {% if bio.references|length < 3 %}
+                                <div class="alert alert-warning">
+                                    <strong>⚠️ You have {{ bio.references|length }} reference(s).</strong> Most applications require 3-5. 
+                                    Add {{ 3 - bio.references|length }} more.
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <div class="p-4 text-center text-muted">
+                                <p class="mb-3">No references added yet.</p>
+                                <p class="small">References should be master plumbers, supervisors, or business owners who know your work. 
+                                Include at least 3 references.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Formatted References for Copy/Paste -->
+                        <div class="netsuite-table-card">
+                            <div class="p-3 border-bottom d-flex justify-content-between">
+                                <h6 class="mb-0">📋 References (Application Format)</h6>
+                                <button class="btn btn-sm btn-primary" onclick="copyAllReferences()">
+                                    📋 Copy All
+                                </button>
+                            </div>
+                            <div class="p-3">
+                                <textarea id="references-formatted" class="form-control" rows="12" readonly style="font-family: monospace; font-size: 0.875rem;">{% for ref in bio.references %}
+REFERENCE #{{ loop.index }}
+
+Name: {{ ref.name }}
+Title: {{ ref.title }}
+Company: {{ ref.company }}
+Company Address: {{ ref.company_address }}
+City, State ZIP: {{ ref.city }}, {{ ref.state }} {{ ref.zip }}
+
+Phone: {{ ref.phone }}
+Email: {{ ref.email }}
+Best time to call: {{ ref.best_time_to_call }}
+
+Relationship: {{ ref.relationship }}
+How long known: {{ ref.years_known }} years
+May contact: {{ 'Yes - Anytime' if ref.can_contact_anytime else 'Please notify me first' }}
+
+{% if ref.notes %}Additional Notes: {{ ref.notes }}{% endif %}
+
+---
+{% endfor %}</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Reference Letters Section -->
+                        <div class="netsuite-table-card mt-3">
+                            <div class="p-3 border-bottom">
+                                <h6 class="mb-0">📝 Recommendation Letters</h6>
+                            </div>
+                            <div class="p-3">
+                                <div class="alert alert-secondary">
+                                    <strong>💡 Pro Tip:</strong> Some states accept pre-written recommendation letters. 
+                                    Ask your references to write letters you can keep on file and submit when needed.
+                                </div>
+                                <p class="text-muted small">Future feature: Upload and store reference letters here for easy access.</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- EDUCATION -->
+                    <div class="bio-section-content" id="education-section">
+                        <div class="alert alert-info mb-3">
+                            <strong>📌 Pro Tip:</strong> Include ALL education - high school, trade school, apprenticeships, technical training, 
+                            and relevant certifications. Boards want to see formal training.
+                        </div>
+                        
+                        <!-- HIGH SCHOOL -->
+                        <div class="netsuite-table-card mb-3">
+                            <div class="p-3 border-bottom">
+                                <h6 class="mb-0">🎓 High School</h6>
+                            </div>
+                            <div class="p-3">
+                                <form method="POST" action="/bio/update/{{ holder.user_id }}/education">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">School Name *</label>
+                                            <input type="text" class="form-control" name="hs_name" 
+                                                   value="{{ bio.education.high_school.name or '' }}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">School Address</label>
+                                            <input type="text" class="form-control" name="hs_address" 
+                                                   value="{{ bio.education.high_school.address or '' }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">City *</label>
+                                            <input type="text" class="form-control" name="hs_city" 
+                                                   value="{{ bio.education.high_school.city or '' }}" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">State *</label>
+                                            <input type="text" class="form-control" name="hs_state" 
+                                                   value="{{ bio.education.high_school.state or '' }}" maxlength="2" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Graduation Year *</label>
+                                            <input type="number" class="form-control" name="hs_year" 
+                                                   value="{{ bio.education.high_school.graduation_year or '' }}" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Diploma/GED</label>
+                                            <select class="form-select" name="hs_diploma_type">
+                                                <option value="Diploma" {% if bio.education.high_school.diploma_type == 'Diploma' %}selected{% endif %}>Diploma</option>
+                                                <option value="GED" {% if bio.education.high_school.diploma_type == 'GED' %}selected{% endif %}>GED</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-success">💾 Save High School Info</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- APPRENTICESHIP -->
+                        <div class="netsuite-table-card mb-3">
+                            <div class="p-3 border-bottom d-flex justify-content-between">
+                                <h6 class="mb-0">🔧 Apprenticeship Programs</h6>
+                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addApprenticeshipModal">
+                                    + Add Apprenticeship
+                                </button>
+                            </div>
+                            <div class="p-3">
+                                {% if bio.education.apprenticeships and bio.education.apprenticeships|length > 0 %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Program Name</th>
+                                                <th>Location</th>
+                                                <th>Dates</th>
+                                                <th>Hours</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for app in bio.education.apprenticeships %}
+                                            <tr>
+                                                <td class="fw-semibold">{{ app.program_name }}</td>
+                                                <td>{{ app.city }}, {{ app.state }}</td>
+                                                <td>{{ app.start_date }} - {{ app.end_date or 'In Progress' }}</td>
+                                                <td>{{ app.total_hours }}</td>
+                                                <td>
+                                                    <span class="badge bg-{% if app.completed %}success{% else %}warning{% endif %}">
+                                                        {{ 'Completed' if app.completed else 'In Progress' }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <p class="text-muted text-center mb-0">No apprenticeships added. Click "+ Add Apprenticeship" if you've completed formal apprenticeship training.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- TRADE/TECHNICAL SCHOOL -->
+                        <div class="netsuite-table-card mb-3">
+                            <div class="p-3 border-bottom d-flex justify-content-between">
+                                <h6 class="mb-0">🏫 Trade/Technical Schools</h6>
+                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addTradeSchoolModal">
+                                    + Add School
+                                </button>
+                            </div>
+                            <div class="p-3">
+                                {% if bio.education.trade_schools and bio.education.trade_schools|length > 0 %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>School Name</th>
+                                                <th>Location</th>
+                                                <th>Program/Major</th>
+                                                <th>Dates</th>
+                                                <th>Credential</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for school in bio.education.trade_schools %}
+                                            <tr>
+                                                <td class="fw-semibold">{{ school.name }}</td>
+                                                <td>{{ school.city }}, {{ school.state }}</td>
+                                                <td>{{ school.program }}</td>
+                                                <td>{{ school.start_date }} - {{ school.end_date }}</td>
+                                                <td>{{ school.credential }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <p class="text-muted text-center mb-0">No trade schools added.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- COLLEGE (if applicable) -->
+                        <div class="netsuite-table-card">
+                            <div class="p-3 border-bottom">
+                                <h6 class="mb-0">🎓 College/University (if applicable)</h6>
+                            </div>
+                            <div class="p-3">
+                                <form method="POST" action="/bio/update/{{ holder.user_id }}/college">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">College Name</label>
+                                            <input type="text" class="form-control" name="college_name" 
+                                                   value="{{ bio.education.college.name or '' }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">City</label>
+                                            <input type="text" class="form-control" name="college_city" 
+                                                   value="{{ bio.education.college.city or '' }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">State</label>
+                                            <input type="text" class="form-control" name="college_state" 
+                                                   value="{{ bio.education.college.state or '' }}" maxlength="2">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Major/Field of Study</label>
+                                            <input type="text" class="form-control" name="college_major" 
+                                                   value="{{ bio.education.college.major or '' }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Degree Earned</label>
+                                            <select class="form-select" name="college_degree">
+                                                <option value="">Select...</option>
+                                                <option value="Associate's">Associate's Degree</option>
+                                                <option value="Bachelor's">Bachelor's Degree</option>
+                                                <option value="Some College">Some College (No Degree)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Dates Attended</label>
+                                            <input type="text" class="form-control" name="college_dates" 
+                                                   value="{{ bio.education.college.dates or '' }}" placeholder="e.g., 2010-2014">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-success">💾 Save College Info</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- LICENSES & CERTIFICATIONS -->
+                    <div class="bio-section-content" id="licenses-section">
+                        <div class="netsuite-table-card">
+                            <div class="p-3 border-bottom">
+                                <h6 class="mb-0">📜 Licenses & Certifications</h6>
+                            </div>
+                            <div class="p-4 text-center text-muted">
+                                <p>This will auto-populate from your licenses in the system</p>
+                                <a href="/manage-licenses?account={{ holder.user_id }}" class="btn btn-sm btn-primary">View My Licenses</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BACKGROUND -->
+                    <div class="bio-section-content" id="background-section">
+                        <div class="netsuite-table-card">
+                            <div class="p-3 border-bottom">
+                                <h6 class="mb-0">📋 Background Information</h6>
+                            </div>
+                            <div class="p-3">
+                                <div class="alert alert-info">
+                                    <strong>Note:</strong> Most applications ask about criminal history and disciplinary actions. 
+                                    Prepare your explanations here so you can copy/paste consistently.
+                                </div>
+                                <form method="POST" action="/bio/update/{{ holder.user_id }}/background">
+                                    <div class="mb-3">
+                                        <label class="form-label">Have you ever been convicted of a crime?</label>
+                                        <select class="form-select" name="has_criminal_history">
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">If yes, provide explanation:</label>
+                                        <textarea class="form-control" name="criminal_explanation" rows="4" 
+                                                  placeholder="Include dates, charges, disposition, and current status..."></textarea>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-success">💾 Save Background Info</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MILITARY -->
+                    <div class="bio-section-content" id="military-section">
+                        <div class="netsuite-table-card">
+                            <div class="p-3 border-bottom">
+                                <h6 class="mb-0">🎖️ Military Service</h6>
+                            </div>
+                            <div class="p-3">
+                                <form method="POST" action="/bio/update/{{ holder.user_id }}/military">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Have you served in the military?</label>
+                                            <select class="form-select" name="has_served">
+                                                <option value="No">No</option>
+                                                <option value="Yes">Yes</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Branch</label>
+                                            <input type="text" class="form-control" name="branch" 
+                                                   value="{{ bio.military.branch or '' }}" placeholder="e.g., U.S. Army">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Dates of Service</label>
+                                            <input type="text" class="form-control" name="dates" 
+                                                   value="{{ bio.military.dates or '' }}" placeholder="2010-2014">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Rank at Discharge</label>
+                                            <input type="text" class="form-control" name="rank" 
+                                                   value="{{ bio.military.rank or '' }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Discharge Type</label>
+                                            <input type="text" class="form-control" name="discharge_type" 
+                                                   value="{{ bio.military.discharge_type or '' }}" placeholder="Honorable">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-success">💾 Save Military Info</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Add Job Project Modal -->
+<div class="modal fade" id="addJobProjectModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Job/Project to Library</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/bio/add-job-project/{{ holder.user_id }}">
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <strong>💡 Use this for:</strong> Individual projects boards ask about. Example: "List all jobs completed in last 4 years" 
+                        - you'll have them all saved here!
+                    </div>
+                    
+                    <!-- PROJECT BASICS -->
+                    <h6 class="mb-3">Project Information</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Project Name *</label>
+                            <input type="text" class="form-control" name="project_name" required 
+                                   placeholder="e.g., 24-unit apartment building, Smith residence remodel">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Location *</label>
+                            <input type="text" class="form-control" name="location" required 
+                                   placeholder="e.g., Houston, TX | 123 Main St, Dallas, TX">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Completion Date *</label>
+                            <input type="date" class="form-control" name="completion_date" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Job Type *</label>
+                            <select class="form-select" name="job_type" required>
+                                <option value="">Select...</option>
+                                <option value="residential">Residential</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="industrial">Industrial</option>
+                                <option value="service">Service/Repair</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Project Value ($)</label>
+                            <input type="number" class="form-control" name="project_value" step="0.01" 
+                                   placeholder="e.g., 45000">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Hours on Project</label>
+                            <input type="number" class="form-control" name="hours_on_project" 
+                                   placeholder="e.g., 320">
+                        </div>
+                    </div>
+                    
+                    <!-- CLIENT INFO -->
+                    <h6 class="mb-3">Client/General Contractor</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Client/GC Name</label>
+                            <input type="text" class="form-control" name="client_name" 
+                                   placeholder="e.g., ABC Construction, John Homeowner">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Contact Person</label>
+                            <input type="text" class="form-control" name="client_contact">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Contact Phone</label>
+                            <input type="tel" class="form-control" name="client_phone">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Contact Email</label>
+                            <input type="email" class="form-control" name="client_email">
+                        </div>
+                    </div>
+                    
+                    <!-- WORK DETAILS -->
+                    <h6 class="mb-3">Work Performed</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label class="form-label">Scope of Work Summary *</label>
+                            <textarea class="form-control" name="scope_summary" rows="2" required 
+                                      placeholder="Brief 1-2 sentence summary. e.g., 'Complete rough-in and finish plumbing for 24-unit apartment building including water supply, DWV, and gas piping.'"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Detailed Description *</label>
+                            <textarea class="form-control" name="detailed_description" rows="5" required 
+                                      placeholder="Full description of work performed. Include materials used, challenges overcome, code requirements met, etc."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Systems Worked On</label>
+                            <textarea class="form-control" name="systems_worked" rows="2" 
+                                      placeholder="e.g., 'Water supply (copper), DWV (PVC), natural gas piping (black iron), fixtures (Kohler, Delta)'"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Your Role *</label>
+                            <select class="form-select" name="your_role" required>
+                                <option value="">Select...</option>
+                                <option value="Lead Plumber">Lead Plumber</option>
+                                <option value="Journeyman">Journeyman</option>
+                                <option value="Apprentice">Apprentice</option>
+                                <option value="Foreman">Foreman</option>
+                                <option value="Self-Employed">Self-Employed Contractor</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Permits Required?</label>
+                            <select class="form-select" name="permits_required">
+                                <option value="Yes">Yes - Pulled and finaled</option>
+                                <option value="No">No permits required</option>
+                                <option value="GC Pulled">GC pulled permits</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- CREW & SUPERVISION -->
+                    <h6 class="mb-3">Team & Supervision</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="supervised_others" value="yes">
+                                <label class="form-check-label">
+                                    I supervised other workers on this job
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Crew Size (if supervised)</label>
+                            <input type="number" class="form-control" name="crew_size" placeholder="e.g., 3">
+                        </div>
+                    </div>
+                    
+                    <!-- SPECIAL NOTES -->
+                    <h6 class="mb-3">Additional Information</h6>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Special Features/Notes</label>
+                            <textarea class="form-control" name="special_notes" rows="2" 
+                                      placeholder="e.g., 'Featured in local trade magazine', 'Emergency repair completed in 4 hours', 'First LEED-certified project'"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_use_as_reference" value="yes">
+                                <label class="form-check-label">
+                                    Client can be used as a reference
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="have_photos" value="yes">
+                                <label class="form-check-label">
+                                    I have photos of this project
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">💾 Add to Job Library</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Reference Modal -->
+<div class="modal fade" id="addReferenceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Professional Reference</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/bio/add-reference/{{ holder.user_id }}">
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Important:</strong> Always ask permission before listing someone as a reference!
+                    </div>
+                    
+                    <h6 class="mb-3">Reference Information</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Title/Position *</label>
+                            <input type="text" class="form-control" name="title" required 
+                                   placeholder="e.g., Master Plumber, Owner, Foreman">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Relationship to You *</label>
+                            <select class="form-select" name="relationship" required>
+                                <option value="">Select...</option>
+                                <option value="Former Supervisor">Former Supervisor</option>
+                                <option value="Current Supervisor">Current Supervisor</option>
+                                <option value="Master Plumber">Master Plumber I worked under</option>
+                                <option value="Business Owner">Business Owner/Employer</option>
+                                <option value="Colleague">Colleague/Co-worker</option>
+                                <option value="Instructor">Instructor/Teacher</option>
+                                <option value="Customer">Customer/Client</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">How long have they known you? *</label>
+                            <input type="text" class="form-control" name="years_known" required 
+                                   placeholder="e.g., 5 years">
+                        </div>
+                    </div>
+                    
+                    <h6 class="mb-3">Company Information</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Company Name *</label>
+                            <input type="text" class="form-control" name="company" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Company Address</label>
+                            <input type="text" class="form-control" name="company_address">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">City *</label>
+                            <input type="text" class="form-control" name="city" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">State *</label>
+                            <input type="text" class="form-control" name="state" required maxlength="2">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">ZIP</label>
+                            <input type="text" class="form-control" name="zip">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">County</label>
+                            <input type="text" class="form-control" name="county">
+                        </div>
+                    </div>
+                    
+                    <h6 class="mb-3">Contact Information</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" class="form-control" name="phone" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Best Time to Call</label>
+                            <input type="text" class="form-control" name="best_time_to_call" 
+                                   placeholder="e.g., Mornings, After 3pm">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" name="email">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Alternate Phone</label>
+                            <input type="tel" class="form-control" name="alternate_phone">
+                        </div>
+                    </div>
+                    
+                    <h6 class="mb-3">Permission & Notes</h6>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="can_contact_anytime" value="yes" checked>
+                                <label class="form-check-label">
+                                    <strong>May be contacted anytime without prior notice</strong>
+                                </label>
+                            </div>
+                            <small class="text-muted">Uncheck if you want to notify them before boards contact them</small>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="has_letter" value="yes">
+                                <label class="form-check-label">
+                                    I have a written recommendation letter from this person
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes (for your reference only)</label>
+                            <textarea class="form-control" name="notes" rows="3" 
+                                      placeholder="e.g., Worked together 2018-2020 on commercial projects. Very familiar with my rough-in work. Said happy to be a reference."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">💾 Add Reference</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Apprenticeship Modal -->
+<div class="modal fade" id="addApprenticeshipModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Apprenticeship Program</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/bio/add-apprenticeship/{{ holder.user_id }}">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Program Name *</label>
+                            <input type="text" class="form-control" name="program_name" required 
+                                   placeholder="e.g., UA Local 123 Plumbing Apprenticeship">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Sponsor/Organization</label>
+                            <input type="text" class="form-control" name="sponsor" 
+                                   placeholder="e.g., United Association, ABC, Independent">
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Address</label>
+                            <input type="text" class="form-control" name="address">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">City *</label>
+                            <input type="text" class="form-control" name="city" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">State *</label>
+                            <input type="text" class="form-control" name="state" required maxlength="2">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Start Date *</label>
+                            <input type="date" class="form-control" name="start_date" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">End Date</label>
+                            <input type="date" class="form-control" name="end_date">
+                            <small class="text-muted">Leave blank if in progress</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Total Hours Completed</label>
+                            <input type="number" class="form-control" name="total_hours" placeholder="e.g., 8000">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Instructor/Contact Name</label>
+                            <input type="text" class="form-control" name="instructor_name">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Contact Phone</label>
+                            <input type="tel" class="form-control" name="contact_phone">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Certificate/Credential Earned</label>
+                            <input type="text" class="form-control" name="credential" 
+                                   placeholder="e.g., Journeyman Certificate">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="completed">
+                                <option value="yes">Completed</option>
+                                <option value="no">In Progress</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Coursework/Skills Learned</label>
+                            <textarea class="form-control" name="coursework" rows="3" 
+                                      placeholder="Describe the training received, skills learned, code education, etc."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Apprenticeship</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Trade School Modal -->
+<div class="modal fade" id="addTradeSchoolModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Trade/Technical School</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/bio/add-trade-school/{{ holder.user_id }}">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">School Name *</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">City *</label>
+                            <input type="text" class="form-control" name="city" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">State *</label>
+                            <input type="text" class="form-control" name="state" required maxlength="2">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Program/Major *</label>
+                            <input type="text" class="form-control" name="program" required 
+                                   placeholder="e.g., HVAC/Plumbing Technology">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Credential Earned</label>
+                            <input type="text" class="form-control" name="credential" 
+                                   placeholder="e.g., Certificate, Diploma">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Start Date *</label>
+                            <input type="date" class="form-control" name="start_date" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">End Date *</label>
+                            <input type="date" class="form-control" name="end_date" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Total Hours</label>
+                            <input type="number" class="form-control" name="total_hours">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">GPA (if applicable)</label>
+                            <input type="text" class="form-control" name="gpa" placeholder="e.g., 3.5">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add School</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Work Modal -->
+<div class="modal fade" id="addWorkModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Employment Record</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/bio/add-work/{{ holder.user_id }}">
+                <div class="modal-body">
+                    <!-- COMPANY INFO -->
+                    <h6 class="mb-3">Company Information</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Company Name *</label>
+                            <input type="text" class="form-control" name="company_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Company Phone</label>
+                            <input type="tel" class="form-control" name="company_phone">
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Street Address</label>
+                            <input type="text" class="form-control" name="address">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Suite/Unit</label>
+                            <input type="text" class="form-control" name="address_unit">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">City *</label>
+                            <input type="text" class="form-control" name="city" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">State *</label>
+                            <input type="text" class="form-control" name="state" required maxlength="2">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">ZIP</label>
+                            <input type="text" class="form-control" name="zip">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">County</label>
+                            <input type="text" class="form-control" name="county">
+                        </div>
+                    </div>
+                    
+                    <!-- POSITION INFO -->
+                    <h6 class="mb-3">Position & Dates</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Position/Title *</label>
+                            <input type="text" class="form-control" name="position" required placeholder="e.g., Journeyman Plumber">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Employment Type</label>
+                            <select class="form-select" name="employment_type">
+                                <option value="">Select...</option>
+                                <option value="Full-Time">Full-Time</option>
+                                <option value="Part-Time">Part-Time</option>
+                                <option value="Contract/1099">Contract/1099</option>
+                                <option value="Apprenticeship">Apprenticeship</option>
+                                <option value="Self-Employed">Self-Employed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Start Date *</label>
+                            <input type="date" class="form-control" name="start_date" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">End Date</label>
+                            <input type="date" class="form-control" name="end_date">
+                            <small class="text-muted">Leave blank if current</small>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Duration</label>
+                            <input type="text" class="form-control" name="duration" placeholder="e.g., 2 years 3 months">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Total Hours</label>
+                            <input type="number" class="form-control" name="total_hours" placeholder="e.g., 4160">
+                        </div>
+                    </div>
+                    
+                    <!-- SUPERVISOR INFO -->
+                    <h6 class="mb-3">Supervisor/Reference Information</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Supervisor Name</label>
+                            <input type="text" class="form-control" name="supervisor_name" placeholder="First Last">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Supervisor Title</label>
+                            <input type="text" class="form-control" name="supervisor_title" placeholder="e.g., Master Plumber, Foreman">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Supervisor Phone</label>
+                            <input type="tel" class="form-control" name="supervisor_phone">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Supervisor Email</label>
+                            <input type="email" class="form-control" name="supervisor_email">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">May we contact this employer?</label>
+                            <select class="form-select" name="may_contact">
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                                <option value="After Hire">Only after hire</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- JOB DETAILS -->
+                    <h6 class="mb-3">Job Responsibilities & Details</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label class="form-label">Detailed Job Responsibilities *</label>
+                            <textarea class="form-control" name="responsibilities" rows="5" required 
+                                      placeholder="Describe your duties in detail. Include: types of projects (residential/commercial), systems worked on (water, gas, drainage), scope of work (new construction, service, repairs), tools/equipment used, supervision of others, etc."></textarea>
+                            <small class="text-muted">Be specific - boards want details! Example: "Installed and repaired water supply and DWV systems in 2-4 story residential buildings. Performed rough-in and finish plumbing. Read blueprints and worked from specifications."</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reason for Leaving</label>
+                            <input type="text" class="form-control" name="reason_leaving" placeholder="e.g., Better opportunity, Relocation, Career advancement">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Starting Wage</label>
+                            <input type="text" class="form-control" name="starting_wage" placeholder="e.g., $25/hr">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Ending Wage</label>
+                            <input type="text" class="form-control" name="ending_wage" placeholder="e.g., $35/hr">
+                        </div>
+                    </div>
+                    
+                    <!-- PLUMBING SPECIFICS -->
+                    <h6 class="mb-3">Plumbing-Specific Experience at This Job</h6>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Types of Work (check all that apply)</label>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="work_residential" value="yes">
+                                <label class="form-check-label">Residential</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="work_commercial" value="yes">
+                                <label class="form-check-label">Commercial</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="work_industrial" value="yes">
+                                <label class="form-check-label">Industrial</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="work_service" value="yes">
+                                <label class="form-check-label">Service/Repair</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="work_new_construction" value="yes">
+                                <label class="form-check-label">New Construction</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="work_remodel" value="yes">
+                                <label class="form-check-label">Remodel/Renovation</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">💾 Add Employment Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Section switching
+document.querySelectorAll('.bio-section-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const section = this.dataset.section;
+        
+        document.querySelectorAll('.bio-section-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.bio-section-content').forEach(c => c.classList.remove('active'));
+        
+        this.classList.add('active');
+        document.getElementById(section + '-section').classList.add('active');
+    });
+});
+
+function copyPersonalInfo() {
+    alert('Personal info copy coming soon!');
+}
+
+function copyAllWorkHistory() {
+    const textarea = document.getElementById('work-history-formatted');
+    textarea.select();
+    document.execCommand('copy');
+    alert('✅ Complete work history copied to clipboard! Ready to paste into applications.');
+}
+
+function copyJob(index) {
+    alert('Individual job copy coming soon!');
+}
+
+function editJob(index) {
+    alert('Edit functionality coming soon!');
+}
+
+function copyAllReferences() {
+    const textarea = document.getElementById('references-formatted');
+    textarea.select();
+    document.execCommand('copy');
+    alert('✅ All references copied to clipboard!');
+}
+
+function copyReference(index) {
+    alert('Individual reference copy coming soon!');
+}
+
+// Job filtering
+function filterJobs() {
+    const dateRange = document.getElementById('dateRangeFilter').value;
+    const jobType = document.getElementById('jobTypeFilter').value;
+    const rows = document.querySelectorAll('#jobProjectsTable tbody tr');
+    
+    const today = new Date();
+    let cutoffDate;
+    
+    if (dateRange === '1year') cutoffDate = new Date(today.setFullYear(today.getFullYear() - 1));
+    else if (dateRange === '2years') cutoffDate = new Date(today.setFullYear(today.getFullYear() - 2));
+    else if (dateRange === '4years') cutoffDate = new Date(today.setFullYear(today.getFullYear() - 4));
+    else if (dateRange === '5years') cutoffDate = new Date(today.setFullYear(today.getFullYear() - 5));
+    
+    let visibleCount = 0;
+    rows.forEach(row => {
+        const jobDate = new Date(row.dataset.jobDate);
+        const jobTypeValue = row.dataset.jobType;
+        
+        let showDate = dateRange === 'all' || jobDate >= cutoffDate;
+        let showType = jobType === 'all' || jobType === jobTypeValue;
+        
+        if (showDate && showType) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Update count display
+    const countSpan = document.getElementById('jobCount');
+    if (countSpan) {
+        countSpan.textContent = visibleCount;
+    }
+}
+
+function copyFilteredJobs() {
+    const textarea = document.getElementById('job-projects-formatted');
+    textarea.select();
+    document.execCommand('copy');
+    alert('✅ Job list copied to clipboard!');
+}
+
+function viewJobDetail(index) {
+    alert('Job detail view coming soon!');
+}
+</script>
+{% endblock %}

@@ -24,6 +24,9 @@
         <div class="top-nav-right">
             <!-- Brag Bar -->
             <div class="brag-bar">
+                <a href="/logout" class="btn btn-sm btn-outline-light me-3" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">
+                    🔒 Logout
+                </a>
                 <div class="brag-item">
                     <div class="brag-number">{% block brag_licenses %}{{ holder.total_licenses if holder else 29 }}{% endblock %}</div>
                     <div class="brag-label">Licenses</div>
@@ -104,9 +107,19 @@
                         <span class="sidebar-nav-icon">📜</span>
                         <span>Manage Licenses</span>
                     </a>
+                    {% if holder and holder.user_id != 'director' %}
+                    <a href="/bio/{{ holder.user_id }}" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">📝</span>
+                        <span>My Bio</span>
+                    </a>
+                    {% endif %}
                     <a href="/cost-analytics?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
                         <span class="sidebar-nav-icon">💰</span>
                         <span>Cost Analytics</span>
+                    </a>
+                    <a href="/team/manage?account={{ holder.user_id if holder else 'bhambrick' }}" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">👥</span>
+                        <span>Manage Team</span>
                     </a>
                     <a href="/admin/licensing/states?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
                         <span class="sidebar-nav-icon">📋</span>

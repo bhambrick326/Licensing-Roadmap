@@ -157,6 +157,28 @@
                             </div>
                         </div>
 
+                        <!-- Next Target State -->
+                        {% if holder.next_target_state and holder.user_id != 'director' %}
+                        <div class="compact-stats-card mb-3 border-warning" style="border-width: 2px;">
+                            <h6 class="mb-3">🎯 Next License Goal</h6>
+                            <div class="text-center mb-3">
+                                <div class="next-target-state">{{ holder.next_target_state }}</div>
+                                <small class="text-muted">Your next target state</small>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="/settings/add-license?prefill={{ holder.next_target_state }}&account={{ holder.user_id }}" 
+                                   class="btn btn-warning btn-sm">
+                                    🚀 Start Application
+                                </a>
+                                <a href="/licensing-roadmap?account={{ holder.user_id }}" 
+                                   class="btn btn-outline-secondary btn-sm">
+                                    View on Map
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+
+
                         <!-- Cost Summary -->
                         <div class="compact-stats-card mb-3">
                             <h6 class="mb-3">�� Cost Summary</h6>

@@ -1,112 +1,207 @@
-# 🔧 Licensing Roadmap
+# 🔧 Licensing Roadmap - Professional License Management System
 
-A professional multi-user licensing management system designed for plumbing professionals to track licenses, certifications, and compliance across all 50 U.S. states.
+A comprehensive web application for tracking professional plumbing licenses across multiple U.S. states, managing costs, and maintaining detailed professional bio information for license applications.
 
-![License Management Dashboard](https://img.shields.io/badge/Status-Active%20Development-green)
-![Python](https://img.shields.io/badge/Python-3.12-blue)
-![Flask](https://img.shields.io/badge/Flask-3.0-lightgrey)
+**Built by a licensed plumber for plumbers** - solving real compliance and licensing challenges.
 
 ---
 
-## 🎯 Features
+## 🎯 Core Features
 
-### **Multi-Account System**
-- **Individual License Holders** - Personal license tracking and management
-- **Director Dashboard** - Aggregated view across all team members
-- **Account Switching** - Seamless switching between user profiles
+### **Multi-Account License Tracking**
+- Track licenses for multiple team members (Benjamin, John, etc.)
+- Team Overview (Director) mode for aggregated view
+- Individual license holder views
+- Easy account switching with persistent context
 
-### **Interactive Map Visualizations**
-- 🗺️ **License Status View** - Current licensing state across all states
-- ⏰ **Expiration Tracker** - Color-coded urgency based on renewal dates
-- 👔 **Leadership Dashboard** - Team-wide coverage and compliance metrics
-- 🎓 **Training Roadmap** - Step-by-step licensing paths for new hires
+### **Interactive Map Visualization**
+- **4 Map Views:**
+  1. **License Status** - Visual overview of all licenses (licensed, in progress, overdue)
+  2. **Expiration Tracker** - Color-coded by days until expiration
+  3. **Leadership View** - Team-wide coverage map
+  4. **Training Roadmap** - Recommended licensing paths
+- Powered by Mapbox GL JS with custom styling
+- Click states for detailed information
+- Real-time status updates
 
-### **License Management**
-- ✅ View all licenses in a professional table layout
-- ✏️ Edit license details (dates, costs, status, board info)
-- ➕ Add new licenses for any U.S. state
-- 📊 Track renewal costs and expiration dates
-- 🔔 Visual urgency indicators (due soon, overdue)
+### **Comprehensive License Management**
+- Full CRUD operations (Create, Read, Update, Delete)
+- Track multiple licenses per jurisdiction (e.g., VA Master Plumber + VA Backflow)
+- Support for state, city, county, and certification licenses
+- License details:
+  - Status tracking (licensed, in progress, not licensed, overdue)
+  - License numbers and issue/expiration dates
+  - Board contact information
+  - Renewal tracking
+  - Master of Record / Designated Employee designation
+  - Next target state for each license holder
 
-### **Professional UI/UX**
-- NetSuite-inspired compact design
-- Minimal scrolling, information-dense layouts
-- Responsive design (desktop, tablet, mobile)
-- Dark blue/copper professional color scheme
-- Interactive Mapbox GL maps with smooth transitions
+### **💰 Cost Tracking System**
+Track every dollar spent on licensing - from initial costs to recurring renewals.
+
+**Cost Categories:**
+- Application Fees
+- Test Fees  
+- Trade Books & Business/Law Books
+- License Activation Fees
+- Prep Course Fees
+- Travel & Shipping
+- Renewal Fees
+- Continuing Education
+
+**Features:**
+- **Estimated vs. Actual Tracking** - Budget planning and variance analysis
+- **Line-Item Expense Tracking** - Individual expenses with dates, vendors, notes
+- **Cost Analytics Dashboard** - Total spend by state, by category, by license holder
+- **Annual Recurring Projections** - Forecast renewal costs
+- **CSV Export** - Export data in spreadsheet format
+
+### **📝 Professional Bio Builder**
+**The game-changer:** Build your professional profile ONCE, use it for EVERY application.
+
+#### **👤 Personal Information**
+- Full legal name (first, middle, last, suffix, other names)
+- Date of birth, place of birth, SSN (last 4)
+- Physical description (height, weight, eye/hair color)
+- Driver's license (number, state, expiration)
+- Multiple contact methods (cell, home, work, emails)
+- Current address with county, years at address, own/rent
+- Previous addresses (5-year history)
+- Citizenship status
+- Emergency contact
+
+#### **💼 Work History**
+Comprehensive employment records with:
+- Company information (name, address, phone)
+- Position details (title, employment type, dates, duration)
+- Supervisor contact info (name, title, phone, email)
+- Permission to contact preferences
+- Detailed job responsibilities
+- Reason for leaving
+- Starting/ending wages
+- Work type checkboxes (residential, commercial, industrial, service, new construction, remodel)
+- Total hours worked
+- Copy-to-clipboard formatted output
+
+#### **🔧 Plumbing Experience**
+- Total years in trade
+- Hour breakdowns (residential, commercial, industrial, service/repair, new construction)
+- Systems experience (water supply, DWV, gas, medical gas, backflow, fire sprinkler)
+- Experience narrative
+- Auto-calculating total hours
+
+**🏗️ Job Projects Library** *(Solves the "Hawaii Problem")*
+- Add individual jobs/projects with full details:
+  - Project name, location, completion date
+  - Job type (residential/commercial/industrial/service)
+  - Project value and hours
+  - Client/GC contact information
+  - Scope of work (summary + detailed description)
+  - Systems worked on
+  - Your role, permits, crew size
+  - Special notes, reference availability
+- **Filter by date range** - "Last 4 years" for applications that ask
+- **Filter by job type** - Show only residential or commercial
+- **Copy filtered list** - Formatted text ready to paste into applications
+- Eliminates hours of rewriting the same job descriptions
+
+#### **🎓 Education**
+- High school (name, address, city, state, graduation year, diploma/GED)
+- Apprenticeship programs (program name, sponsor, dates, hours, instructors, credentials)
+- Trade/technical schools (school name, program, dates, credentials)
+- College/university (if applicable)
+
+#### **👥 Professional References**
+- 3-5 professional references with:
+  - Full name, title, company
+  - Relationship to you, years known
+  - Complete contact info (phone, email, best time to call)
+  - Company address
+  - Permission to contact (anytime vs. notify first)
+  - Reference letter status
+  - Personal notes
+- Warning when you have fewer than 3 references
+- Copy-to-clipboard formatted output
+
+#### **📋 Background & Military**
+- Criminal history disclosure and explanations
+- Disciplinary action history
+- Military service details (branch, dates, rank, discharge type)
+
+**All sections include "Copy to Clipboard" functionality** - format once, paste into any application!
+
+### **👥 Team Management**
+- Add/edit license holders
+- Set "Next Target State" for each team member
+- Track total licenses and certificates per holder
+- Quick navigation to individual license views
 
 ---
 
-## 🚀 Tech Stack
+## 🛠️ Technical Stack
 
-**Backend:**
-- Python 3.12
-- Flask 3.0
-- JSON file-based storage (PostgreSQL ready for production)
+### **Backend**
+- **Python 3.12**
+- **Flask 3.0** - Web framework
+- **JSON-based data storage** - Simple file-based persistence (PostgreSQL migration planned)
 
-**Frontend:**
-- Bootstrap 5.3
-- Mapbox GL JS
-- Custom CSS with professional styling
-- Vanilla JavaScript (no heavy frameworks)
+### **Frontend**
+- **Bootstrap 5.3** - Responsive UI framework
+- **Mapbox GL JS** - Interactive mapping
+- **Vanilla JavaScript** - Dynamic interactions, filtering, copy-to-clipboard
+- **NetSuite-inspired design** - Compact, professional, minimal scrolling
 
-**Data Storage:**
-- JSON files (development)
-- Ready for PostgreSQL migration (production)
+### **Styling**
+- Custom CSS with copper accent colors (#d97706, #b45309)
+- Technical typography (DM Sans, JetBrains Mono)
+- Compact form layouts (0.5rem padding, 0.875rem fonts)
+- Professional color palette for plumbing industry
 
 ---
 
 ## 📁 Project Structure
 ```
-Licensing-Roadmap/
-├── app.py                          # Flask application
-├── data/
-│   ├── license_holders/            # Individual user license data
-│   │   ├── bhambrick.json          # Benjamin Hambrick's licenses
-│   │   └── jsmith.json             # John Smith's licenses
-│   ├── training_roadmaps/          # Training paths for new hires
-│   │   └── master_plumber_southwest.json
-│   ├── company/                    # Company-wide data
-│   │   └── coverage.json
-│   └── states/                     # State-specific roadmap guides
-│       └── tx.md
+/workspaces/Licensing-Roadmap/
+├── app.py                          # Flask application with all routes
 ├── templates/
-│   ├── base.html                   # Base template with sidebar
-│   ├── licensing_roadmap.html      # Main map view
-│   ├── manage_licenses.html        # License table (CRUD)
-│   ├── edit_license.html           # Edit license form
+│   ├── base.html                   # Base layout with sidebar navigation
+│   ├── home.html                   # Dashboard with urgent items, stats
+│   ├── licensing_roadmap.html      # Interactive map with 4 views
+│   ├── manage_licenses.html        # License table with CRUD operations
+│   ├── edit_license.html           # Edit individual license
 │   ├── add_license.html            # Add new license form
-│   └── settings.html               # App settings
+│   ├── cost_details.html           # Cost tracking per license
+│   ├── cost_analytics.html         # Cost analytics dashboard
+│   ├── bio_builder.html            # Professional bio builder (8 sections)
+│   ├── manage_team.html            # Team management
+│   ├── edit_holder.html            # Edit license holder info
+│   ├── settings.html               # App settings
+│   └── login.html                  # Password protection
 ├── static/
 │   ├── css/
-│   │   └── main.css                # ~2000 lines of custom styling
+│   │   └── main.css                # ~3000+ lines of custom styling
 │   └── js/
-│       ├── main.js                 # Core JavaScript
-│       └── mapbox-map.js           # Map visualization logic
+│       ├── main.js                 # Offcanvas, search, interactions
+│       └── mapbox-map.js           # Map initialization, view switching
+├── data/
+│   ├── license_holders/
+│   │   ├── bhambrick.json          # Benjamin's licenses & bio
+│   │   └── jsmith.json             # John's licenses & bio
+│   ├── training_roadmaps/
+│   │   └── master_plumber_southwest.json
+│   ├── company/
+│   │   └── coverage.json
+│   ├── bio_templates/
+│   │   └── default_bio.json        # Bio structure template
+│   └── backups/                    # Automatic backups of data migrations
 └── README.md
 ```
 
 ---
 
-## 🎨 Design Philosophy
-
-### **NetSuite-Inspired Efficiency**
-- Compact layouts with minimal vertical scrolling
-- Table-based data presentation for dense information
-- Professional color palette (Navy blue, Copper accents)
-- Information hierarchy through typography and spacing
-
-### **User-Centric Features**
-- **Brag Bar** - Quick stats showing total licenses/certificates
-- **Context-Aware Sidebars** - Different content based on map view
-- **Smart Color Coding** - Instant visual understanding of status
-- **Minimal Clicks** - Common tasks accessible in 1-2 clicks
-
----
-
 ## 💾 Data Structure
 
-### License Holder Profile
+### **License Holder Profile**
 ```json
 {
   "user_id": "bhambrick",
@@ -114,249 +209,251 @@ Licensing-Roadmap/
   "role": "Master Plumber",
   "total_licenses": 29,
   "total_certificates": 42,
-  "states": {
-    "TX": {
-      "name": "Texas",
-      "status": "licensed",
+  "next_target_state": "AZ",
+  "licenses": [
+    {
+      "license_id": "TX-001",
+      "jurisdiction": "Texas",
+      "jurisdiction_abbr": "TX",
+      "jurisdiction_type": "state",
       "license_type": "Master Plumber",
       "license_number": "MP-123456",
+      "status": "licensed",
       "issued_on": "2020-03-15",
       "expires_on": "2026-03-15",
-      "renewal_cost": 450,
+      "designated_role": "master_of_record",
+      
+      "estimated_costs": {
+        "application_fee": 225.00,
+        "test_fee": 0.00,
+        "trade_book_fee": 126.73,
+        "renewal_fee": 300.00
+      },
+      
+      "actual_costs": [
+        {
+          "date": "2020-02-10",
+          "category": "application_fee",
+          "amount": 225.00,
+          "vendor": "Texas State Board",
+          "notes": "Initial application"
+        }
+      ],
+      
+      "recurring": {
+        "renewal_fee": 300.00,
+        "continuing_ed_fee": 100.00,
+        "renewal_period_years": 1
+      },
+      
       "board_name": "Texas State Board of Plumbing Examiners",
       "board_phone": "(512) 555-0100",
       "board_url": "https://www.tsbpe.texas.gov"
     }
+  ],
+  
+  "bio": {
+    "personal_info": { ... },
+    "work_history": [ ... ],
+    "plumbing_experience": {
+      "total_years": 12,
+      "residential_hours": 8000,
+      "commercial_hours": 6000,
+      "job_projects": [
+        {
+          "project_name": "24-unit apartment building",
+          "location": "Houston, TX",
+          "completion_date": "2023-06-15",
+          "job_type": "commercial",
+          "project_value": 145000,
+          "scope_summary": "Complete rough-in and finish plumbing...",
+          "your_role": "Lead Plumber"
+        }
+      ]
+    },
+    "education": { ... },
+    "references": [ ... ],
+    "background": { ... },
+    "military": { ... }
   }
-}
-```
-
-### Training Roadmap
-```json
-{
-  "roadmap_id": "master_plumber_southwest",
-  "title": "Master Plumber - Southwest Region",
-  "estimated_duration": "18-24 months",
-  "total_cost_estimate": "$15,000",
-  "path": [
-    {
-      "step": 1,
-      "state": "TX",
-      "license_type": "Journey Plumber",
-      "priority": "critical",
-      "estimated_timeline": "6 months",
-      "cost_estimate": "$500"
-    }
-  ]
 }
 ```
 
 ---
 
-## 🔧 Installation & Setup
+## �� Installation & Setup
 
-### Prerequisites
+### **Prerequisites**
 - Python 3.12+
-- Mapbox Account (free tier works)
+- pip package manager
+- Git
 
-### Local Development
-
-1. **Clone the repository**
+### **Installation**
 ```bash
-git clone https://github.com/yourusername/Licensing-Roadmap.git
+# Clone the repository
+git clone <repository-url>
 cd Licensing-Roadmap
-```
 
-2. **Install dependencies**
-```bash
-pip install flask
-```
+# Install dependencies
+pip install flask --break-system-packages
 
-3. **Set Mapbox Token**
-Edit `app.py` and add your Mapbox token:
-```python
-MAPBOX_ACCESS_TOKEN = 'your_mapbox_token_here'
-```
+# Set environment variables (optional - uses defaults if not set)
+export MAPBOX_ACCESS_TOKEN="your_mapbox_token"
 
-4. **Run the application**
-```bash
+# Run the application
 python app.py
 ```
 
-5. **Open in browser**
-```
-http://localhost:5000
-```
+The app will be available at `http://localhost:5000`
+
+### **Default Login**
+- **Password:** `TeamLicense2024` (change in `app.py` line ~15)
+
+---
+
+## 🎨 Design Philosophy
+
+### **NetSuite-Inspired Efficiency**
+- Compact layouts - maximum information, minimal scrolling
+- Professional color scheme (copper accents on neutral grays)
+- Consistent spacing and typography
+- Quick actions always visible
+- Reduced padding/margins throughout (25-40% smaller than Bootstrap defaults)
+
+### **Copy-to-Clipboard First**
+Every section of the bio builder includes formatted text outputs that can be copied directly into applications. No more retyping the same information 50 times.
+
+### **Mobile-Responsive**
+All pages adapt to tablet and mobile screens (though desktop is optimal for detailed work).
 
 ---
 
 ## 🗺️ Map Views Explained
 
-### 1. License Status View (Default)
-- **Green** - Licensed and active
-- **Blue** - Application in progress
-- **Orange** - Renewal due soon (< 90 days)
-- **Red** - Overdue renewal
-- **Gray** - Not licensed
+### **License Status View**
+- **Green** - Licensed and current
+- **Blue** - Application in progress  
+- **Red** - Overdue for renewal
+- **Gray** - Not licensed in this state
 
-### 2. Expiration Tracker
-- **Dark Green** - 180+ days remaining
-- **Lime** - 90-180 days remaining
-- **Yellow** - 30-90 days remaining
-- **Orange** - 0-30 days remaining
+### **Expiration Tracker View**
+- **Green** - >90 days until expiration
+- **Yellow** - 30-90 days (due soon)
+- **Orange** - <30 days (urgent)
 - **Red** - Overdue
+- **Gray** - No license
 
-### 3. Leadership Dashboard
-- Shows aggregate coverage across all license holders
-- Identifies coverage gaps
-- Tracks team-wide expiration urgency
+### **Leadership View** (Director Mode)
+Shows aggregated team coverage - tracks who's licensed where across all team members.
 
-### 4. Training Roadmap
-- Displays recommended licensing sequence
-- Color-coded by step priority
-- Shows timeline and cost estimates
+### **Training Roadmap View**
+Recommended licensing paths based on your role and experience level.
 
 ---
 
-## 📊 Current Capabilities
+## 🔮 Future Enhancements
 
-### ✅ Implemented
-- [x] Multi-user account system
-- [x] Four interactive map views
-- [x] License CRUD operations
-- [x] Expiration tracking with urgency
-- [x] Training roadmap visualization
-- [x] Professional NetSuite-style UI
-- [x] Responsive design
-- [x] State detail pages
+### **Phase 1: Production Deployment**
+- [ ] Migrate to PostgreSQL database
+- [ ] Deploy to Render with production configs
+- [ ] Email/SMS renewal notifications
+- [ ] Document upload (PDFs, receipts, certificates)
 
-### 🚧 In Development
-- [ ] PostgreSQL database migration
-- [ ] User authentication system
-- [ ] Email/SMS renewal reminders
-- [ ] Document upload (license PDFs)
-- [ ] Export to CSV/PDF
-- [ ] Cost analytics dashboard
-- [ ] Calendar integration
+### **Phase 2: Advanced Features**
+- [ ] CSV import/export for bulk data
+- [ ] Calendar integration (Google Calendar, Outlook)
+- [ ] Advanced analytics (cost trends, ROI per state)
+- [ ] Mobile app (iOS/Android)
+- [ ] Reference letter storage and templates
 
----
-
-## 🎓 Training Roadmap Feature
-
-The training roadmap helps new hires understand the optimal path to obtain licenses:
-
-**Example: Master Plumber - Southwest Region**
-1. **Texas** - Foundation (6 months, $500)
-2. **Arizona** - Market expansion (3 months, $400)
-3. **Nevada** - Las Vegas coverage (4 months, $800)
-4. **California** - West coast (6 months, $1,200)
-5. **Colorado** - Denver market (3 months, $350)
-
-**Total Investment:** 22 months, ~$3,250
+### **Phase 3: SaaS Conversion** (Long-term)
+- [ ] Multi-company support
+- [ ] Role-based permissions (admin, manager, license holder)
+- [ ] Email-based user accounts
+- [ ] Subscription billing
+- [ ] API for third-party integrations
 
 ---
 
-## 👥 User Personas
+## 🎯 Use Cases
 
-### License Holder (Individual)
-- View personal licenses
-- Update expiration dates and costs
-- Track renewal deadlines
-- Add new states
+### **Individual License Holder**
+- Track all your licenses in one place
+- Set renewal reminders
+- Build professional bio once, use everywhere
+- Filter job history by date for specific applications
+- Track how much you've spent on licensing
 
-### Director (Leadership)
-- View all team members' licenses
-- Identify coverage gaps
-- Monitor team-wide expirations
+### **Department Manager**
+- See team-wide license coverage
+- Track costs across all team members
+- Assign "next target states" to employees
+- Monitor upcoming expirations
 - Generate compliance reports
 
-### New Hire (Trainee)
-- Follow recommended licensing path
-- Understand prerequisites and timelines
-- Track progress through training roadmap
+### **Business Owner**
+- Know who's your Master of Record in each state
+- Budget for licensing costs
+- Plan expansion based on current coverage
+- Track employee certifications
 
 ---
 
-## 🎨 Color Palette
-```css
---primary-dark: #1a2634
---primary-blue: #2563eb
---accent-copper: #d97706
---accent-warm: #f59e0b
+## 🏆 Key Innovations
 
---status-licensed: #10b981
---status-progress: #3b82f6
---status-due-soon: #f59e0b
---status-overdue: #ef4444
-```
+### **The "Hawaii Solution"**
+Hawaii requires "List all jobs completed in the last 4 years with detailed descriptions." Before this app, you'd spend hours rewriting job descriptions from memory.
 
----
+**Now:**
+1. Build your job library once (add jobs as you complete them)
+2. When Hawaii asks, filter to "Last 4 Years"
+3. Click "Copy Filtered Jobs"
+4. Paste into application
+5. Done in 30 seconds instead of 3 hours
 
-## 🔐 Security Notes
+### **Bio Builder vs. Traditional Method**
+**Traditional:** Retype name, address, work history, references for every application (15-30 min per app × 20 states = 5-10 hours)
 
-**Current (Development):**
-- No authentication
-- JSON file storage
-- Local development only
+**With Bio Builder:** Fill out comprehensive profile once (1 hour), then copy/paste sections into each application (2-3 min per app × 20 states = 40 min-1 hour)
 
-**Production TODO:**
-- Implement user authentication (Flask-Login)
-- Migrate to PostgreSQL
-- Add role-based access control (RBAC)
-- Environment variables for secrets
-- HTTPS/SSL certificates
+**Time savings: 4-9 hours** across 20 state applications
 
 ---
 
-## 📈 Future Enhancements
-
-### Phase 1 - Production Ready
-- PostgreSQL database
-- User authentication
-- Deployment to Render/Heroku
-
-### Phase 2 - Advanced Features
-- Email/SMS notifications
-- Document storage (AWS S3)
-- Advanced analytics
-- Bulk import/export
-
-### Phase 3 - Enterprise
-- Multi-tenant support
-- API for integrations
-- Mobile app (React Native)
-- Advanced reporting
+## 📊 Current Stats (Example Data)
+- **8 licenses** tracked (TX, CA, FL, WA, NV, AZ, NY, CO)
+- **3 statuses** (licensed, in progress, not licensed)
+- **29 total licenses** and **42 certificates** across team
+- **$15,000+** in licensing costs tracked
+- **8 comprehensive bio sections** covering every application question
 
 ---
 
 ## 🤝 Contributing
 
-This is currently a private project. Contact the maintainer for collaboration opportunities.
+This is currently a private internal tool. Future open-source release TBD.
 
 ---
 
-## 📄 License
+## 📝 License
 
-Proprietary - All Rights Reserved
-
----
-
-## 👨‍💻 Author
-
-**Benjamin Hambrick**
-- Master Plumber
-- 29 State Licenses
-- 42 Professional Certificates
+Proprietary - Internal use only
 
 ---
 
-## 🙏 Acknowledgments
+## 👨‍🔧 About
 
-- **Mapbox** - Interactive mapping platform
-- **Bootstrap** - UI framework
-- **Flask** - Python web framework
-- **Claude (Anthropic)** - Development assistance
+Built by Benjamin Hambrick, Master Plumber, to solve real licensing compliance challenges in the plumbing industry. 
+
+**"Stop filling out the same forms 50 times. Build it once, use it forever."**
 
 ---
 
-**Built with 🔧 by licensed professionals, for licensed professionals.**
+## 📞 Support
+
+For questions or issues, contact the development team.
+
+---
+
+**Last Updated:** December 2024
+**Version:** 2.0 - Bio Builder Release

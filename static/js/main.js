@@ -1,5 +1,5 @@
 /**
- * Main JavaScript - Enhanced Offcanvas Content
+ * Main JavaScript - Enhanced Offcanvas Content with 4 Different Views
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -83,150 +83,370 @@ function handleStateClick(stateAbbr) {
     const stateData = window.statesData[stateAbbr];
     if (!stateData) return;
     
-    populateOffcanvas(stateAbbr, stateData);
+    // Determine which view is active
+    const activeView = document.querySelector('.view-tab.active')?.getAttribute('data-view') || 'status';
+    
+    // Populate offcanvas based on active view
+    populateOffcanvasForView(stateAbbr, stateData, activeView);
     
     const offcanvas = new bootstrap.Offcanvas(document.getElementById('stateOffcanvas'));
     offcanvas.show();
 }
 
-function populateOffcanvas(stateAbbr, stateData) {
-
-    // Check if we're in training roadmap view
-    const isTrainingView = document.querySelector('.view-tab[data-view="training"]')?.classList.contains('active');
-    const trainingRoadmap = window.trainingRoadmap;
-    
-    if (isTrainingView && trainingRoadmap && trainingRoadmap.path) {
-        const trainingStep = trainingRoadmap.path.find(step => step.state === stateAbbr);
-        if (trainingStep) {
-            populateTrainingRoadmapOffcanvas(stateAbbr, stateData, trainingStep, trainingRoadmap);
-            return;
-        }
+function populateOffcanvasForView(stateAbbr, stateData, view) {
+    switch(view) {
+        case 'status':
+            populateLicenseStatusView(stateAbbr, stateData);
+            break;
+        case 'expiration':
+            populateExpirationTrackerView(stateAbbr, stateData);
+            break;
+        case 'leadership':
+            populateLeadershipView(stateAbbr, stateData);
+            break;
+        case 'training':
+            populateTrainingRoadmapView(stateAbbr, stateData);
+            break;
+        default:
+            populateLicenseStatusView(stateAbbr, stateData);
     }
-    
+}
+
+// CLEAN, COMPACT SIDE PANEL - NO SCROLLING
+// Each view shows only essential summary info with prominent "View Full Details" button
+
+// ============================================================================
+// VIEW 1: LICENSE STATUS VIEW - COMPACT
+// ============================================================================
+function populateLicenseStatusView(stateAbbr, stateData) {
     const offcanvasTitle = document.getElementById('stateOffcanvasLabel');
     const offcanvasContent = document.getElementById('offcanvasContent');
     
     offcanvasTitle.textContent = stateData.name;
     
-    // Build gorgeous content
     let html = `
-        <div class="offcanvas-state-content">
+        <div class="offcanvas-state-content-clean">
             <!-- Status Badge -->
-            <div class="status-badge-container">
-                <span class="status-badge-large status-${stateData.status_class}">
+            <div class="status-badge-container-clean">
+                <span class="status-badge-xl status-${stateData.status_class}">
                     ${getStatusIcon(stateData.status_class)} ${stateData.badge_text}
                 </span>
             </div>
     `;
     
-    // License Information Card
     if (stateData.status === 'licensed') {
         html += `
-            <div class="info-card-pro">
-                <div class="info-card-header">
-                    <span class="info-card-icon">📜</span>
-                    <span class="info-card-title">License Details</span>
+            <!-- Quick Info Grid -->
+            <div class="quick-info-grid">
+                <div class="quick-info-item">
+                    <div class="quick-info-label">License Type</div>
+                    <div class="quick-info-value">${stateData.license_type || 'Master Plumber'}</div>
                 </div>
-                <div class="info-card-body">
-                    <div class="info-row">
-                        <span class="info-label">Type</span>
-                        <span class="info-value">${stateData.license_type || 'Master Plumber'}</span>
-                    </div>
-                    ${stateData.license_number ? `
-                    <div class="info-row">
-                        <span class="info-label">License #</span>
-                        <span class="info-value"><code>${stateData.license_number}</code></span>
-                    </div>
-                    ` : ''}
+                ${stateData.license_number ? `
+                <div class="quick-info-item">
+                    <div class="quick-info-label">License #</div>
+                    <div class="quick-info-value"><code>${stateData.license_number}</code></div>
                 </div>
-            </div>
-        `;
-        
-        // Expiration Card with Progress Bar
-        if (stateData.expires_on) {
-            const daysRemaining = stateData.days_remaining;
-            let progressPercent = 0;
-            let progressClass = 'success';
-            let expiryText = '';
-            
-            if (daysRemaining < 0) {
-                progressPercent = 100;
-                progressClass = 'danger';
-                expiryText = `OVERDUE by ${Math.abs(daysRemaining)} days`;
-            } else if (daysRemaining <= 90) {
-                progressPercent = 100 - ((daysRemaining / 90) * 100);
-                progressClass = 'warning';
-                expiryText = `${daysRemaining} days remaining`;
-            } else {
-                progressPercent = 20;
-                progressClass = 'success';
-                expiryText = `${daysRemaining} days remaining`;
-            }
-            
-            html += `
-                <div class="info-card-pro expiry-card">
-                    <div class="info-card-header">
-                        <span class="info-card-icon">📅</span>
-                        <span class="info-card-title">Expiration</span>
-                    </div>
-                    <div class="info-card-body">
-                        <div class="expiry-date">${formatDate(stateData.expires_on)}</div>
-                        <div class="expiry-countdown ${progressClass}">${expiryText}</div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar-fill progress-${progressClass}" style="width: ${progressPercent}%"></div>
-                        </div>
+                ` : ''}
+                ${stateData.expires_on ? `
+                <div class="quick-info-item">
+                    <div class="quick-info-label">Expires</div>
+                    <div class="quick-info-value">${formatDate(stateData.expires_on)}</div>
+                </div>
+                ` : ''}
+                <div class="quick-info-item">
+                    <div class="quick-info-label">Designation</div>
+                    <div class="quick-info-value">
+                        ${stateData.designated_role === 'master_of_record' ? 
+                            '<span class="badge-sm badge-primary">Master of Record</span>' : 
+                            '<span class="badge-sm badge-secondary">Standard</span>'
+                        }
                     </div>
                 </div>
-            `;
-        }
-    }
-    
-    // For not licensed states, show minimal info
-    if (stateData.status === 'not_licensed' || !stateData.license_number) {
-        html += `
-            <div class="text-center py-3">
-                <p class="text-muted mb-3">Not licensed in ${stateData.name} yet.</p>
-                <p class="small text-muted">Click below to view complete licensing requirements, costs, and application process.</p>
             </div>
         `;
     } else {
-        // For licensed states, show full details
         html += `
-            <div class="info-card-pro">
-                <div class="info-card-header">
-                    <span class="info-card-icon">🏛️</span>
-                    <span class="info-card-title">Licensing Board</span>
-                </div>
-                <div class="info-card-body">
-                    <div class="board-name">${stateData.board_name}</div>
-                    ${stateData.board_phone ? `
-                    <div class="board-contact">
-                        <span class="contact-icon">📞</span>
-                        <span>${stateData.board_phone}</span>
-                    </div>
-                    ` : ''}
-                </div>
+            <div class="empty-state">
+                <p class="empty-state-text">Not licensed in ${stateData.name}</p>
+                <p class="empty-state-subtext">View full details to see requirements and costs</p>
             </div>
         `;
     }
     
-    // Action Buttons
+    // Board Contact - Compact
     html += `
-        <div class="action-buttons">
-            <a href="/state/${stateAbbr}" class="btn-action btn-primary-action">
-                <span>📖</span> Complete Licensing Guide
-            </a>
-            <a href="${stateData.board_url}" target="_blank" class="btn-action btn-secondary-action">
-                <span>🔗</span> Visit Board Website
+        <div class="board-contact-compact">
+            <div class="board-name-sm">${stateData.board_name || stateData.name + ' State Board'}</div>
+            ${stateData.board_phone ? `<div class="board-phone-sm">📞 ${stateData.board_phone}</div>` : ''}
+        </div>
+    `;
+    
+    // Big Action Button
+    html += `
+        <div class="action-button-clean">
+            <a href="/state/${stateAbbr}" class="btn-full-details">
+                <span class="btn-icon">📖</span>
+                <span class="btn-text">View Full Licensing Guide</span>
+                <span class="btn-arrow">→</span>
             </a>
         </div>
     `;
     
     html += '</div>';
+    offcanvasContent.innerHTML = html;
+}
+
+// ============================================================================
+// VIEW 2: EXPIRATION TRACKER VIEW - COMPACT
+// ============================================================================
+function populateExpirationTrackerView(stateAbbr, stateData) {
+    const offcanvasTitle = document.getElementById('stateOffcanvasLabel');
+    const offcanvasContent = document.getElementById('offcanvasContent');
+    
+    offcanvasTitle.textContent = stateData.name;
+    
+    let html = `<div class="offcanvas-state-content-clean">`;
+    
+    if (stateData.status === 'licensed' && stateData.expires_on) {
+        const daysRemaining = stateData.days_remaining;
+        let urgencyClass = 'good';
+        let urgencyText = '';
+        
+        if (daysRemaining < 0) {
+            urgencyClass = 'overdue';
+            urgencyText = `OVERDUE by ${Math.abs(daysRemaining)} days`;
+        } else if (daysRemaining <= 30) {
+            urgencyClass = 'critical';
+            urgencyText = `${daysRemaining} days remaining`;
+        } else if (daysRemaining <= 90) {
+            urgencyClass = 'warning';
+            urgencyText = `${daysRemaining} days remaining`;
+        } else {
+            urgencyClass = 'good';
+            urgencyText = `${daysRemaining} days remaining`;
+        }
+        
+        html += `
+            <!-- Expiration Status -->
+            <div class="expiration-display urgency-${urgencyClass}">
+                <div class="expiration-date-xl">${formatDate(stateData.expires_on)}</div>
+                <div class="expiration-countdown-xl">${urgencyText}</div>
+                ${urgencyClass === 'critical' || urgencyClass === 'overdue' ? 
+                    '<div class="urgency-alert">⚠️ Renewal needed immediately</div>' : ''}
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="quick-info-grid">
+                <div class="quick-info-item">
+                    <div class="quick-info-label">Renewal Fee</div>
+                    <div class="quick-info-value">TBD</div>
+                </div>
+                <div class="quick-info-item">
+                    <div class="quick-info-label">CE Required</div>
+                    <div class="quick-info-value">TBD hours</div>
+                </div>
+            </div>
+        `;
+    } else {
+        html += `
+            <div class="status-badge-container-clean">
+                <span class="status-badge-xl status-${stateData.status_class}">
+                    ${getStatusIcon(stateData.status_class)} ${stateData.badge_text}
+                </span>
+            </div>
+            <div class="empty-state">
+                <p class="empty-state-text">No active license to track</p>
+                <p class="empty-state-subtext">View full details for licensing requirements</p>
+            </div>
+        `;
+    }
+    
+    // Big Action Button
+    html += `
+        <div class="action-button-clean">
+            <a href="/state/${stateAbbr}" class="btn-full-details">
+                <span class="btn-icon">📖</span>
+                <span class="btn-text">View Full Licensing Guide</span>
+                <span class="btn-arrow">→</span>
+            </a>
+        </div>
+    </div>`;
     
     offcanvasContent.innerHTML = html;
 }
 
+// ============================================================================
+// VIEW 3: LEADERSHIP VIEW - COMPACT
+// ============================================================================
+function populateLeadershipView(stateAbbr, stateData) {
+    const offcanvasTitle = document.getElementById('stateOffcanvasLabel');
+    const offcanvasContent = document.getElementById('offcanvasContent');
+    
+    offcanvasTitle.textContent = stateData.name;
+    
+    let html = `
+        <div class="offcanvas-state-content-clean">
+            <div class="status-badge-container-clean">
+                <span class="status-badge-xl status-${stateData.status_class}">
+                    ${getStatusIcon(stateData.status_class)} ${stateData.badge_text}
+                </span>
+            </div>
+    `;
+    
+    if (stateData.status === 'licensed') {
+        html += `
+            <!-- Coverage Stats -->
+            <div class="quick-info-grid">
+                <div class="quick-info-item">
+                    <div class="quick-info-label">Coverage Status</div>
+                    <div class="quick-info-value">
+                        <span class="badge-sm badge-success">Active</span>
+                    </div>
+                </div>
+                <div class="quick-info-item">
+                    <div class="quick-info-label">License Health</div>
+                    <div class="quick-info-value">
+                        ${stateData.days_remaining && stateData.days_remaining > 90 ?
+                            '<span class="badge-sm badge-success">Healthy</span>' :
+                            '<span class="badge-sm badge-warning">Attention Needed</span>'
+                        }
+                    </div>
+                </div>
+                <div class="quick-info-item">
+                    <div class="quick-info-label">Team Coverage</div>
+                    <div class="quick-info-value">1 license holder</div>
+                </div>
+                <div class="quick-info-item">
+                    <div class="quick-info-label">Revenue Tracking</div>
+                    <div class="quick-info-value text-muted">Coming soon</div>
+                </div>
+            </div>
+        `;
+    } else {
+        html += `
+            <div class="empty-state">
+                <p class="empty-state-text">No coverage in ${stateData.name}</p>
+                <p class="empty-state-subtext">View full details for expansion analysis</p>
+            </div>
+        `;
+    }
+    
+    // Big Action Button
+    html += `
+        <div class="action-button-clean">
+            <a href="/state/${stateAbbr}" class="btn-full-details">
+                <span class="btn-icon">📖</span>
+                <span class="btn-text">View Full Licensing Guide</span>
+                <span class="btn-arrow">→</span>
+            </a>
+        </div>
+    </div>`;
+    
+    offcanvasContent.innerHTML = html;
+}
+
+// ============================================================================
+// VIEW 4: TRAINING ROADMAP VIEW - COMPACT
+// ============================================================================
+function populateTrainingRoadmapView(stateAbbr, stateData) {
+    const offcanvasTitle = document.getElementById('stateOffcanvasLabel');
+    const offcanvasContent = document.getElementById('offcanvasContent');
+    
+    offcanvasTitle.textContent = stateData.name;
+    
+    const trainingRoadmap = window.trainingRoadmap;
+    const trainingStep = trainingRoadmap && trainingRoadmap.path ? 
+        trainingRoadmap.path.find(step => step.state === stateAbbr) : null;
+    
+    let html = `<div class="offcanvas-state-content-clean">`;
+    
+    if (trainingStep) {
+        html += `
+            <!-- Training Badge -->
+            <div class="training-badge-clean">
+                <div class="training-step">Step ${trainingStep.step}</div>
+                <div class="training-priority priority-${trainingStep.priority}">${trainingStep.priority.toUpperCase()}</div>
+            </div>
+            
+            <!-- Quick Info -->
+            <div class="quick-info-grid">
+                <div class="quick-info-item">
+                    <div class="quick-info-label">Target License</div>
+                    <div class="quick-info-value">${trainingStep.license_type}</div>
+                </div>
+                <div class="quick-info-item">
+                    <div class="quick-info-label">Timeline</div>
+                    <div class="quick-info-value">${trainingStep.estimated_timeline}</div>
+                </div>
+                <div class="quick-info-item">
+                    <div class="quick-info-label">Est. Cost</div>
+                    <div class="quick-info-value">${trainingStep.cost_estimate}</div>
+                </div>
+            </div>
+            
+            <div class="training-reason">
+                <strong>Why ${stateData.name}:</strong> ${trainingStep.reason}
+            </div>
+        `;
+    } else {
+        html += `
+            <div class="status-badge-container-clean">
+                <span class="status-badge-xl status-${stateData.status_class}">
+                    ${getStatusIcon(stateData.status_class)} ${stateData.badge_text}
+                </span>
+            </div>
+            <div class="empty-state">
+                <p class="empty-state-text">Not in training roadmap</p>
+                <p class="empty-state-subtext">View full details for exam prep and requirements</p>
+            </div>
+        `;
+    }
+    
+    // Big Action Button
+    html += `
+        <div class="action-button-clean">
+            <a href="/state/${stateAbbr}" class="btn-full-details">
+                <span class="btn-icon">📖</span>
+                <span class="btn-text">View Full Licensing Guide</span>
+                <span class="btn-arrow">→</span>
+            </a>
+        </div>
+    </div>`;
+    
+    offcanvasContent.innerHTML = html;
+}
+
+// Utility functions
+function getStatusIcon(statusClass) {
+    const icons = {
+        'licensed': '✓',
+        'in_progress': '⟳',
+        'due-soon': '⚠',
+        'overdue': '!',
+        'not_licensed': '○'
+    };
+    return icons[statusClass] || '○';
+}
+
+function formatDate(isoString) {
+    if (!isoString) return 'N/A';
+    try {
+        const date = new Date(isoString);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+    } catch (e) {
+        return isoString;
+    }
+}
+
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
 function getStatusIcon(statusClass) {
     const icons = {
         'licensed': '✓',
@@ -252,125 +472,5 @@ function formatDate(isoString) {
         return isoString;
     }
 }
-
-
-function populateTrainingRoadmapOffcanvas(stateAbbr, stateData, trainingStep, roadmap) {
-    const offcanvasTitle = document.getElementById('stateOffcanvasLabel');
-    const offcanvasContent = document.getElementById('offcanvasContent');
-    
-    offcanvasTitle.textContent = stateData.name;
-    
-    // Build training-specific content
-    let html = `
-        <div class="offcanvas-state-content">
-            <!-- Training Step Badge -->
-            <div class="training-step-badge">
-                <div class="step-number">Step ${trainingStep.step}</div>
-                <div class="step-priority priority-${trainingStep.priority}">${trainingStep.priority.toUpperCase()}</div>
-            </div>
-            
-            <!-- Training Info Card -->
-            <div class="info-card-pro training-card">
-                <div class="info-card-header">
-                    <span class="info-card-icon">🎓</span>
-                    <span class="info-card-title">Training Path Details</span>
-                </div>
-                <div class="info-card-body">
-                    <div class="info-row">
-                        <span class="info-label">License Type</span>
-                        <span class="info-value">${trainingStep.license_type}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Timeline</span>
-                        <span class="info-value">${trainingStep.estimated_timeline}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Cost Estimate</span>
-                        <span class="info-value"><strong>${trainingStep.cost_estimate}</strong></span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Why This State -->
-            <div class="info-card-pro">
-                <div class="info-card-header">
-                    <span class="info-card-icon">💡</span>
-                    <span class="info-card-title">Strategic Rationale</span>
-                </div>
-                <div class="info-card-body">
-                    <p class="summary-text">${trainingStep.reason}</p>
-                </div>
-            </div>
-            
-            <!-- Prerequisites -->
-            ${trainingStep.prerequisites && trainingStep.prerequisites.length > 0 ? `
-            <div class="info-card-pro">
-                <div class="info-card-header">
-                    <span class="info-card-icon">✅</span>
-                    <span class="info-card-title">Prerequisites</span>
-                </div>
-                <div class="info-card-body">
-                    <ul class="prerequisites-list">
-                        ${trainingStep.prerequisites.map(req => `<li>${req}</li>`).join('')}
-                    </ul>
-                </div>
-            </div>
-            ` : ''}
-            
-            <!-- Roadmap Overview -->
-            <div class="info-card-pro">
-                <div class="info-card-header">
-                    <span class="info-card-icon">🗺️</span>
-                    <span class="info-card-title">Full Roadmap</span>
-                </div>
-                <div class="info-card-body">
-                    <div class="roadmap-summary">
-                        <div class="roadmap-stat">
-                            <strong>${roadmap.path.length}</strong> Total Steps
-                        </div>
-                        <div class="roadmap-stat">
-                            <strong>${roadmap.estimated_duration}</strong> Duration
-                        </div>
-                        <div class="roadmap-stat">
-                            <strong>${roadmap.total_cost_estimate}</strong> Total Cost
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Board Information -->
-            ${stateData.board_name ? `
-            <div class="info-card-pro">
-                <div class="info-card-header">
-                    <span class="info-card-icon">🏛️</span>
-                    <span class="info-card-title">Licensing Board</span>
-                </div>
-                <div class="info-card-body">
-                    <div class="board-name">${stateData.board_name}</div>
-                    ${stateData.board_phone ? `
-                    <div class="board-contact">
-                        <span class="contact-icon">��</span>
-                        <span>${stateData.board_phone}</span>
-                    </div>
-                    ` : ''}
-                </div>
-            </div>
-            ` : ''}
-            
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <a href="/state/${stateAbbr}" class="btn-action btn-primary-action">
-                    <span>📖</span> Complete Licensing Guide
-                </a>
-                <a href="${stateData.board_url || '#'}" target="_blank" class="btn-action btn-secondary-action">
-                    <span>🔗</span> Visit Licensing Board
-                </a>
-            </div>
-        </div>
-    `;
-    
-    offcanvasContent.innerHTML = html;
-}
-
 
 window.handleStateClick = handleStateClick;

@@ -2,8 +2,1304 @@
   "user_id": "bhambrick",
   "name": "Benjamin Hambrick",
   "role": "Master Plumber",
-  "total_licenses": 0,
+  "total_licenses": 37,
   "total_certificates": 0,
-  "licenses": [],
+  "licenses": [
+    {
+      "license_id": "AL-001",
+      "jurisdiction": "Alabama",
+      "jurisdiction_abbr": "AL",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing Contractor",
+      "status": "licensed",
+      "license_number": "EMP-5836",
+      "issued_on": "2024-09-12",
+      "expires_on": "2026-12-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 0.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Alabama State Board",
+      "board_phone": "https://pgfb.alabama.gov/",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "AL-002",
+      "jurisdiction": "Alabama",
+      "jurisdiction_abbr": "AL",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "MP-4533",
+      "issued_on": "2024-09-12",
+      "expires_on": "2026-12-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 225.0,
+        "test_fee": 185.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 78.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 175.0,
+        "continuing_ed_fee": 39.0,
+        "renewal_period_years": 1
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 5
+      },
+      "board_name": "State of Alabama Plumbers and Gasfitters Examining Board",
+      "board_phone": "",
+      "board_url": "https://pgfb.alabama.gov/",
+      "actual_costs": []
+    },
+    {
+      "license_id": "AZ-003",
+      "jurisdiction": "Arizona",
+      "jurisdiction_abbr": "AZ",
+      "jurisdiction_type": "state",
+      "license_type": "Qualifying Party CR-37",
+      "status": "licensed",
+      "license_number": "ROC 335967",
+      "issued_on": "2023-02-21",
+      "expires_on": "2027-12-25",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 100.0,
+        "test_fee": 54.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 750.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 650.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 2,
+        "test_duration_hours": 0
+      },
+      "board_name": "Arizona State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "AR-004",
+      "jurisdiction": "Arkansas",
+      "jurisdiction_abbr": "AR",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "MP-7262",
+      "issued_on": "2024-09-27",
+      "expires_on": "2026-12-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 125.0,
+        "test_fee": 409.0,
+        "trade_book_fee": 238.95,
+        "business_law_book_fee": 93.95,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 708.93,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 200.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 1
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 6
+      },
+      "board_name": "Arkansas Department of Health",
+      "board_phone": "",
+      "board_url": "",
+      "actual_costs": []
+    },
+    {
+      "license_id": "CA-005",
+      "jurisdiction": "California",
+      "jurisdiction_abbr": "CA",
+      "jurisdiction_type": "state",
+      "license_type": "C-36 Plumbing",
+      "status": "licensed",
+      "license_number": "1088254",
+      "issued_on": "2025-03-17",
+      "expires_on": "2026-03-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 235.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 482.5,
+        "prep_course_fee": 850.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 10
+      },
+      "board_name": "Department of Consumer Affairs Contractors State License Board",
+      "board_phone": "",
+      "board_url": "",
+      "actual_costs": []
+    },
+    {
+      "license_id": "CO-006",
+      "jurisdiction": "Colorado",
+      "jurisdiction_abbr": "CO",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing Contractor",
+      "status": "licensed",
+      "license_number": "PC.0004532",
+      "issued_on": "2023-09-28",
+      "expires_on": "2027-02-28",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 0.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Colorado State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "CO-007",
+      "jurisdiction": "Colorado",
+      "jurisdiction_abbr": "CO",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "MP.030001478",
+      "issued_on": "2023-09-28",
+      "expires_on": "2027-02-28",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 84.0,
+        "test_fee": 78.0,
+        "trade_book_fee": 92.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 140.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 88.0
+      },
+      "recurring": {
+        "renewal_fee": 177.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 3,
+        "test_duration_hours": 0
+      },
+      "board_name": "Colorado State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "FL-008",
+      "jurisdiction": "Florida",
+      "jurisdiction_abbr": "FL",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing contractor",
+      "status": "licensed",
+      "license_number": "CFC1433461",
+      "issued_on": "2025-03-07",
+      "expires_on": "2026-08-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 145.0,
+        "test_fee": 295.0,
+        "trade_book_fee": 1387.0,
+        "business_law_book_fee": 349.97,
+        "activation_fee": 249.0,
+        "prep_course_fee": 791.67,
+        "travel_fee": 1300.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 209.0,
+        "continuing_ed_fee": 150.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 24,
+        "test_duration_hours": 14
+      },
+      "board_name": "Florida Department of Business & Professional Regulation",
+      "board_phone": "",
+      "board_url": "",
+      "actual_costs": []
+    },
+    {
+      "license_id": "GA-009",
+      "jurisdiction": "Georgia",
+      "jurisdiction_abbr": "GA",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber Unrestricted",
+      "status": "licensed",
+      "license_number": "MP211009",
+      "issued_on": "2024-08-22",
+      "expires_on": "2026-11-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 40.0,
+        "test_fee": 100.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 819.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 5,
+        "test_duration_hours": 0
+      },
+      "board_name": "Georgia State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "HI-010",
+      "jurisdiction": "Hawaii",
+      "jurisdiction_abbr": "HI",
+      "jurisdiction_type": "state",
+      "license_type": "C-37",
+      "status": "licensed",
+      "license_number": "CT-39088",
+      "issued_on": "2024-06-17",
+      "expires_on": "2026-09-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 50.0,
+        "test_fee": 160.0,
+        "trade_book_fee": 126.73,
+        "business_law_book_fee": 78.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 766.7,
+        "travel_fee": 0.0,
+        "shipping_fee": 30.0
+      },
+      "recurring": {
+        "renewal_fee": 306.0,
+        "continuing_ed_fee": 150.0,
+        "renewal_period_years": 3
+      },
+      "planning": {
+        "est_study_hours": 10,
+        "test_duration_hours": 4
+      },
+      "board_name": "MyPVL DCCA Professional Vocational Licensing",
+      "board_phone": "",
+      "board_url": "",
+      "actual_costs": []
+    },
+    {
+      "license_id": "ID-011",
+      "jurisdiction": "Idaho",
+      "jurisdiction_abbr": "ID",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "79703",
+      "issued_on": "2024-11-20",
+      "expires_on": "2027-10-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 0.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Idaho State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "ID-012",
+      "jurisdiction": "Idaho",
+      "jurisdiction_abbr": "ID",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing Contractor",
+      "status": "licensed",
+      "license_number": "PC6771332",
+      "issued_on": "2024-11-20",
+      "expires_on": "2027-11-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 23.06,
+        "test_fee": 100.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 147.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 925.17,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 5,
+        "test_duration_hours": 0
+      },
+      "board_name": "Idaho State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "IL-013",
+      "jurisdiction": "Illinois",
+      "jurisdiction_abbr": "IL",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "058-200575",
+      "issued_on": "2025-03-26",
+      "expires_on": "2026-04-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 100.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 1146.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 7
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Illinois State Board",
+      "board_phone": null,
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "IN-014",
+      "jurisdiction": "Indiana",
+      "jurisdiction_abbr": "IN",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing contractor",
+      "status": "licensed",
+      "license_number": "PC12400085",
+      "issued_on": "2024-05-07",
+      "expires_on": "2027-12-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 53.94,
+        "test_fee": 100.0,
+        "trade_book_fee": 89.55,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 100.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 30.0
+      },
+      "recurring": {
+        "renewal_fee": 100.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 4
+      },
+      "board_name": "Indiana Professional Licensing Agency",
+      "board_phone": "",
+      "board_url": "",
+      "actual_costs": []
+    },
+    {
+      "license_id": "IA-015",
+      "jurisdiction": "Iowa",
+      "jurisdiction_abbr": "IA",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing Contractor",
+      "status": "licensed",
+      "license_number": "53313-CL",
+      "issued_on": "2025-05-30",
+      "expires_on": "2026-06-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 0.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Iowa State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "IA-016",
+      "jurisdiction": "Iowa",
+      "jurisdiction_abbr": "IA",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "29593",
+      "issued_on": "2025-05-30",
+      "expires_on": "2026-06-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 133.25,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Iowa State Board",
+      "board_phone": null,
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "MO-017",
+      "jurisdiction": "Kansas City MO",
+      "jurisdiction_abbr": "MO",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "CLCQ-043316-2024",
+      "issued_on": "2024-06-04",
+      "expires_on": "2028-06-04",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 60.0,
+        "test_fee": 115.0,
+        "trade_book_fee": 174.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 30.0,
+        "shipping_fee": 55.0
+      },
+      "recurring": {
+        "renewal_fee": 100.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 3,
+        "test_duration_hours": 0
+      },
+      "board_name": "Kansas City MO State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "MD-018",
+      "jurisdiction": "Maryland",
+      "jurisdiction_abbr": "MD",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "115651",
+      "issued_on": "2024-05-28",
+      "expires_on": "2026-05-28",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 78.0,
+        "test_fee": 65.0,
+        "trade_book_fee": 174.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 30.0,
+        "shipping_fee": 78.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 3,
+        "test_duration_hours": 0
+      },
+      "board_name": "Maryland State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "MI-019",
+      "jurisdiction": "Michigan",
+      "jurisdiction_abbr": "MI",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing contractor",
+      "status": "licensed",
+      "license_number": "8005076",
+      "issued_on": "2025-02-04",
+      "expires_on": "2028-04-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 0.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Michigan State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "MI-020",
+      "jurisdiction": "Michigan",
+      "jurisdiction_abbr": "MI",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "8113826",
+      "issued_on": "2025-02-04",
+      "expires_on": "2028-04-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 600.0,
+        "test_fee": 100.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 600.0,
+        "prep_course_fee": 50.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 3
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 5
+      },
+      "board_name": "Michigan Department of Licensing and Regulatory Affairs",
+      "board_phone": "",
+      "board_url": "",
+      "actual_costs": []
+    },
+    {
+      "license_id": "MN-021",
+      "jurisdiction": "Minnesota",
+      "jurisdiction_abbr": "MN",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing Contractor",
+      "status": "licensed",
+      "license_number": "IR814456",
+      "issued_on": "2025-03-25",
+      "expires_on": "2027-12-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 0.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Minnesota State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "MN-022",
+      "jurisdiction": "Minnesota",
+      "jurisdiction_abbr": "MN",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "PM806984",
+      "issued_on": "2025-03-25",
+      "expires_on": "2026-12-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 238.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 126.48,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 88.0,
+        "prep_course_fee": 59.0,
+        "travel_fee": 933.93,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 6,
+        "test_duration_hours": 0
+      },
+      "board_name": "Minnesota State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "NV-023",
+      "jurisdiction": "Nevada",
+      "jurisdiction_abbr": "NV",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing Contractor",
+      "status": "licensed",
+      "license_number": "0.0089568",
+      "issued_on": "2025-11-24",
+      "expires_on": "2026-06-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 0.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 672.53,
+        "business_law_book_fee": 80.6,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Nevada State Board",
+      "board_phone": null,
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "NC-024",
+      "jurisdiction": "North Carolina",
+      "jurisdiction_abbr": "NC",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing Class 1",
+      "status": "licensed",
+      "license_number": "36827",
+      "issued_on": "2024-01-26",
+      "expires_on": "2026-12-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 150.0,
+        "test_fee": 100.0,
+        "trade_book_fee": 407.0,
+        "business_law_book_fee": 78.0,
+        "activation_fee": 75.0,
+        "prep_course_fee": 395.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 100.0,
+        "continuing_ed_fee": 50.0,
+        "renewal_period_years": 1
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 5
+      },
+      "board_name": "North Carolina State Board of Examiners of Plumbing Heating & Fire Sprinkler Contractors",
+      "board_phone": "",
+      "board_url": "",
+      "actual_costs": []
+    },
+    {
+      "license_id": "OH-025",
+      "jurisdiction": "Ohio",
+      "jurisdiction_abbr": "OH",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing Contractor",
+      "status": "licensed",
+      "license_number": "50974",
+      "issued_on": "2025-01-28",
+      "expires_on": "2026-01-28",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 25.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 5
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Ohio State Board",
+      "board_phone": null,
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "OK-026",
+      "jurisdiction": "Oklahoma",
+      "jurisdiction_abbr": "OK",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing Contractor",
+      "status": "licensed",
+      "license_number": "MPL # 00221011",
+      "issued_on": "2024-08-20",
+      "expires_on": "2026-09-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 30.0,
+        "test_fee": 92.0,
+        "trade_book_fee": 174.0,
+        "business_law_book_fee": 78.0,
+        "activation_fee": 300.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 30.0
+      },
+      "recurring": {
+        "renewal_fee": 200.0,
+        "continuing_ed_fee": 100.0,
+        "renewal_period_years": 1
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 6
+      },
+      "board_name": "Oklahoma Construction Industries Board",
+      "board_phone": "",
+      "board_url": "",
+      "actual_costs": []
+    },
+    {
+      "license_id": "OR-027",
+      "jurisdiction": "Oregon",
+      "jurisdiction_abbr": "OR",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing Contractor",
+      "status": "licensed",
+      "license_number": "PB2580",
+      "issued_on": "2025-07-25",
+      "expires_on": "2026-07-01",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 0.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Oregon State Board",
+      "board_phone": null,
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "PA-028",
+      "jurisdiction": "Pennsylvania",
+      "jurisdiction_abbr": "PA",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing contractor",
+      "status": "licensed",
+      "license_number": "64657",
+      "issued_on": "",
+      "expires_on": "2026-11-24",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 0.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 104.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Pennsylvania State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "SC-029",
+      "jurisdiction": "South Carolina",
+      "jurisdiction_abbr": "SC",
+      "jurisdiction_type": "state",
+      "license_type": "Plumbing Contractor",
+      "status": "licensed",
+      "license_number": "CLM.117911",
+      "issued_on": "2024-08-30",
+      "expires_on": "2026-10-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 350.0,
+        "test_fee": 75.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 177.95,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 30.0
+      },
+      "recurring": {
+        "renewal_fee": 160.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 2
+      },
+      "board_name": "South Carolina Labor Licensing Regulation",
+      "board_phone": "",
+      "board_url": "",
+      "actual_costs": []
+    },
+    {
+      "license_id": "TX-030",
+      "jurisdiction": "Texas",
+      "jurisdiction_abbr": "TX",
+      "jurisdiction_type": "state",
+      "license_type": "Responsible Master Plumber",
+      "status": "licensed",
+      "license_number": "44752",
+      "issued_on": "2023-10-06",
+      "expires_on": "2026-09-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 225.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 126.73,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 225.0,
+        "prep_course_fee": 550.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 300.0
+      },
+      "recurring": {
+        "renewal_fee": 100.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 24
+      },
+      "planning": {
+        "est_study_hours": 8,
+        "test_duration_hours": 0
+      },
+      "board_name": "Texas State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "VA-031",
+      "jurisdiction": "Virginia",
+      "jurisdiction_abbr": "VA",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "2710079781",
+      "issued_on": "2023-09-18",
+      "expires_on": "2026-09-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 130.0,
+        "test_fee": 125.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 78.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 558.9,
+        "travel_fee": 0.0,
+        "shipping_fee": 30.0
+      },
+      "recurring": {
+        "renewal_fee": 240.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 3
+      },
+      "planning": {
+        "est_study_hours": 3,
+        "test_duration_hours": 4
+      },
+      "board_name": "Virginia Department of Professional and Occupational Regulation",
+      "board_phone": "",
+      "board_url": "",
+      "actual_costs": []
+    },
+    {
+      "license_id": "VA-032",
+      "jurisdiction": "Virginia",
+      "jurisdiction_abbr": "VA",
+      "jurisdiction_type": "state",
+      "license_type": "Class A Contractor",
+      "status": "licensed",
+      "license_number": "2705189432",
+      "issued_on": "2023-10-17",
+      "expires_on": "2027-10-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 385.0,
+        "test_fee": 85.0,
+        "trade_book_fee": 92.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 1000.0,
+        "travel_fee": 30.0,
+        "shipping_fee": 135.0
+      },
+      "recurring": {
+        "renewal_fee": 40.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 3
+      },
+      "planning": {
+        "est_study_hours": 3,
+        "test_duration_hours": 0
+      },
+      "board_name": "Virginia State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "VA-033",
+      "jurisdiction": "Virginia",
+      "jurisdiction_abbr": "VA",
+      "jurisdiction_type": "state",
+      "license_type": "Backflow",
+      "status": "licensed",
+      "license_number": "59885",
+      "issued_on": "2024-06-04",
+      "expires_on": "2026-06-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 130.0,
+        "test_fee": 100.0,
+        "trade_book_fee": 393.06,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 30.0,
+        "shipping_fee": 130.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 3
+      },
+      "planning": {
+        "est_study_hours": 2,
+        "test_duration_hours": 0
+      },
+      "board_name": "Virginia State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "WA-034",
+      "jurisdiction": "Washington",
+      "jurisdiction_abbr": "WA",
+      "jurisdiction_type": "state",
+      "license_type": "Journey Level",
+      "status": "licensed",
+      "license_number": "HAMBRBR789B5",
+      "issued_on": "2022-07-25",
+      "expires_on": "2027-09-30",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 189.8,
+        "test_fee": 80.0,
+        "trade_book_fee": 126.73,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 227.9,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 227.9
+      },
+      "recurring": {
+        "renewal_fee": 224.91,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 16
+      },
+      "planning": {
+        "est_study_hours": 4,
+        "test_duration_hours": 0
+      },
+      "board_name": "Washington State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "KS-035",
+      "jurisdiction": "Wichita KS",
+      "jurisdiction_abbr": "KS",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber",
+      "status": "licensed",
+      "license_number": "CER2024-12890",
+      "issued_on": "2024-06-21",
+      "expires_on": "2025-12-31",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 35.0,
+        "test_fee": 115.0,
+        "trade_book_fee": 87.5,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 30.0,
+        "shipping_fee": 35.0
+      },
+      "recurring": {
+        "renewal_fee": 100.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 3,
+        "test_duration_hours": 0
+      },
+      "board_name": "Wichita KS State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "WY-036",
+      "jurisdiction": "Wyoming",
+      "jurisdiction_abbr": "WY",
+      "jurisdiction_type": "state",
+      "license_type": "Class C-1 Plumbing and Pipe fitting",
+      "status": "licensed",
+      "license_number": "BUCT-31645",
+      "issued_on": "2025-02-11",
+      "expires_on": "2026-11-17",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 0.0,
+        "test_fee": 0.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 0.0,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Wyoming State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    },
+    {
+      "license_id": "WY-037",
+      "jurisdiction": "Wyoming",
+      "jurisdiction_abbr": "WY",
+      "jurisdiction_type": "state",
+      "license_type": "Master Plumber with Gas",
+      "status": "licensed",
+      "license_number": "BUCT-31646",
+      "issued_on": "2025-02-11",
+      "expires_on": "2026-11-17",
+      "designated_role": "master_of_record",
+      "estimated_costs": {
+        "application_fee": 250.0,
+        "test_fee": 115.0,
+        "trade_book_fee": 0.0,
+        "business_law_book_fee": 0.0,
+        "activation_fee": 358.75,
+        "prep_course_fee": 0.0,
+        "travel_fee": 0.0,
+        "shipping_fee": 0.0
+      },
+      "recurring": {
+        "renewal_fee": 0.0,
+        "continuing_ed_fee": 0.0,
+        "renewal_period_years": 2
+      },
+      "planning": {
+        "est_study_hours": 0,
+        "test_duration_hours": 0
+      },
+      "board_name": "Wyoming State Board",
+      "board_phone": "",
+      "board_url": null,
+      "actual_costs": []
+    }
+  ],
   "next_target_state": "NV"
 }

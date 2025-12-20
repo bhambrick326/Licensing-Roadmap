@@ -3,382 +3,1047 @@
 {% block title %}{{ state.state }} - Licensing Requirements{% endblock %}
 
 {% block content %}
-<div class="settings-page">
-    <div class="container-fluid px-4 py-3">
+<div class="state-detail-page">
+    <div class="container-fluid px-3 py-2">
         
-        <!-- Header -->
-        <div class="page-header-compact mb-3">
-            <div>
-                <a href="/licensing-roadmap?account={{ holder.user_id if holder else 'bhambrick' }}" class="btn btn-sm btn-outline-secondary mb-2">← Back to Map</a>
-                <h3>{{ state.state }} ({{ state.state_abbr }}) Licensing Guide</h3>
-                <p class="text-muted mb-0">{{ state.governing_body }}</p>
+        <!-- Compact Header -->
+        <div class="state-header-compact">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div>
+                    <a href="/licensing-roadmap?account=bhambrick" class="btn-back">← Map</a>
+                    <h4 class="state-title">{{ state.state }} <span class="state-abbr">({{ state.state_abbr }})</span></h4>
+                </div>
+                <div class="state-board-quick">
+                    <div class="board-name-quick">{{ state.governing_body }}</div>
+                    <div class="board-contact-quick">📞 {{ state.board_phone }}</div>
+                </div>
             </div>
         </div>
 
-        <div class="row">
-            <!-- Main Content -->
-            <div class="col-lg-8">
-                
-                <!-- Quick Stats -->
-                <div class="row g-2 mb-3">
-                    <div class="col-md-3">
-                        <div class="compact-stats-card text-center">
-                            <div class="stat-value">{{ state.license_types|length }}</div>
-                            <div class="stat-label">License Types</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="compact-stats-card text-center">
-                            <div class="stat-value">{{ state.requirements.minimum_age }}</div>
-                            <div class="stat-label">Min. Age</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="compact-stats-card text-center">
-                            <div class="stat-value">{{ state.renewal.continuing_education_hours }}</div>
-                            <div class="stat-label">CE Hours/Year</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="compact-stats-card text-center">
-                            <div class="stat-value">${{ state.renewal.renewal_fee }}</div>
-                            <div class="stat-label">Renewal Fee</div>
-                        </div>
-                    </div>
-                </div>
+        <!-- COMPACT VIEW TABS -->
+        <div class="state-view-tabs-compact">
+            <button class="state-view-tab-compact active" data-view="status">
+                <span class="tab-icon">📊</span>
+                <span class="tab-label">License Status</span>
+            </button>
+            <button class="state-view-tab-compact" data-view="expiration">
+                <span class="tab-icon">⏰</span>
+                <span class="tab-label">Expiration Tracker</span>
+            </button>
+            <button class="state-view-tab-compact" data-view="leadership">
+                <span class="tab-icon">👔</span>
+                <span class="tab-label">Leadership View</span>
+            </button>
+            <button class="state-view-tab-compact" data-view="training">
+                <span class="tab-icon">🎓</span>
+                <span class="tab-label">Training Roadmap</span>
+            </button>
+        </div>
 
-                <!-- License Types -->
-                <div class="netsuite-table-card mb-3">
-                    <div class="p-3 border-bottom">
-                        <h6 class="mb-0">📜 Available License Types</h6>
-                    </div>
-                    <div class="p-3">
-                        {% for license in state.license_types %}
-                        <div class="license-type-card mb-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">{{ license.name }}</h6>
-                                    <p class="text-muted small mb-2">{{ license.description }}</p>
-                                    <div class="row g-2 small">
-                                        <div class="col-md-6">
-                                            <strong>Experience:</strong> {{ license.experience_required }}
+        <!-- VIEW CONTENT CONTAINERS -->
+        <div id="view-content">
+            
+            <!-- ============================================================ -->
+            <!-- LICENSE STATUS VIEW -->
+            <!-- ============================================================ -->
+            <div class="view-container active" data-view="status">
+                <div class="row g-2">
+                    <!-- Main Content -->
+                    <div class="col-lg-9">
+                        
+                        <!-- License Types -->
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">📜</span>
+                                <span class="card-title">Available License Types</span>
+                            </div>
+                            <div class="card-body-compact">
+                                {% for license in state.license_types %}
+                                <div class="license-row">
+                                    <div class="license-info">
+                                        <div class="license-name">{{ license.name }}</div>
+                                        <div class="license-desc">{{ license.description }}</div>
+                                    </div>
+                                    <div class="license-details-grid">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Experience</span>
+                                            <span class="detail-value">{{ license.experience_required }}</span>
                                         </div>
-                                        <div class="col-md-6">
-                                            <strong>Exam:</strong> {{ 'Required (' + license.exam_type + ')' if license.exam_required else 'Not Required' }}
+                                        <div class="detail-item">
+                                            <span class="detail-label">Exam</span>
+                                            <span class="detail-value">{{ 'Required (' + license.exam_type + ')' if license.exam_required else 'Not Required' }}</span>
                                         </div>
-                                        <div class="col-md-4">
-                                            <strong>Application:</strong> ${{ "%.2f"|format(license.application_fee) }}
+                                        <div class="detail-item">
+                                            <span class="detail-label">Application</span>
+                                            <span class="detail-value">${{ "%.2f"|format(license.application_fee) }}</span>
                                         </div>
-                                        <div class="col-md-4">
-                                            <strong>Exam:</strong> ${{ "%.2f"|format(license.exam_fee) }}
+                                        <div class="detail-item">
+                                            <span class="detail-label">Exam Fee</span>
+                                            <span class="detail-value">${{ "%.2f"|format(license.exam_fee) }}</span>
                                         </div>
-                                        <div class="col-md-4">
-                                            <strong>License:</strong> ${{ "%.2f"|format(license.license_fee) }}
+                                        <div class="detail-item">
+                                            <span class="detail-label">License Fee</span>
+                                            <span class="detail-value">${{ "%.2f"|format(license.license_fee) }}</span>
                                         </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Total</span>
+                                            <span class="detail-value-total">${{ "%.2f"|format(license.application_fee + license.exam_fee + license.license_fee) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Requirements -->
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">✅</span>
+                                <span class="card-title">Basic Requirements</span>
+                            </div>
+                            <div class="card-body-compact">
+                                <div class="requirements-grid">
+                                    <div class="req-item">
+                                        <span class="req-label">Min. Age</span>
+                                        <span class="req-value">{{ state.requirements.minimum_age }} years</span>
+                                    </div>
+                                    <div class="req-item">
+                                        <span class="req-label">Residency</span>
+                                        <span class="req-value">{{ 'Required' if state.requirements.residency_required else 'Not Required' }}</span>
+                                    </div>
+                                    <div class="req-item">
+                                        <span class="req-label">Background Check</span>
+                                        <span class="req-value">{{ 'Required' if state.requirements.background_check else 'Not Required' }}</span>
+                                    </div>
+                                    <div class="req-item">
+                                        <span class="req-label">Education</span>
+                                        <span class="req-value">{{ state.requirements.education }}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
-                    </div>
-                </div>
 
-                <!-- Requirements -->
-                <div class="netsuite-table-card mb-3">
-                    <div class="p-3 border-bottom">
-                        <h6 class="mb-0">✅ Basic Requirements</h6>
-                    </div>
-                    <div class="p-3">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <strong>Minimum Age:</strong> {{ state.requirements.minimum_age }} years old
+                        <!-- Application Process -->
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">📋</span>
+                                <span class="card-title">Application Process</span>
                             </div>
-                            <div class="col-md-6">
-                                <strong>Residency Required:</strong> {{ 'Yes' if state.requirements.residency_required else 'No' }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Background Check:</strong> {{ 'Yes' if state.requirements.background_check else 'No' }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Education:</strong> {{ state.requirements.education }}
-                            </div>
-                            {% if state.requirements.experience_breakdown %}
-                            <div class="col-12">
-                                <strong>Experience Breakdown:</strong>
-                                <ul class="mb-0 mt-1">
-                                    {% for key, value in state.requirements.experience_breakdown.items() %}
-                                    <li>{{ key.replace('_', ' ').title() }}: {{ value }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Examination -->
-                <div class="netsuite-table-card mb-3">
-                    <div class="p-3 border-bottom">
-                        <h6 class="mb-0">📝 Examination Details</h6>
-                    </div>
-                    <div class="p-3">
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <strong>Test Provider:</strong> {{ state.examination.provider }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Format:</strong> {{ state.examination.test_format }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Reference Materials:</strong> {{ state.examination.reference_materials }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Scheduling:</strong> {{ state.examination.scheduling }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Results:</strong> {{ state.examination.results }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Retake Policy:</strong> {{ state.examination.retake_policy }}
-                            </div>
-                        </div>
-
-                        <h6 class="mb-2">Required Books</h6>
-                        <table class="table table-sm table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Book</th>
-                                    <th>Cost</th>
-                                    <th>Vendor</th>
-                                    <th>Required For</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for book in state.examination.required_books %}
-                                <tr>
-                                    <td>{{ book.name }}</td>
-                                    <td>${{ "%.2f"|format(book.cost) }}</td>
-                                    <td>{{ book.vendor }}</td>
-                                    <td>{{ book.required_for|join(', ') }}</td>
-                                </tr>
+                            <div class="card-body-compact">
+                                {% for step in state.application_process %}
+                                <div class="process-step">
+                                    <div class="step-num">{{ step.step }}</div>
+                                    <div class="step-content">
+                                        <div class="step-title">{{ step.title }}</div>
+                                        <div class="step-desc">{{ step.description }}</div>
+                                        <div class="step-meta">
+                                            {% if step.fees %}<span class="meta-tag">Fee: ${{ "%.2f"|format(step.fees) }}</span>{% endif %}
+                                            <span class="meta-tag">{{ step.timeline }}</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 {% endfor %}
-                            </tbody>
-                        </table>
-
-                        <h6 class="mb-2 mt-3">Test Details by License Type</h6>
-                        {% for license_key, details in state.examination.test_details.items() %}
-                        <div class="mb-2">
-                            <strong>{{ license_key.title() }}:</strong>
-                            {{ details.duration_hours }} hours, {{ details.questions }} questions, 
-                            {{ details.passing_score }} passing score
-                            <div class="small text-muted">Sections: {{ details.sections|join(' | ') }}</div>
+                            </div>
                         </div>
-                        {% endfor %}
-                    </div>
-                </div>
 
-                <!-- Application Process -->
-                <div class="netsuite-table-card mb-3">
-                    <div class="p-3 border-bottom">
-                        <h6 class="mb-0">📋 Application Process (Step-by-Step)</h6>
                     </div>
-                    <div class="p-3">
-                        {% for step in state.application_process %}
-                        <div class="application-step mb-3">
-                            <div class="d-flex align-items-start">
-                                <div class="step-number me-3">{{ step.step }}</div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">{{ step.title }}</h6>
-                                    <p class="mb-1">{{ step.description }}</p>
-                                    {% if step.forms_required %}
-                                    <div class="small text-muted">Forms: {{ step.forms_required|join(', ') }}</div>
-                                    {% endif %}
-                                    {% if step.fees %}
-                                    <div class="small text-muted">Fee: ${{ "%.2f"|format(step.fees) }}</div>
-                                    {% endif %}
-                                    <div class="small"><strong>Timeline:</strong> {{ step.timeline }}</div>
+
+                    <!-- Sidebar -->
+                    <div class="col-lg-3">
+                        
+                        <!-- Quick Actions -->
+                        <div class="data-card sticky-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">🔗</span>
+                                <span class="card-title">Quick Links</span>
+                            </div>
+                            <div class="card-body-compact">
+                                <div class="quick-links">
+                                    {% for link in state.resources.official_links %}
+                                    <a href="{{ link.url }}" target="_blank" class="quick-link">
+                                        {{ link.name }} →
+                                    </a>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
+
                     </div>
                 </div>
-
-                <!-- Insurance & Bonding -->
-                <div class="netsuite-table-card mb-3">
-                    <div class="p-3 border-bottom">
-                        <h6 class="mb-0">🛡️ Insurance & Bonding Requirements</h6>
-                    </div>
-                    <div class="p-3">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <strong>Liability Insurance Required:</strong> {{ 'Yes' if state.insurance_bonding.liability_insurance_required else 'No' }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Bond Required:</strong> {{ 'Yes' if state.insurance_bonding.bond_required else 'No' }}
-                            </div>
-                            <div class="col-12">
-                                <strong>Notes:</strong> {{ state.insurance_bonding.notes }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Renewal -->
-                <div class="netsuite-table-card mb-3">
-                    <div class="p-3 border-bottom">
-                        <h6 class="mb-0">🔄 Renewal Requirements</h6>
-                    </div>
-                    <div class="p-3">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <strong>Renewal Period:</strong> {{ state.renewal.period }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Renewal Fee:</strong> ${{ "%.2f"|format(state.renewal.renewal_fee) }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>CE Hours Required:</strong> {{ state.renewal.continuing_education_hours }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>CE Topics:</strong> {{ state.renewal.ce_topics|join(', ') }}
-                            </div>
-                            <div class="col-12">
-                                <strong>CE Providers:</strong> {{ state.renewal.ce_providers|join(', ') }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Late Renewal:</strong> {{ state.renewal.late_renewal }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Inactive Status:</strong> {{ state.renewal.inactive_status }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reciprocity -->
-                <div class="netsuite-table-card mb-3">
-                    <div class="p-3 border-bottom">
-                        <h6 class="mb-0">🤝 Reciprocity & Endorsement</h6>
-                    </div>
-                    <div class="p-3">
-                        <div class="mb-2">
-                            <strong>Accepts Licenses From:</strong> {{ state.reciprocity.accepts_from|join(', ') }}
-                        </div>
-                        <div class="mb-2">
-                            <strong>Endorsement Process:</strong> {{ state.reciprocity.endorsement_process }}
-                        </div>
-                        <div class="alert alert-info mb-0">
-                            {{ state.reciprocity.notes }}
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                
-                <!-- Contact Info -->
-                <div class="compact-stats-card mb-3">
-                    <h6 class="mb-3">📞 Board Contact</h6>
-                    <div class="small">
-                        <p><strong>{{ state.governing_body }}</strong></p>
-                        <p class="mb-1">{{ state.board_address }}</p>
-                        <p class="mb-1">Phone: {{ state.board_phone }}</p>
-                        <p class="mb-1"><a href="{{ state.board_website }}" target="_blank">{{ state.board_website }}</a></p>
+            <!-- ============================================================ -->
+            <!-- EXPIRATION TRACKER VIEW -->
+            <!-- ============================================================ -->
+            <div class="view-container" data-view="expiration">
+                <div class="row g-2">
+                    <div class="col-lg-9">
+                        
+                        <!-- Quick Stats -->
+                        <div class="stats-row">
+                            <div class="stat-box">
+                                <div class="stat-value">{{ state.renewal.continuing_education_hours }}</div>
+                                <div class="stat-label">CE Hours</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">${{ state.renewal.renewal_fee }}</div>
+                                <div class="stat-label">Renewal Fee</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">{{ state.renewal.period }}</div>
+                                <div class="stat-label">Period</div>
+                            </div>
+                        </div>
+
+                        <!-- Renewal Requirements -->
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">🔄</span>
+                                <span class="card-title">Renewal Requirements</span>
+                            </div>
+                            <div class="card-body-compact">
+                                <div class="requirements-grid">
+                                    <div class="req-item">
+                                        <span class="req-label">Period</span>
+                                        <span class="req-value">{{ state.renewal.period }}</span>
+                                    </div>
+                                    <div class="req-item">
+                                        <span class="req-label">Fee</span>
+                                        <span class="req-value">${{ "%.2f"|format(state.renewal.renewal_fee) }}</span>
+                                    </div>
+                                    <div class="req-item">
+                                        <span class="req-label">CE Hours</span>
+                                        <span class="req-value">{{ state.renewal.continuing_education_hours }}</span>
+                                    </div>
+                                    <div class="req-item">
+                                        <span class="req-label">Late Renewal</span>
+                                        <span class="req-value">{{ state.renewal.late_renewal }}</span>
+                                    </div>
+                                </div>
+                                <div class="renewal-note">
+                                    <strong>CE Topics:</strong> {{ state.renewal.ce_topics|join(', ') }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CE Providers -->
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">🎓</span>
+                                <span class="card-title">Approved CE Providers</span>
+                            </div>
+                            <div class="card-body-compact">
+                                <ul class="provider-list">
+                                    {% for provider in state.renewal.ce_providers %}
+                                    <li>{{ provider }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="data-card sticky-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">📞</span>
+                                <span class="card-title">Contact</span>
+                            </div>
+                            <div class="card-body-compact">
+                                <div class="contact-info">
+                                    <div class="contact-name">{{ state.governing_body }}</div>
+                                    <div class="contact-detail">{{ state.board_phone }}</div>
+                                    <a href="{{ state.board_website }}" target="_blank" class="contact-link">Visit Website →</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Pro Tips -->
-                <div class="compact-stats-card mb-3 bg-success bg-opacity-10 border-success">
-                    <h6 class="mb-3">💡 Pro Tips</h6>
-                    <ul class="small mb-0">
-                        {% for tip in state.pro_tips %}
-                        <li class="mb-2">{{ tip }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-                <!-- Common Pitfalls -->
-                <div class="compact-stats-card mb-3 bg-warning bg-opacity-10 border-warning">
-                    <h6 class="mb-3">⚠️ Common Pitfalls</h6>
-                    <ul class="small mb-0">
-                        {% for pitfall in state.common_pitfalls %}
-                        <li class="mb-2">{{ pitfall }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-                <!-- Resources -->
-                <div class="compact-stats-card">
-                    <h6 class="mb-3">📚 Resources</h6>
-                    
-                    <div class="mb-3">
-                        <strong class="small">Official Links</strong>
-                        <ul class="small mb-0 mt-1">
-                            {% for link in state.resources.official_links %}
-                            <li><a href="{{ link.url }}" target="_blank">{{ link.name }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-
-                    <div class="mb-3">
-                        <strong class="small">Study Materials</strong>
-                        <ul class="small mb-0 mt-1">
-                            {% for material in state.resources.study_materials %}
-                            <li>
-                                <a href="{{ material.url }}" target="_blank">{{ material.name }}</a>
-                                {% if material.cost > 0 %} - ${{ "%.2f"|format(material.cost) }}{% endif %}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-
-                    {% if state.resources.prep_courses %}
-                    <div>
-                        <strong class="small">Prep Courses</strong>
-                        <ul class="small mb-0 mt-1">
-                            {% for course in state.resources.prep_courses %}
-                            <li>
-                                {{ course.name }} - {{ course.provider }}
-                                <div class="text-muted">{{ course.cost }} | {{ course.notes }}</div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
-                </div>
-
             </div>
+
+            <!-- ============================================================ -->
+            <!-- LEADERSHIP VIEW -->
+            <!-- ============================================================ -->
+            <div class="view-container" data-view="leadership">
+                <div class="row g-2">
+                    <div class="col-lg-9">
+                        
+                        <!-- Cost Table -->
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">💰</span>
+                                <span class="card-title">Cost Analysis</span>
+                            </div>
+                            <div class="card-body-compact p-0">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>License Type</th>
+                                            <th class="text-end">Application</th>
+                                            <th class="text-end">Exam</th>
+                                            <th class="text-end">License</th>
+                                            <th class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for license in state.license_types %}
+                                        <tr>
+                                            <td><strong>{{ license.name }}</strong></td>
+                                            <td class="text-end">${{ "%.0f"|format(license.application_fee) }}</td>
+                                            <td class="text-end">${{ "%.0f"|format(license.exam_fee) }}</td>
+                                            <td class="text-end">${{ "%.0f"|format(license.license_fee) }}</td>
+                                            <td class="text-end"><strong>${{ "%.0f"|format(license.application_fee + license.exam_fee + license.license_fee) }}</strong></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Insurance & Bonding -->
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">🛡️</span>
+                                <span class="card-title">Insurance & Bonding</span>
+                            </div>
+                            <div class="card-body-compact">
+                                <div class="requirements-grid">
+                                    <div class="req-item">
+                                        <span class="req-label">Liability Insurance</span>
+                                        <span class="req-value">{{ 'Required' if state.insurance_bonding.liability_insurance_required else 'Not Required' }}</span>
+                                    </div>
+                                    <div class="req-item">
+                                        <span class="req-label">Bond</span>
+                                        <span class="req-value">{{ 'Required' if state.insurance_bonding.bond_required else 'Not Required' }}</span>
+                                    </div>
+                                </div>
+                                <div class="renewal-note">{{ state.insurance_bonding.notes }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Reciprocity -->
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">🤝</span>
+                                <span class="card-title">Reciprocity</span>
+                            </div>
+                            <div class="card-body-compact">
+                                <div class="recip-info">
+                                    <div class="recip-label">Accepts from:</div>
+                                    <div class="recip-value">{{ state.reciprocity.accepts_from|join(', ') }}</div>
+                                </div>
+                                <div class="recip-info">
+                                    <div class="recip-label">Process:</div>
+                                    <div class="recip-value">{{ state.reciprocity.endorsement_process }}</div>
+                                </div>
+                                <div class="recip-note">{{ state.reciprocity.notes }}</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="data-card sticky-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">📊</span>
+                                <span class="card-title">Annual Cost</span>
+                            </div>
+                            <div class="card-body-compact text-center">
+                                <div class="cost-display">${{ "%.0f"|format(state.renewal.renewal_fee) }}</div>
+                                <div class="cost-label">per {{ state.renewal.period }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TRAINING ROADMAP VIEW -->
+            <!-- ============================================================ -->
+            <div class="view-container" data-view="training">
+                <div class="row g-2">
+                    <div class="col-lg-9">
+                        
+                        <!-- Exam Details -->
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">📝</span>
+                                <span class="card-title">Examination Details</span>
+                            </div>
+                            <div class="card-body-compact">
+                                <div class="requirements-grid">
+                                    <div class="req-item">
+                                        <span class="req-label">Provider</span>
+                                        <span class="req-value">{{ state.examination.provider }}</span>
+                                    </div>
+                                    <div class="req-item">
+                                        <span class="req-label">Format</span>
+                                        <span class="req-value">{{ state.examination.test_format }}</span>
+                                    </div>
+                                    <div class="req-item">
+                                        <span class="req-label">Materials</span>
+                                        <span class="req-value">{{ state.examination.reference_materials }}</span>
+                                    </div>
+                                    <div class="req-item">
+                                        <span class="req-label">Results</span>
+                                        <span class="req-value">{{ state.examination.results }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Required Books -->
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">📚</span>
+                                <span class="card-title">Required Books</span>
+                            </div>
+                            <div class="card-body-compact p-0">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Book</th>
+                                            <th>Vendor</th>
+                                            <th class="text-end">Cost</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for book in state.examination.required_books %}
+                                        <tr>
+                                            <td><strong>{{ book.name }}</strong></td>
+                                            <td>{{ book.vendor }}</td>
+                                            <td class="text-end">${{ "%.2f"|format(book.cost) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Test Details -->
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">⏱️</span>
+                                <span class="card-title">Test Details by License Type</span>
+                            </div>
+                            <div class="card-body-compact">
+                                {% for license_key, details in state.examination.test_details.items() %}
+                                <div class="test-detail-row">
+                                    <div class="test-type">{{ license_key.title() }}</div>
+                                    <div class="test-specs">
+                                        <span class="spec">{{ details.duration_hours }}h</span>
+                                        <span class="spec">{{ details.questions }} Q</span>
+                                        <span class="spec">{{ details.passing_score }} pass</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-3">
+                        <!-- Pro Tips -->
+                        <div class="data-card tip-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">💡</span>
+                                <span class="card-title">Pro Tips</span>
+                            </div>
+                            <div class="card-body-compact">
+                                <ul class="tip-list">
+                                    {% for tip in state.pro_tips %}
+                                    <li>{{ tip }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Pitfalls -->
+                        <div class="data-card warning-card">
+                            <div class="card-header-compact">
+                                <span class="card-icon">⚠️</span>
+                                <span class="card-title">Pitfalls</span>
+                            </div>
+                            <div class="card-body-compact">
+                                <ul class="tip-list">
+                                    {% for pitfall in state.common_pitfalls %}
+                                    <li>{{ pitfall }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
 <style>
-.license-type-card {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 1rem;
+:root {
+    --primary-blue: #1e40af;
+    --primary-dark: #1e293b;
+    --accent-copper: #d97706;
+    --bg-light: #f8fafc;
+    --border-color: #e2e8f0;
 }
 
-.application-step {
-    border-left: 3px solid var(--accent-copper);
-    padding-left: 1rem;
+/* Base Layout */
+.state-detail-page {
+    background: #fff;
+    min-height: 100vh;
 }
 
-.step-number {
+/* Header */
+.state-header-compact {
+    padding: 0.75rem 0;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 0.75rem;
+}
+
+.btn-back {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #f1f5f9;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    color: var(--primary-dark);
+    font-size: 0.813rem;
+    font-weight: 600;
+    margin-right: 1rem;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
     background: var(--accent-copper);
     color: white;
-    width: 32px;
-    height: 32px;
+}
+
+.state-title {
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    margin: 0;
+}
+
+.state-abbr {
+    font-size: 1.125rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.state-board-quick {
+    text-align: right;
+}
+
+.board-name-quick {
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.board-contact-quick {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+/* Compact View Tabs */
+.state-view-tabs-compact {
+    display: flex;
+    gap: 0.375rem;
+    padding: 0.5rem;
+    background: var(--bg-light);
+    border-radius: 0.375rem;
+    margin-bottom: 0.75rem;
+}
+
+.state-view-tab-compact {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.state-view-tab-compact .tab-icon {
+    font-size: 1.125rem;
+}
+
+.state-view-tab-compact .tab-label {
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.state-view-tab-compact:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.state-view-tab-compact.active {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #3b82f6 100%);
+    border-color: var(--primary-blue);
+}
+
+.state-view-tab-compact.active .tab-label {
+    color: white;
+}
+
+/* View Containers */
+.view-container {
+    display: none;
+}
+
+.view-container.active {
+    display: block;
+}
+
+/* Data Cards */
+.data-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+}
+
+.sticky-card {
+    position: sticky;
+    top: 1rem;
+}
+
+.card-header-compact {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    background: var(--bg-light);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-icon {
+    font-size: 1.125rem;
+}
+
+.card-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.card-body-compact {
+    padding: 0.875rem;
+}
+
+/* License Rows */
+.license-row {
+    padding: 0.75rem;
+    background: var(--bg-light);
+    border-radius: 0.375rem;
+    margin-bottom: 0.625rem;
+}
+
+.license-row:last-child {
+    margin-bottom: 0;
+}
+
+.license-name {
+    font-size: 0.938rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 0.25rem;
+}
+
+.license-desc {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 0.625rem;
+}
+
+.license-details-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 0.688rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.detail-value {
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.detail-value-total {
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: var(--accent-copper);
+}
+
+/* Requirements Grid */
+.requirements-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.625rem;
+}
+
+.req-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.req-label {
+    font-size: 0.688rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 0.125rem;
+}
+
+.req-value {
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+/* Process Steps */
+.process-step {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.process-step:last-child {
+    border-bottom: none;
+}
+
+.step-num {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    background: var(--accent-copper);
+    color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    flex-shrink: 0;
+    font-size: 0.813rem;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 0.25rem;
+}
+
+.step-desc {
+    font-size: 0.75rem;
+    color: #475569;
+    line-height: 1.4;
+    margin-bottom: 0.375rem;
+}
+
+.step-meta {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.meta-tag {
+    font-size: 0.688rem;
+    padding: 0.125rem 0.5rem;
+    background: #f1f5f9;
+    border-radius: 0.25rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Stats Row */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.stat-box {
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+/* Data Table */
+.data-table {
+    width: 100%;
+    font-size: 0.813rem;
+}
+
+.data-table thead {
+    background: var(--bg-light);
+}
+
+.data-table th {
+    padding: 0.5rem 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    font-size: 0.688rem;
+    letter-spacing: 0.025em;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--primary-dark);
+}
+
+.data-table tbody tr:hover {
+    background: var(--bg-light);
+}
+
+/* Quick Links */
+.quick-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.quick-link {
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-light);
+    border-radius: 0.375rem;
+    text-decoration: none;
+    color: var(--primary-blue);
+    font-size: 0.813rem;
+    font-weight: 600;
+    transition: all 0.15s;
+}
+
+.quick-link:hover {
+    background: var(--primary-blue);
+    color: white;
+}
+
+/* Contact Info */
+.contact-info {
+    text-align: center;
+}
+
+.contact-name {
+    font-size: 0.813rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 0.375rem;
+}
+
+.contact-detail {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 0.625rem;
+}
+
+.contact-link {
+    display: block;
+    padding: 0.5rem;
+    background: var(--primary-blue);
+    color: white;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Cost Display */
+.cost-display {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent-copper);
+    margin-bottom: 0.25rem;
+}
+
+.cost-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Lists */
+.provider-list,
+.tip-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: 0.813rem;
+    line-height: 1.6;
+    color: #475569;
+}
+
+.provider-list li,
+.tip-list li {
+    margin-bottom: 0.375rem;
+}
+
+/* Cards with special styling */
+.tip-card {
+    border-left: 3px solid #10b981;
+}
+
+.warning-card {
+    border-left: 3px solid #f59e0b;
+}
+
+/* Renewal Note */
+.renewal-note {
+    margin-top: 0.75rem;
+    padding: 0.625rem;
+    background: #f1f5f9;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    color: #475569;
+    line-height: 1.5;
+}
+
+/* Reciprocity */
+.recip-info {
+    margin-bottom: 0.625rem;
+}
+
+.recip-label {
+    font-size: 0.688rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.recip-value {
+    font-size: 0.813rem;
+    color: var(--primary-dark);
+}
+
+.recip-note {
+    margin-top: 0.75rem;
+    padding: 0.625rem;
+    background: #eff6ff;
+    border-left: 3px solid #3b82f6;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    color: #1e40af;
+    line-height: 1.5;
+}
+
+/* Test Detail Rows */
+.test-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.test-detail-row:last-child {
+    border-bottom: none;
+}
+
+.test-type {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+.test-specs {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.spec {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    background: var(--bg-light);
+    border-radius: 0.25rem;
+    color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .license-details-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .requirements-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
+
+<script>
+// View tab switching
+document.addEventListener('DOMContentLoaded', function() {
+    const viewTabs = document.querySelectorAll('.state-view-tab-compact');
+    const viewContainers = document.querySelectorAll('.view-container');
+    
+    viewTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const targetView = this.getAttribute('data-view');
+            
+            // Update tab active states
+            viewTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update content visibility
+            viewContainers.forEach(container => {
+                if (container.getAttribute('data-view') === targetView) {
+                    container.classList.add('active');
+                } else {
+                    container.classList.remove('active');
+                }
+            });
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -19,7 +19,7 @@
             border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             padding: 3rem;
-            max-width: 400px;
+            max-width: 450px;
             width: 100%;
         }
         .login-header {
@@ -40,15 +40,31 @@
             color: #6b7280;
             font-size: 0.9375rem;
         }
-        .form-control {
-            padding: 0.875rem 1rem;
-            border-radius: 8px;
-            border: 2px solid #e5e7eb;
-            font-size: 1rem;
+        .pin-container {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
         }
-        .form-control:focus {
+        .pin-box {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .pin-box:focus {
             border-color: #d97706;
             box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+            outline: none;
+        }
+        #pin-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
         }
         .btn-login {
             width: 100%;
@@ -59,7 +75,6 @@
             font-weight: 600;
             border-radius: 8px;
             font-size: 1rem;
-            margin-top: 1rem;
         }
         .btn-login:hover {
             background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
@@ -75,6 +90,12 @@
             font-size: 0.875rem;
             text-align: center;
         }
+        .pin-label {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -82,7 +103,7 @@
         <div class="login-header">
             <div class="login-icon">🔧</div>
             <h1 class="login-title">Licensing Roadmap</h1>
-            <p class="login-subtitle">Department Compliance Tool</p>
+            <p class="login-subtitle">Professional License Tracking</p>
         </div>
         
         {% if error %}
@@ -91,14 +112,56 @@
         </div>
         {% endif %}
         
-        <form method="POST" action="/login">
-            <div class="mb-3">
-                <label class="form-label">Access Code</label>
-                <input type="password" class="form-control" name="password" 
-                       placeholder="Enter team access code" required autofocus>
+        <form method="POST" action="/login" id="login-form">
+            <div class="pin-label">Enter Your 6-Digit PIN</div>
+            <div class="pin-container" id="pin-display">
+                <input type="text" class="pin-box" maxlength="1" readonly>
+                <input type="text" class="pin-box" maxlength="1" readonly>
+                <input type="text" class="pin-box" maxlength="1" readonly>
+                <input type="text" class="pin-box" maxlength="1" readonly>
+                <input type="text" class="pin-box" maxlength="1" readonly>
+                <input type="text" class="pin-box" maxlength="1" readonly>
             </div>
-            <button type="submit" class="btn btn-login">🔓 Access System</button>
+            <input type="text" id="pin-input" name="pin" maxlength="6" autofocus>
+            <button type="submit" class="btn btn-login">🔓 Login</button>
+            <div class="text-center mt-3" style="font-size: 0.875rem; color: #6b7280;">
+                Forgot PIN? Contact your administrator
+            </div>
         </form>
     </div>
+
+    <script>
+        const pinInput = document.getElementById('pin-input');
+        const pinBoxes = document.querySelectorAll('.pin-box');
+        const form = document.getElementById('login-form');
+
+        // Focus on the hidden input
+        pinInput.focus();
+
+        // Update display boxes when typing
+        pinInput.addEventListener('input', function(e) {
+            const value = e.target.value;
+            pinBoxes.forEach((box, index) => {
+                box.value = value[index] || '';
+            });
+            
+            // Auto-submit when 6 digits entered
+            if (value.length === 6) {
+                form.submit();
+            }
+        });
+
+        // Click on any box to focus the hidden input
+        pinBoxes.forEach(box => {
+            box.addEventListener('click', () => {
+                pinInput.focus();
+            });
+        });
+
+        // Keep focus on hidden input
+        document.addEventListener('click', () => {
+            pinInput.focus();
+        });
+    </script>
 </body>
 </html>

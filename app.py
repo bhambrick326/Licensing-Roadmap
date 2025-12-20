@@ -17,21 +17,78 @@ ACCESS_CODE = "TeamLicense2024"  # Change this to your team's password
 app = Flask(__name__)
 
 
+# Custom Jinja filter for currency formatting
+@app.template_filter('format_currency')
+def format_currency(value):
+    """Format number as currency"""
+    try:
+        return f"${value:,.0f}"
+    except:
+        return "$0"
+
+
+# ==================== USER CONFIGURATION ====================
+# Simple user database with PINs
+USERS = {
+    '100001': {
+        'pin': '100001',
+        'user_type': 'manager',
+        'name': 'Benjamin Hambrick',
+        'email': 'ben@example.com',
+        'user_id': 'director'
+    },
+    '200001': {
+        'pin': '200001',
+        'user_type': 'license_holder',
+        'name': 'John Smith',
+        'email': 'john@example.com',
+        'user_id': 'jsmith'
+    },
+    '200002': {
+        'pin': '200002',
+        'user_type': 'license_holder',
+        'name': 'Benjamin Hambrick',
+        'email': 'ben.personal@example.com',
+        'user_id': 'bhambrick'
+    }
+}
+
+
+# ==================== HELPER FUNCTIONS ====================
+def get_allowed_account():
+    """Get the account the current user is allowed to view"""
+    user_type = session.get('user_type')
+    user_id = session.get('user_id')
+    
+    # Managers can view any account via URL parameter
+    if user_type == 'manager':
+        return request.args.get('account', user_id)
+    
+    # License holders can ONLY see their own account
+    else:
+        return user_id
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Login page"""
-    # If already logged in, go to home
+    """PIN-based login page"""
+    # If already logged in, redirect to home
     if session.get('logged_in'):
-        return redirect('/home?account=bhambrick')
+        return redirect('/')
     
     if request.method == 'POST':
-        password = request.form.get('password')
+        pin = request.form.get('pin', '').strip()
         
-        if password == ACCESS_CODE:
+        # Check if PIN exists in USERS
+        if pin in USERS:
+            user = USERS[pin]
             session['logged_in'] = True
+            session['pin'] = pin
+            session['user_type'] = user['user_type']
+            session['user_id'] = user['user_id']
+            session['name'] = user['name']
             return redirect('/')
         else:
-            return render_template('login.html', error='Invalid access code')
+            return render_template('login.html', error='Invalid PIN')
     
     return render_template('login.html')
 
@@ -63,7 +120,8 @@ def inject_current_account():
     """Make current account available to all templates"""
     import os
     
-    account = request.args.get('account', 'bhambrick')
+    # Get account from session or URL parameter
+    account = get_allowed_account()
     
     # Load current user for navigation
     if account == 'director':
@@ -277,7 +335,8 @@ def landing_page():
 @app.route('/home')
 def home():
     """Home dashboard"""
-    account = request.args.get('account', 'bhambrick')
+    # Get account from session or URL parameter
+    account = get_allowed_account()
     
     # Handle director view
     if account == 'director':
@@ -296,14 +355,91 @@ def home():
                     enhanced['holder_name'] = holder['name']
                     all_licenses.append(enhanced)
         
-        holder_data = {
-            'user_id': 'director',
-            'name': 'Director View',
-            'role': 'Department Leadership',
-            'total_licenses': sum(h.get('total_licenses', 0) for h in all_holders),
-            'total_certificates': sum(h.get('total_certificates', 0) for h in all_holders)
+        # Load company coverage data
+        import os
+        coverage = {}
+        coverage_file = 'data/company/coverage.json'
+        if os.path.exists(coverage_file):
+            with open(coverage_file, 'r') as f:
+                coverage = json.load(f)
+        
+        # Calculate stats for all license holders
+        total_licenses = sum(h.get('total_licenses', 0) for h in all_holders)
+        expiring_soon = 0
+        annual_cost = 0
+        active_states_detail = {}
+        
+        # Build detailed state info
+        for license in all_licenses:
+            abbr = license.get('jurisdiction_abbr')
+            if abbr:
+                if abbr not in active_states_detail:
+                    active_states_detail[abbr] = {'holders': []}
+                if license.get('holder_name') not in active_states_detail[abbr]['holders']:
+                    active_states_detail[abbr]['holders'].append(license.get('holder_name'))
+            
+            # Count expiring
+            days = license.get('days_remaining')
+            if days and days <= 60:
+                expiring_soon += 1
+            
+            # Sum costs
+            annual_cost += license.get('cost_totals', {}).get('recurring_cost', 0) / 2  # Assuming 2-year periods
+        
+        # Prepare team member cards with stats
+        team_members = []
+        for holder in all_holders:
+            holder_licenses = holder.get('licenses', [])
+            states_count = len(set(lic.get('jurisdiction_abbr') for lic in holder_licenses if lic.get('jurisdiction_abbr')))
+            expiring_count = sum(1 for lic in holder_licenses 
+                               if lic.get('expires_on') and calculate_days_remaining(lic.get('expires_on')) 
+                               and calculate_days_remaining(lic.get('expires_on')) <= 60)
+            
+            team_members.append({
+                'user_id': holder.get('user_id'),
+                'name': holder.get('name'),
+                'role': holder.get('role', 'License Holder'),
+                'total_licenses': holder.get('total_licenses', 0),
+                'states_count': states_count,
+                'expiring_count': expiring_count
+            })
+        
+        # Build urgent items with holder names
+        urgent_items = []
+        for license in all_licenses:
+            days_remaining = license.get('days_remaining')
+            if license.get('status') == 'overdue':
+                urgent_items.append({
+                    'holder_name': license.get('holder_name'),
+                    'jurisdiction': license.get('jurisdiction'),
+                    'issue': 'OVERDUE',
+                    'urgency': 'danger',
+                    'action': 'Renew Now',
+                    'link': '#'
+                })
+            elif days_remaining and days_remaining <= 30:
+                urgent_items.append({
+                    'holder_name': license.get('holder_name'),
+                    'jurisdiction': license.get('jurisdiction'),
+                    'issue': f'Expires in {days_remaining} days',
+                    'urgency': 'warning',
+                    'action': 'Review',
+                    'link': '#'
+                })
+        
+        stats = {
+            'total_licenses': total_licenses,
+            'active_states': len(coverage.get('covered_states', [])),
+            'expiring_soon': expiring_soon,
+            'annual_cost': annual_cost
         }
-        enhanced_licenses = all_licenses
+        
+        return render_template('director_dashboard.html',
+                             stats=stats,
+                             coverage=coverage,
+                             active_states_detail=active_states_detail,
+                             team_members=team_members,
+                             urgent_items=urgent_items[:10])
     else:
         # Individual holder
         holder_data = load_license_holder_data(account)
@@ -393,7 +529,8 @@ def home():
 def licensing_roadmap():
     """Main licensing roadmap with multi-account support"""
     # Get account from query parameter (default: bhambrick)
-    account = request.args.get('account', 'bhambrick')
+    # Get account from session or URL parameter
+    account = get_allowed_account()
     
     # Handle director view differently
     if account == 'director':
@@ -468,11 +605,18 @@ def licensing_roadmap():
                          states_json=states_json,
                          stats=stats,
                          holder=holder_data,
-                         training_roadmap=training_roadmap_json)
-
+                         training_roadmap=training_roadmap_json,
+)
 def render_director_view():
-    """Render the director/leadership aggregated view"""
+    """Render the director/leadership aggregated view with company coverage"""
     import glob
+    import os
+    
+    coverage = {}
+    coverage_file = 'data/company/coverage.json'
+    if os.path.exists(coverage_file):
+        with open(coverage_file, 'r') as f:
+            coverage = json.load(f)
     
     # Load all license holders
     all_states = {}
@@ -497,9 +641,12 @@ def render_director_view():
                         'name': license['jurisdiction'],
                         'status': license['status'],
                         'holders': [],
+                        'holder_details': [],
                         'board_name': license.get('board_name'),
                         'board_url': license.get('board_url'),
                         'expires_on': license.get('expires_on'),
+                        'company_status': 'not_active',  # Will be updated from coverage
+                        'revenue': 0,
                         'license_type': license.get('license_type'),
                         'state_abbr': abbr
                     }
@@ -521,6 +668,51 @@ def render_director_view():
                 
                 all_states[abbr]['holders'].append(holder['name'])
     
+
+    # Overlay company coverage status
+    for abbr in all_states:
+        if abbr in coverage.get('covered_states', []):
+            all_states[abbr]['company_status'] = 'licensed'
+            all_states[abbr]['status_class'] = 'company-licensed'
+        elif abbr in coverage.get('in_progress_states', []):
+            all_states[abbr]['company_status'] = 'in_progress'
+            all_states[abbr]['status_class'] = 'company-in-progress'
+        elif abbr in coverage.get('target_states', []):
+            all_states[abbr]['company_status'] = 'target'
+            all_states[abbr]['status_class'] = 'company-target'
+        
+        # Add revenue if available
+        if abbr in coverage.get('state_revenues', {}):
+            all_states[abbr]['revenue'] = coverage['state_revenues'][abbr]
+    
+    # Add base state data for states not yet licensed
+    base_states_file = 'data/base_data/all_states.json'
+    if os.path.exists(base_states_file):
+        with open(base_states_file, 'r') as f:
+            base_states = json.load(f)
+            for abbr, state_data in base_states.items():
+                if abbr not in all_states:
+                    all_states[abbr] = {
+                        'name': state_data['name'],
+                        'state_abbr': abbr,
+                        'status': 'not_licensed',
+                        'status_class': 'not-licensed',
+                        'company_status': 'not_active',
+                        'holders': [],
+                        'holder_details': [],
+                        'summary': 'Not licensed'
+                    }
+                    # Check if it's in coverage
+                    if abbr in coverage.get('covered_states', []):
+                        all_states[abbr]['company_status'] = 'licensed'
+                        all_states[abbr]['status_class'] = 'company-licensed'
+                    elif abbr in coverage.get('in_progress_states', []):
+                        all_states[abbr]['company_status'] = 'in_progress'
+                        all_states[abbr]['status_class'] = 'company-in-progress'
+                    elif abbr in coverage.get('target_states', []):
+                        all_states[abbr]['company_status'] = 'target'
+                        all_states[abbr]['status_class'] = 'company-target'
+
     # Enhance state data for director view
     enhanced_states = {}
     total_due_soon = 0
@@ -570,10 +762,11 @@ def render_director_view():
                          states_json=states_json,
                          stats=stats,
                          holder=director_data,
-                         training_roadmap=training_roadmap_json)
+                         training_roadmap=training_roadmap_json,
+                         team_members=all_holders,
+                         team_members_json=json.dumps([{'user_id': h.get('user_id'), 'name': h.get('name')} for h in all_holders]))
 
 
-@app.route('/licensing/<state_abbrev>')
 @app.route('/api/states')
 def api_states():
     """API endpoint for state data (for AJAX/JS usage)"""
@@ -695,7 +888,8 @@ def settings():
 @app.route('/manage-licenses')
 def manage_licenses():
     """License management page"""
-    account = request.args.get('account', 'bhambrick')
+    # Get account from session or URL parameter
+    account = get_allowed_account()
     
     # Handle director view - show all licenses
     if account == 'director':
@@ -809,7 +1003,8 @@ def delete_license():
 @app.route('/settings/edit-license/<license_id>')
 def edit_license(license_id):
     """Edit license form"""
-    account = request.args.get('account', 'bhambrick')
+    # Get account from session or URL parameter
+    account = get_allowed_account()
     holder_data = load_license_holder_data(account)
     
     if not holder_data:
@@ -829,7 +1024,8 @@ def edit_license(license_id):
 @app.route('/settings/update-license/<license_id>', methods=['POST'])
 def update_license(license_id):
     """Update license data"""
-    account = request.args.get('account', 'bhambrick')
+    # Get account from session or URL parameter
+    account = get_allowed_account()
     holder_data = load_license_holder_data(account)
     
     if not holder_data:
@@ -880,7 +1076,8 @@ def update_license(license_id):
 @app.route('/settings/add-license')
 def add_license_form():
     """Show add license form"""
-    account = request.args.get('account', 'bhambrick')
+    # Get account from session or URL parameter
+    account = get_allowed_account()
     prefill_state = request.args.get('prefill')  # Prefill from next target
     
     # All 50 US states
@@ -969,7 +1166,8 @@ def add_license():
 @app.route('/settings/cost-details/<license_id>')
 def cost_details(license_id):
     """View cost details for a license"""
-    account = request.args.get('account', 'bhambrick')
+    # Get account from session or URL parameter
+    account = get_allowed_account()
     holder_data = load_license_holder_data(account)
     
     if not holder_data:
@@ -989,7 +1187,8 @@ def cost_details(license_id):
 @app.route('/settings/add-cost/<license_id>', methods=['POST'])
 def add_cost(license_id):
     """Add a cost line item to a license"""
-    account = request.args.get('account', 'bhambrick')
+    # Get account from session or URL parameter
+    account = get_allowed_account()
     holder_data = load_license_holder_data(account)
     
     if not holder_data:
@@ -1032,7 +1231,8 @@ def add_cost(license_id):
 @app.route('/settings/update-estimated-costs/<license_id>', methods=['POST'])
 def update_estimated_costs(license_id):
     """Update estimated costs for budget planning"""
-    account = request.args.get('account', 'bhambrick')
+    # Get account from session or URL parameter
+    account = get_allowed_account()
     holder_data = load_license_holder_data(account)
     
     if not holder_data:
@@ -1080,7 +1280,8 @@ def update_estimated_costs(license_id):
 @app.route('/cost-analytics')
 def cost_analytics():
     """Cost analytics dashboard"""
-    account = request.args.get('account', 'bhambrick')
+    # Get account from session or URL parameter
+    account = get_allowed_account()
     
     # Handle director view - aggregate all holders
     if account == 'director':
@@ -1257,6 +1458,83 @@ def update_holder(user_id):
     return redirect('/team/manage')
 
 
+
+
+
+@app.route('/team/view/<user_id>')
+def team_view_employee(user_id):
+    """Detailed view of a specific employee (Manager only)"""
+    # Check if user is manager
+    if session.get('user_type') != 'manager':
+        return "Access denied", 403
+    
+    # Load employee data
+    employee_data = load_license_holder_data(user_id)
+    
+    if not employee_data:
+        return "Employee not found", 404
+    
+    # Calculate stats
+    licenses = employee_data.get('licenses', [])
+    states_count = len(set(lic.get('jurisdiction_abbr') for lic in licenses if lic.get('jurisdiction_abbr')))
+    expiring_count = sum(1 for lic in licenses 
+                        if lic.get('expires_on') and calculate_days_remaining(lic.get('expires_on')) 
+                        and calculate_days_remaining(lic.get('expires_on')) <= 60)
+    
+    # Calculate costs
+    total_estimated = 0
+    total_actual = 0
+    annual_recurring = 0
+    costs_by_state = {}
+    
+    enhanced_licenses = []
+    for license in licenses:
+        enhanced = enhance_license_data(license)
+        enhanced_licenses.append(enhanced)
+        
+        total_estimated += enhanced['cost_totals']['initial_estimated']
+        total_actual += enhanced['cost_totals']['actual_spent']
+        
+        period_years = enhanced.get('recurring', {}).get('renewal_period_years', 2)
+        recurring_per_period = enhanced['cost_totals']['recurring_cost']
+        annual_recurring += recurring_per_period / period_years if period_years > 0 else 0
+        
+        # Group by state
+        state = license.get('jurisdiction')
+        if state:
+            if state not in costs_by_state:
+                costs_by_state[state] = {'state': state, 'initial': 0, 'renewal': 0, 'total': 0}
+            costs_by_state[state]['initial'] += enhanced['cost_totals']['initial_estimated']
+            costs_by_state[state]['renewal'] += enhanced['cost_totals']['recurring_cost']
+            costs_by_state[state]['total'] += enhanced['cost_totals']['initial_estimated'] + enhanced['cost_totals']['recurring_cost']
+    
+    stats = {
+        'states_count': states_count,
+        'expiring_count': expiring_count,
+        'annual_cost': annual_recurring
+    }
+    
+    costs = {
+        'total_estimated': total_estimated,
+        'total_actual': total_actual,
+        'annual_recurring': annual_recurring,
+        'by_state': sorted(costs_by_state.values(), key=lambda x: x['total'], reverse=True)
+    }
+    
+    # Try to load bio data
+    bio = None
+    bio_file = f'data/bios/{user_id}_bio.json'
+    import os
+    if os.path.exists(bio_file):
+        with open(bio_file, 'r') as f:
+            bio = json.load(f)
+    
+    return render_template('employee_detail.html',
+                         employee=employee_data,
+                         stats=stats,
+                         licenses=enhanced_licenses,
+                         costs=costs,
+                         bio=bio)
 
 @app.route('/bio/<user_id>')
 def bio_builder(user_id):
@@ -1855,109 +2133,321 @@ def format_date(date_string):
         return date_string
 
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
-
-
-@app.route('/')
-def index():
-    """Redirect to licensing roadmap"""
-    return render_template('index.html')
-
-
-@app.route('/licensing-roadmap')
-@app.route('/licensing/<state_abbrev>')
-def state_detail(state_abbrev):
-    """State-specific detail page"""
-    state_abbr = state_abbrev.upper()
-    data = load_licensing_data()
-    states = data.get('states', {})
+@app.route('/admin/state-encyclopedia')
+def admin_state_encyclopedia():
+    """Admin page to manage state detail files"""
+    print("🔍 DEBUG: admin_state_encyclopedia route hit!")
+    import os
+    import glob
     
-    if state_abbr not in states:
-        abort(404)
+    state_files = glob.glob('data/state_details/*.json')
+    states = []
     
-    state_data = states[state_abbr].copy()
-    state_data['status_class'] = get_state_status_class(state_data)
-    state_data['badge_text'] = get_state_badge_text(state_data)
-    state_data['days_remaining'] = calculate_days_remaining(state_data.get('expires_on'))
+    for file_path in state_files:
+        with open(file_path, 'r') as f:
+            state_data = json.load(f)
+            
+            # Calculate completion percentage
+            completion = calculate_state_completion(state_data)
+            
+            states.append({
+                'abbr': state_data['state_abbr'],
+                'name': state_data['state'],
+                'completion': completion,
+                'file_path': file_path
+            })
     
-    # Load detailed content from markdown
-    detail_content = load_state_detail(state_abbr)
+    # Sort by name
+    states.sort(key=lambda x: x['name'])
     
-    return render_template('state_detail.html',
-                         state=state_data,
-                         state_abbr=state_abbr,
-                         detail_content=detail_content)
+    return render_template('admin_state_encyclopedia.html', states=states)
 
 
-@app.route('/api/states')
-def api_states():
-    """API endpoint for state data (for AJAX/JS usage)"""
-    data = load_licensing_data()
-    states = data.get('states', {})
+
+
+@app.route('/states/directory')
+def states_directory():
+    """Read-only state requirements directory for license holders"""
+    import os
+    import glob
     
-    # Enhance state data
-    enhanced_states = {}
-    for abbr, state_data in states.items():
-        enhanced = state_data.copy()
-        enhanced['status_class'] = get_state_status_class(state_data)
-        enhanced['badge_text'] = get_state_badge_text(state_data)
-        enhanced['days_remaining'] = calculate_days_remaining(state_data.get('expires_on'))
-        enhanced_states[abbr] = enhanced
+    state_files = glob.glob('data/state_details/*.json')
+    states = []
     
-    return jsonify(enhanced_states)
-
-
-@app.route('/admin/licensing/states')
-def admin_states_list():
-    """Simple admin view to track state content freshness"""
-    data = load_licensing_data()
-    states = data.get('states', {})
+    for file_path in state_files:
+        with open(file_path, 'r') as f:
+            state_data = json.load(f)
+            
+            # Calculate completion percentage
+            completion = calculate_state_completion(state_data)
+            
+            states.append({
+                'abbr': state_data['state_abbr'],
+                'name': state_data['state'],
+                'completion': completion,
+                'governing_body': state_data.get('governing_body', 'N/A'),
+                'board_phone': state_data.get('board_phone', 'N/A')
+            })
     
-    # Sort by last_reviewed date
-    states_list = []
-    for abbr, state_data in states.items():
-        item = {
-            'abbr': abbr,
-            'name': state_data.get('name', abbr),
-            'last_reviewed': state_data.get('last_reviewed'),
-            'coverage_level': state_data.get('coverage_level', 'draft'),
-            'status': state_data.get('status')
-        }
-        states_list.append(item)
+    # Sort by name
+    states.sort(key=lambda x: x['name'])
     
-    # Sort by last_reviewed (oldest first)
-    states_list.sort(key=lambda x: x.get('last_reviewed') or '1900-01-01')
+    return render_template('states_directory.html', states=states)
+
+@app.route('/admin/edit-state/<state_abbr>')
+def admin_edit_state(state_abbr):
+    """Edit a specific state's details"""
+    import os
     
-    return render_template('admin_states.html', states=states_list)
+    file_path = os.path.join('data', 'state_details', f'{state_abbr.upper()}.json')
+    
+    if not os.path.exists(file_path):
+        return f"State file not found for {state_abbr}", 404
+    
+    with open(file_path, 'r') as f:
+        state_data = json.load(f)
+    
+    return render_template('admin_edit_state.html', state=state_data)
 
 
-@app.errorhandler(404)
-def not_found(e):
-    """Custom 404 page"""
-    return render_template('404.html'), 404
-
-
-# Mapbox configuration
-MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiYmhhbWJyaWNrIiwiYSI6ImNtZzhiZjU1cTA1eHIya3EzdmI2c3Y0bHQifQ.iMTr0v9G_VIPWtJe6S7tkQ'
-
-@app.context_processor
-def inject_mapbox_token():
-    """Make Mapbox token available to all templates"""
-    return dict(mapbox_token=MAPBOX_ACCESS_TOKEN)
-
-@app.template_filter('format_date')
-def format_date(date_string):
-    """Format ISO date string to human readable"""
-    if not date_string:
-        return 'Not set'
+@app.route('/admin/save-state/<state_abbr>', methods=['POST'])
+def admin_save_state(state_abbr):
+    """Save updated state details"""
+    import os
+    
+    file_path = os.path.join('data', 'state_details', f'{state_abbr.upper()}.json')
+    
+    # Get JSON data from form
     try:
-        date_obj = datetime.fromisoformat(date_string)
-        return date_obj.strftime('%B %d, %Y')
-    except (ValueError, TypeError):
-        return date_string
+        state_data = json.loads(request.form.get('state_data'))
+        
+        # Save to file
+        with open(file_path, 'w') as f:
+            json.dump(state_data, f, indent=2)
+        
+        return redirect(f'/admin/edit-state/{state_abbr}?success=1')
+    
+    except Exception as e:
+        return f"Error saving state: {str(e)}", 500
+
+
+def calculate_state_completion(state_data):
+    """Calculate what percentage of state data is filled out"""
+    total_fields = 0
+    filled_fields = 0
+    
+    # Basic info (5 fields)
+    basic_fields = ['governing_body', 'board_phone', 'board_website', 'board_address']
+    total_fields += len(basic_fields)
+    filled_fields += sum(1 for f in basic_fields if state_data.get(f) and state_data.get(f) != 'TBD' and '000-000' not in str(state_data.get(f)))
+    
+    # License types (count as 1 major section)
+    total_fields += 1
+    if state_data.get('license_types') and len(state_data['license_types']) > 0:
+        first_license = state_data['license_types'][0]
+        if first_license.get('experience_required') != 'TBD':
+            filled_fields += 1
+    
+    # Requirements (count as 1 major section)
+    total_fields += 1
+    if state_data.get('requirements', {}).get('education') != 'TBD':
+        filled_fields += 1
+    
+    # Examination (count as 1 major section)
+    total_fields += 1
+    if state_data.get('examination', {}).get('provider') != 'TBD':
+        filled_fields += 1
+    
+    # Application process (count as 1 major section)
+    total_fields += 1
+    if state_data.get('application_process') and len(state_data['application_process']) > 1:
+        filled_fields += 1
+    
+    # Renewal (count as 1 major section)
+    total_fields += 1
+    renewal_fee = state_data.get('renewal', {}).get('renewal_fee', 0)
+    # Handle both string and int renewal fees
+    if renewal_fee and str(renewal_fee).strip() and renewal_fee != 0:
+        filled_fields += 1
+    
+    return int((filled_fields / total_fields) * 100) if total_fields > 0 else 0
+
+
+@app.route('/admin/active-states')
+def admin_active_states():
+    """Manage active states (Manager only)"""
+    if session.get('user_type') != 'manager':
+        return "Access denied", 403
+    
+    import os
+    import glob
+    
+    # Load coverage data
+    coverage = {}
+    coverage_file = 'data/company/coverage.json'
+    if os.path.exists(coverage_file):
+        with open(coverage_file, 'r') as f:
+            coverage = json.load(f)
+    
+    # Load all state names
+    all_states = {}
+    base_states_file = 'data/base_data/all_states.json'
+    if os.path.exists(base_states_file):
+        with open(base_states_file, 'r') as f:
+            states_data = json.load(f)
+            all_states = {abbr: data['name'] for abbr, data in states_data.items()}
+    
+    # Build state names lookup
+    state_names = all_states
+    
+    # Get details about who is licensed in each state
+    state_details = {}
+    holder_files = glob.glob('data/license_holders/*.json')
+    for holder_file in holder_files:
+        with open(holder_file, 'r') as f:
+            holder = json.load(f)
+            for license in holder.get('licenses', []):
+                abbr = license.get('jurisdiction_abbr')
+                if abbr:
+                    if abbr not in state_details:
+                        state_details[abbr] = {'holders': []}
+                    if holder['name'] not in state_details[abbr]['holders']:
+                        state_details[abbr]['holders'].append(holder['name'])
+    
+    # Load revenues (from coverage or separate file)
+    state_revenues = coverage.get('state_revenues', {})
+    total_revenue = sum(state_revenues.values())
+    
+    return render_template('active_states_manager.html',
+                         coverage=coverage,
+                         all_states=all_states,
+                         state_names=state_names,
+                         state_details=state_details,
+                         state_revenues=state_revenues,
+                         total_revenue=total_revenue)
+
+@app.route('/admin/active-states/add', methods=['POST'])
+def admin_active_states_add():
+    """Add a state to a category"""
+    if session.get('user_type') != 'manager':
+        return jsonify({'success': False, 'message': 'Access denied'}), 403
+    
+    data = request.json
+    state = data.get('state')
+    status = data.get('status')
+    
+    coverage_file = 'data/company/coverage.json'
+    with open(coverage_file, 'r') as f:
+        coverage = json.load(f)
+    
+    if status == 'covered':
+        if state not in coverage['covered_states']:
+            coverage['covered_states'].append(state)
+    elif status == 'in_progress':
+        if state not in coverage['in_progress_states']:
+            coverage['in_progress_states'].append(state)
+    elif status == 'target':
+        if state not in coverage['target_states']:
+            coverage['target_states'].append(state)
+    
+    coverage['total_states_covered'] = len(coverage['covered_states'])
+    coverage['total_states_in_progress'] = len(coverage['in_progress_states'])
+    
+    with open(coverage_file, 'w') as f:
+        json.dump(coverage, f, indent=2)
+    
+    return jsonify({'success': True})
+
+@app.route('/admin/active-states/move', methods=['POST'])
+def admin_active_states_move():
+    """Move a state between categories"""
+    if session.get('user_type') != 'manager':
+        return jsonify({'success': False, 'message': 'Access denied'}), 403
+    
+    data = request.json
+    state = data.get('state')
+    from_status = data.get('from')
+    to_status = data.get('to')
+    
+    coverage_file = 'data/company/coverage.json'
+    with open(coverage_file, 'r') as f:
+        coverage = json.load(f)
+    
+    if from_status == 'covered' and state in coverage['covered_states']:
+        coverage['covered_states'].remove(state)
+    elif from_status == 'in_progress' and state in coverage['in_progress_states']:
+        coverage['in_progress_states'].remove(state)
+    elif from_status == 'target' and state in coverage['target_states']:
+        coverage['target_states'].remove(state)
+    
+    if to_status == 'covered' and state not in coverage['covered_states']:
+        coverage['covered_states'].append(state)
+    elif to_status == 'in_progress' and state not in coverage['in_progress_states']:
+        coverage['in_progress_states'].append(state)
+    elif to_status == 'target' and state not in coverage['target_states']:
+        coverage['target_states'].append(state)
+    
+    coverage['total_states_covered'] = len(coverage['covered_states'])
+    coverage['total_states_in_progress'] = len(coverage['in_progress_states'])
+    
+    with open(coverage_file, 'w') as f:
+        json.dump(coverage, f, indent=2)
+    
+    return jsonify({'success': True})
+
+@app.route('/admin/active-states/remove', methods=['POST'])
+def admin_active_states_remove():
+    """Remove a state from a category"""
+    if session.get('user_type') != 'manager':
+        return jsonify({'success': False, 'message': 'Access denied'}), 403
+    
+    data = request.json
+    state = data.get('state')
+    status = data.get('status')
+    
+    coverage_file = 'data/company/coverage.json'
+    with open(coverage_file, 'r') as f:
+        coverage = json.load(f)
+    
+    if status == 'covered' and state in coverage['covered_states']:
+        coverage['covered_states'].remove(state)
+    elif status == 'in_progress' and state in coverage['in_progress_states']:
+        coverage['in_progress_states'].remove(state)
+    elif status == 'target' and state in coverage['target_states']:
+        coverage['target_states'].remove(state)
+    
+    coverage['total_states_covered'] = len(coverage['covered_states'])
+    coverage['total_states_in_progress'] = len(coverage['in_progress_states'])
+    
+    with open(coverage_file, 'w') as f:
+        json.dump(coverage, f, indent=2)
+    
+    return jsonify({'success': True})
+
+@app.route('/admin/active-states/update-revenue', methods=['POST'])
+def admin_active_states_update_revenue():
+    """Update revenue for a state"""
+    if session.get('user_type') != 'manager':
+        return jsonify({'success': False, 'message': 'Access denied'}), 403
+    
+    data = request.json
+    state = data.get('state')
+    revenue = data.get('revenue', 0)
+    
+    coverage_file = 'data/company/coverage.json'
+    with open(coverage_file, 'r') as f:
+        coverage = json.load(f)
+    
+    if 'state_revenues' not in coverage:
+        coverage['state_revenues'] = {}
+    
+    coverage['state_revenues'][state] = revenue
+    
+    with open(coverage_file, 'w') as f:
+        json.dump(coverage, f, indent=2)
+    
+    return jsonify({'success': True})
 
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-

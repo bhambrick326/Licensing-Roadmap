@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Licensing Roadmap - Professional License Management</title>
+    <title>Licensing Roadmap - Repipe Specialists Compliance</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
@@ -13,100 +13,117 @@
             --accent-copper-dark: #b45309;
         }
         
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #2d3748 100%);
-            min-height: 100vh;
+            background: #0f172a;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .landing-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .landing-header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+        
+        .company-logo {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .module-badge {
+            background: var(--accent-copper);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        
+        /* Main Content */
+        .landing-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+            min-height: 0;
+            background: white;
+        }
+        
+        .content-wrapper {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
         }
         
         /* Hero Section */
-        .hero {
-            padding: 2.5rem 0 2rem 0;
-            color: white;
+        .hero-section {
             text-align: center;
+            margin-bottom: 2rem;
         }
         
-        .hero h1 {
-            font-size: 2.75rem;
+        .hero-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .hero-title {
+            font-size: 2.25rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #ffffff 0%, #fbbf24 100%);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-copper) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
         
-        .hero .tagline {
-            font-size: 1.25rem;
-            color: #cbd5e1;
-            margin-bottom: 1rem;
-            font-weight: 300;
-        }
-        
-        .hero .cta-buttons {
-            margin-top: 2rem;
-        }
-        
-        .btn-primary-custom {
-            background: linear-gradient(135deg, var(--accent-copper) 0%, var(--accent-copper-dark) 100%);
-            border: none;
-            padding: 1rem 2.5rem;
-            font-size: 1.125rem;
-            font-weight: 600;
-            border-radius: 12px;
-            color: white;
-            box-shadow: 0 10px 30px rgba(217, 119, 6, 0.3);
-            transition: all 0.3s;
-        }
-        
-        .btn-primary-custom:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(217, 119, 6, 0.4);
-            background: linear-gradient(135deg, var(--accent-copper-dark) 0%, #92400e 100%);
-        }
-        
-        /* Features Section */
-        .features {
-            background: white;
-            padding: 2.5rem 0;
-        }
-        
-        .feature-card {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 1.25rem;
-            height: 100%;
-            transition: all 0.3s;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-copper);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .feature-icon {
-            font-size: 2.5rem;
+        .hero-subtitle {
+            font-size: 1rem;
+            color: #64748b;
             margin-bottom: 0.75rem;
         }
         
-        .feature-card h3 {
-            color: var(--primary-dark);
-            font-weight: 700;
-            margin-bottom: 1rem;
+        .hero-description {
+            color: #475569;
+            max-width: 600px;
+            margin: 0 auto 1.5rem auto;
+            line-height: 1.5;
+            font-size: 0.95rem;
         }
         
-        .feature-card p {
-            color: #64748b;
-            line-height: 1.6;
-        }
-        
-        /* Stats Section */
-        .stats {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
-            padding: 2rem 0;
-            color: white;
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
         }
         
         .stat-item {
@@ -114,291 +131,222 @@
         }
         
         .stat-number {
-            font-size: 2.25rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: var(--accent-copper);
             display: block;
+            line-height: 1;
         }
         
         .stat-label {
-            font-size: 1.125rem;
-            color: #cbd5e1;
-            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 0.4rem;
         }
         
-        /* Screenshot Section */
-        .screenshots {
-            background: #f8fafc;
-            padding: 4rem 0;
-        }
-        
-        .screenshot-container {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
             margin-bottom: 2rem;
         }
         
-        .screenshot-img {
-            width: 100%;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
+        .feature-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s;
+            cursor: default;
         }
         
-        /* CTA Section */
+        .feature-card:hover {
+            background: white;
+            border-color: var(--accent-copper);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 1.75rem;
+            margin-bottom: 0.6rem;
+            display: block;
+        }
+        
+        .feature-title {
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+        }
+        
+        .feature-description {
+            color: #64748b;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        
+        /* CTA Button */
         .cta-section {
-            background: linear-gradient(135deg, var(--accent-copper) 0%, var(--accent-copper-dark) 100%);
-            padding: 2.5rem 0;
-            color: white;
             text-align: center;
         }
         
-        .cta-section h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-        }
-        
-        .btn-light-custom {
-            background: white;
-            color: var(--accent-copper);
-            padding: 1rem 2.5rem;
-            font-size: 1.125rem;
+        .btn-access {
+            background: linear-gradient(135deg, var(--accent-copper) 0%, var(--accent-copper-dark) 100%);
+            border: none;
+            padding: 0.9rem 2.5rem;
+            font-size: 1.05rem;
             font-weight: 600;
             border-radius: 12px;
-            border: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            color: white;
+            box-shadow: 0 10px 30px rgba(217, 119, 6, 0.3);
             transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
         }
         
-        .btn-light-custom:hover {
+        .btn-access:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-            color: var(--accent-copper-dark);
+            box-shadow: 0 15px 40px rgba(217, 119, 6, 0.4);
+            background: linear-gradient(135deg, var(--accent-copper-dark) 0%, #92400e 100%);
+            color: white;
         }
         
         /* Footer */
-        .footer {
-            background: var(--primary-dark);
-            color: #94a3b8;
-            padding: 1.5rem 0;
+        .landing-footer {
+            padding: 0.75rem 2rem;
             text-align: center;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
         }
         
-        .problem-solution {
-            background: white;
-            padding: 2.5rem 0;
+        /* Responsive */
+        @media (max-width: 992px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         
-        .problem-box {
-            background: #fef2f2;
-            border-left: 4px solid #dc2626;
-            padding: 2rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-        }
-        
-        .solution-box {
-            background: #f0fdf4;
-            border-left: 4px solid #16a34a;
-            padding: 2rem;
-            border-radius: 8px;
-        }
-        
-        .problem-box h3, .solution-box h3 {
-            color: var(--primary-dark);
-            margin-bottom: 1rem;
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                gap: 1.5rem;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .landing-main {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="mb-3">
-                        <span style="font-size: 3rem;">🔧</span>
-                    </div>
-                    <h1>Licensing Roadmap</h1>
-                    <p class="tagline">Department Compliance Management Hub</p>
-                    <p class="lead" style="color: #94a3b8; max-width: 700px; margin: 0 auto 1.5rem auto;">
-                        Track team licenses across all 50 states. Manage costs. Build professional bios once, 
-                        use for every application. Department-wide compliance tracking.
-                    </p>
-                    <div class="cta-buttons">
-                        <a href="/login" class="btn btn-primary-custom">🔓 Access System</a>
-                    </div>
+    <div class="landing-container">
+        <!-- Header -->
+        <header class="landing-header">
+            <div class="d-flex align-items-center">
+                <div class="company-logo">
+                    <span>🔧</span>
+                    <span>Licensing Roadmap</span>
                 </div>
+                <div class="module-badge">Compliance Module</div>
             </div>
-        </div>
-    </section>
-    
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-3">
+        </header>
+        
+        <!-- Main Content -->
+        <main class="landing-main">
+            <div class="content-wrapper">
+                <!-- Hero -->
+                <div class="hero-section">
+                    <div class="hero-icon">🗺️</div>
+                    <h1 class="hero-title">Licensing Roadmap</h1>
+                    <p class="hero-subtitle">Repipe Specialists Compliance Department</p>
+                    <p class="hero-description">
+                        Track team licenses across all 50 states. Manage renewal deadlines, costs, and compliance documentation. 
+                        Build professional bios once, use everywhere.
+                    </p>
+                </div>
+                
+                <!-- Stats -->
+                <div class="stats-bar">
                     <div class="stat-item">
                         <span class="stat-number">50</span>
-                        <div class="stat-label">States Trackable</div>
+                        <div class="stat-label">States Tracked</div>
                     </div>
-                </div>
-                <div class="col-md-3">
                     <div class="stat-item">
-                        <span class="stat-number">4-9</span>
-                        <div class="stat-label">Hours Saved Per License</div>
+                        <span class="stat-number">4-9h</span>
+                        <div class="stat-label">Saved Per License</div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-item">
-                        <span class="stat-number">8</span>
-                        <div class="stat-label">Bio Sections</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
                     <div class="stat-item">
                         <span class="stat-number">100%</span>
-                        <div class="stat-label">Built for Compliance</div>
+                        <div class="stat-label">Compliance Ready</div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Problem/Solution -->
-    <section class="problem-solution">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="problem-box">
-                        <h3>😤 The Problem</h3>
-                        <ul>
-                            <li><strong>Repetitive data entry:</strong> Fill out the same personal info, work history, and references 20+ times</li>
-                            <li><strong>Lost documentation:</strong> "Where did I put my Texas application? What did I write for Hawaii?"</li>
-                            <li><strong>Missed renewals:</strong> Tracking expiration dates across multiple states in spreadsheets</li>
-                            <li><strong>Cost chaos:</strong> How much have we spent on licensing? What's our budget?</li>
-                            <li><strong>The Hawaii nightmare:</strong> "List all jobs completed in the last 4 years with detailed descriptions" 😱</li>
-                        </ul>
+                
+                <!-- Features Grid -->
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">🗺️</span>
+                        <div class="feature-title">Interactive Map</div>
+                        <div class="feature-description">Visual overview of all licenses. Color-coded by status and expiration.</div>
                     </div>
                     
-                    <div class="solution-box">
-                        <h3>✅ The Solution</h3>
-                        <ul>
-                            <li><strong>Build your bio once:</strong> Comprehensive profile with personal info, work history, education, references</li>
-                            <li><strong>Job library:</strong> Add projects as you complete them, filter by date range, copy for applications</li>
-                            <li><strong>Visual tracking:</strong> Interactive map shows all licenses, color-coded by status and expiration</li>
-                            <li><strong>Cost management:</strong> Track estimated vs. actual costs, analyze spending, plan budgets</li>
-                            <li><strong>Team coordination:</strong> Multiple license holders, team overview, coverage mapping</li>
-                        </ul>
+                    <div class="feature-card">
+                        <span class="feature-icon">📝</span>
+                        <div class="feature-title">Bio Builder</div>
+                        <div class="feature-description">Build professional profiles once. Copy-to-clipboard for applications.</div>
                     </div>
+                    
+                    <div class="feature-card">
+                        <span class="feature-icon">⏰</span>
+                        <div class="feature-title">Renewal Tracking</div>
+                        <div class="feature-description">Never miss an expiration. Automated alerts and cost projections.</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <span class="feature-icon">💰</span>
+                        <div class="feature-title">Cost Management</div>
+                        <div class="feature-description">Track expenses. Analyze spending by state, category, and year.</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <span class="feature-icon">👥</span>
+                        <div class="feature-title">Team Dashboard</div>
+                        <div class="feature-description">Multi-user support. Team coverage overview for leadership.</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <span class="feature-icon">📚</span>
+                        <div class="feature-title">State Encyclopedia</div>
+                        <div class="feature-description">Complete licensing requirements and resources for all 50 states.</div>
+                    </div>
+                </div>
+                
+                <!-- CTA -->
+                <div class="cta-section">
+                    <a href="/login" class="btn-access">
+                        🔓 Access System
+                    </a>
                 </div>
             </div>
-        </div>
-    </section>
-    
-    <!-- Features Section -->
-    <section class="features">
-        <div class="container">
-            <div class="text-center mb-4">
-                <h2 style="font-size: 2.5rem; font-weight: 700; color: var(--primary-dark);">Everything You Need</h2>
-                <p class="lead text-muted">Comprehensive license management in one platform</p>
-            </div>
-            
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">��️</div>
-                        <h3>Interactive Map</h3>
-                        <p>Visual overview of all licenses across all 50 states. Color-coded by status, expiration, and team coverage. 4 different map views for different insights.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">📝</div>
-                        <h3>Bio Builder</h3>
-                        <p>Build your professional profile once with 8 comprehensive sections. Copy-to-clipboard for instant application filling. Never retype the same info again.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">🏗️</div>
-                        <h3>Job Projects Library</h3>
-                        <p>Add individual jobs/projects. Filter by date range (last 4 years). Copy formatted list for applications. Solves the "Hawaii problem" in 30 seconds.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">💰</div>
-                        <h3>Cost Tracking</h3>
-                        <p>Track estimated vs. actual costs. Line-item expenses with receipts. Analytics dashboard showing spend by state, category, and year.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">⏰</div>
-                        <h3>Renewal Tracking</h3>
-                        <p>Never miss an expiration date. Color-coded alerts for due soon and overdue licenses. Recurring cost projections for budget planning.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">👥</div>
-                        <h3>Team Management</h3>
-                        <p>Track multiple license holders. Set target states. Master of Record assignments. Team coverage overview for leadership.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">📥</div>
-                        <h3>CSV Import</h3>
-                        <p>Import existing spreadsheet data. Bulk load estimated costs. Download template. Populate multiple licenses at once.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">💼</div>
-                        <h3>Work History</h3>
-                        <p>Detailed employment records with supervisor contacts. Permission to contact tracking. Formatted outputs for applications.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">🎓</div>
-                        <h3>Education & Refs</h3>
-                        <p>Track high school, apprenticeships, trade schools. 3-5 professional references with full contact details. Copy formatted lists.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <h2>Ready to Streamline Compliance?</h2>
-            <p class="lead mb-4">Department-wide license tracking and bio management in one place.</p>
-            <a href="/login" class="btn btn-light-custom">🚀 Get Started Now</a>
-        </div>
-    </section>
-    
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p class="mb-0">Internal Compliance Tool - Department Use Only</p>
-            <p class="small mb-0 mt-2">Future module for Atlas Compliance Hub</p>
-        </div>
-    </footer>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="landing-footer">
+            Professional License Management • Repipe Specialists Licensing Department
+        </footer>
+    </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

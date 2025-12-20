@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% block title %}Active States Management{% endblock %}
+
+{% block content %}
+<div class="active-states-page">
+    <div class="container-fluid px-4 py-3">
+        
+        <!-- Page Header -->
+        <div class="page-header-compact mb-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h3>📊 Active States Management</h3>
+                    <p class="text-muted">Manage company market presence and expansion strategy</p>
+                </div>
+                <a href="/?account=director" class="btn btn-outline-secondary">← Back to Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card-small success">
+                    <div class="stat-value">{{ coverage.covered_states|length }}</div>
+                    <div class="stat-label">✅ Licensed States</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-small warning">
+                    <div class="stat-value">{{ coverage.in_progress_states|length }}</div>
+                    <div class="stat-label">🔄 In Progress</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-small">
+                    <div class="stat-value">{{ coverage.target_states|length }}</div>
+                    <div class="stat-label">⭕ Target States</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-small">
+                    <div class="stat-value">{{ total_revenue|default(0)|format_currency }}</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active States Table -->
+        <div class="data-card mb-4">
+            <div class="card-header-compact">
+                <span class="card-icon">✅</span>
+                <span class="card-title">Licensed States ({{ coverage.covered_states|length }})</span>
+                <button class="btn btn-sm btn-success ms-auto" data-bs-toggle="modal" data-bs-target="#addStateModal" data-status="covered">
+                    + Add Licensed State
+                </button>
+            </div>
+            <div class="card-body-compact">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>State</th>
+                                <th>Team Members Licensed</th>
+                                <th>Annual Revenue</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for state_abbr in coverage.covered_states %}
+                            <tr>
+                                <td>
+                                    <strong>{{ state_names.get(state_abbr, state_abbr) }}</strong>
+                                    <span class="text-muted">({{ state_abbr }})</span>
+                                </td>
+                                <td>
+                                    {% set holders = state_details.get(state_abbr, {}).get('holders', []) %}
+                                    {{ holders|length }} member(s)
+                                    {% if holders %}
+                                        <small class="text-muted d-block">{{ holders|join(', ') }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <input type="number" 
+                                           class="form-control form-control-sm revenue-input" 
+                                           value="{{ state_revenues.get(state_abbr, 0) }}"
+                                           data-state="{{ state_abbr }}"
+                                           placeholder="$0"
+                                           style="max-width: 150px;">
+                                </td>
+                                <td>
+                                    <a href="/state/{{ state_abbr }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
+                                    <button class="btn btn-sm btn-outline-danger ms-1" onclick="removeState('{{ state_abbr }}', 'covered')">Remove</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- In Progress States -->
+        <div class="data-card mb-4">
+            <div class="card-header-compact">
+                <span class="card-icon">🔄</span>
+                <span class="card-title">In Progress States ({{ coverage.in_progress_states|length }})</span>
+                <button class="btn btn-sm btn-warning ms-auto" data-bs-toggle="modal" data-bs-target="#addStateModal" data-status="in_progress">
+                    + Add In Progress State
+                </button>
+            </div>
+            <div class="card-body-compact">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>State</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for state_abbr in coverage.in_progress_states %}
+                            <tr>
+                                <td>
+                                    <strong>{{ state_names.get(state_abbr, state_abbr) }}</strong>
+                                    <span class="text-muted">({{ state_abbr }})</span>
+                                </td>
+                                <td><span class="badge bg-warning">Getting Licensed</span></td>
+                                <td>
+                                    <a href="/state/{{ state_abbr }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
+                                    <button class="btn btn-sm btn-success ms-1" onclick="moveState('{{ state_abbr }}', 'in_progress', 'covered')">Mark Licensed</button>
+                                    <button class="btn btn-sm btn-outline-danger ms-1" onclick="removeState('{{ state_abbr }}', 'in_progress')">Remove</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Target States -->
+        <div class="data-card">
+            <div class="card-header-compact">
+                <span class="card-icon">⭕</span>
+                <span class="card-title">Target States ({{ coverage.target_states|length }})</span>
+                <button class="btn btn-sm btn-secondary ms-auto" data-bs-toggle="modal" data-bs-target="#addStateModal" data-status="target">
+                    + Add Target State
+                </button>
+            </div>
+            <div class="card-body-compact">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>State</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for state_abbr in coverage.target_states %}
+                            <tr>
+                                <td>
+                                    <strong>{{ state_names.get(state_abbr, state_abbr) }}</strong>
+                                    <span class="text-muted">({{ state_abbr }})</span>
+                                </td>
+                                <td><span class="badge bg-secondary">Future Expansion</span></td>
+                                <td>
+                                    <a href="/state/{{ state_abbr }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
+                                    <button class="btn btn-sm btn-warning ms-1" onclick="moveState('{{ state_abbr }}', 'target', 'in_progress')">Start Process</button>
+                                    <button class="btn btn-sm btn-outline-danger ms-1" onclick="removeState('{{ state_abbr }}', 'target')">Remove</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Add State Modal -->
+<div class="modal fade" id="addStateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add State</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addStateForm">
+                    <div class="mb-3">
+                        <label class="form-label">Select State</label>
+                        <select class="form-select" id="stateSelect" required>
+                            <option value="">Choose a state...</option>
+                            {% for abbr, name in all_states.items()|sort(attribute='1') %}
+                            <option value="{{ abbr }}">{{ name }} ({{ abbr }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input type="hidden" id="stateStatus" value="">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addState()">Add State</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set the status when modal opens
+document.getElementById('addStateModal').addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const status = button.getAttribute('data-status');
+    document.getElementById('stateStatus').value = status;
+});
+
+// Add state function
+function addState() {
+    const stateAbbr = document.getElementById('stateSelect').value;
+    const status = document.getElementById('stateStatus').value;
+    
+    if (!stateAbbr) {
+        alert('Please select a state');
+        return;
+    }
+    
+    fetch('/admin/active-states/add', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({state: stateAbbr, status: status})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    });
+}
+
+// Move state between categories
+function moveState(stateAbbr, fromStatus, toStatus) {
+    fetch('/admin/active-states/move', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({state: stateAbbr, from: fromStatus, to: toStatus})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    });
+}
+
+// Remove state
+function removeState(stateAbbr, status) {
+    if (!confirm('Remove ' + stateAbbr + ' from this category?')) return;
+    
+    fetch('/admin/active-states/remove', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({state: stateAbbr, status: status})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    });
+}
+
+// Save revenue on change
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.revenue-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const state = this.dataset.state;
+            const revenue = parseFloat(this.value) || 0;
+            
+            fetch('/admin/active-states/update-revenue', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({state: state, revenue: revenue})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Revenue updated for ' + state);
+                }
+            });
+        });
+    });
+});
+</script>
+
+{% endblock %}

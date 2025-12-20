@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}State Encyclopedia - Admin{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        
+        <div class="page-header-compact mb-3">
+            <h3>📚 State Encyclopedia - Admin</h3>
+            <p class="text-muted">Manage detailed licensing information for all states</p>
+        </div>
+
+        <div class="netsuite-table-card">
+            <div class="p-3 border-bottom">
+                <h6 class="mb-0">All States ({{ states|length }} total)</h6>
+            </div>
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>State</th>
+                        <th>Completion</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for state in states %}
+                    <tr>
+                        <td>
+                            <strong>{{ state.name }}</strong>
+                            <span class="text-muted">({{ state.abbr }})</span>
+                        </td>
+                        <td>
+                            <div class="progress" style="height: 20px; width: 200px;">
+                                <div class="progress-bar 
+                                    {% if state.completion >= 80 %}bg-success
+                                    {% elif state.completion >= 50 %}bg-warning
+                                    {% else %}bg-secondary{% endif %}" 
+                                    style="width: {{ state.completion }}%">
+                                    {{ state.completion }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if state.completion >= 80 %}
+                                <span class="badge bg-success">Complete</span>
+                            {% elif state.completion >= 50 %}
+                                <span class="badge bg-warning">In Progress</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Template</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/admin/edit-state/{{ state.abbr }}" class="btn btn-sm btn-primary">
+                                ✏️ Edit
+                            </a>
+                            <a href="/state/{{ state.abbr }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                👁️ Preview
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

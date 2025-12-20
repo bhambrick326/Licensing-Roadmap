@@ -1,253 +1,204 @@
 {
   "state": "Texas",
   "state_abbr": "TX",
-  "governing_body": "Texas State Board of Plumbing Examiners",
+  "governing_body": "Texas State Board of Plumbing Examiners (TSBPE)",
   "board_phone": "(512) 936-5200",
-  "board_website": "https://www.tsbpe.texas.gov",
+  "board_website": "https://tsbpe.texas.gov",
   "board_address": "929 E. 41st Street, Austin, TX 78751",
+  
   "license_types": [
     {
       "name": "Tradesman Plumber-Limited",
-      "description": "Entry-level license for basic plumbing work under supervision",
-      "experience_required": "4,000 hours (minimum 2 years)",
+      "description": "Entry-level license for basic plumbing work on one- and two-family dwellings under supervision",
+      "experience_required": "4,000 hours of verifiable experience working in the plumbing trade",
       "exam_required": true,
-      "exam_type": "Open Book",
-      "application_fee": 50.0,
-      "exam_fee": 0.0,
-      "license_fee": 50.0
+      "exam_type": "Written (computer-based) + Practical (hands-on)",
+      "application_fee": 36.0,
+      "exam_fee": 104.50,
+      "license_fee": 35.0
     },
     {
       "name": "Journeyman Plumber",
-      "description": "Standard commercial and residential plumbing license",
-      "experience_required": "8,000 hours (minimum 4 years)",
+      "description": "Standard license for commercial and residential plumbing - can work independently",
+      "experience_required": "8,000 hours of experience working in the plumbing trade",
       "exam_required": true,
-      "exam_type": "Open Book",
-      "application_fee": 50.0,
-      "exam_fee": 0.0,
-      "license_fee": 50.0
+      "exam_type": "Written (computer-based) + Practical (hands-on)",
+      "application_fee": 40.0,
+      "exam_fee": 108.50,
+      "license_fee": 40.0
     },
     {
       "name": "Master Plumber",
-      "description": "Highest level - can supervise others, pull permits, run business",
-      "experience_required": "12,000 hours (minimum 4 years as Journeyman + 2 years additional)",
+      "description": "Highest level - can supervise others, pull permits, run business, design systems",
+      "experience_required": "4 years as licensed Journeyman Plumber (or 1 year + DOL apprenticeship completion)",
       "exam_required": true,
-      "exam_type": "Open Book",
-      "application_fee": 225.0,
-      "exam_fee": 0.0,
-      "license_fee": 225.0
+      "exam_type": "Written only (computer-based, comprehensive)",
+      "application_fee": 175.0,
+      "exam_fee": 128.50,
+      "license_fee": 75.0
     },
     {
       "name": "Plumbing Inspector",
-      "description": "Municipal/county inspector license",
-      "experience_required": "Journeyman + 2 years inspection experience",
+      "description": "Municipal/county inspector license for code enforcement",
+      "experience_required": "500 hours training/experience OR current Master/Journeyman/PE/Architect license OR out-of-state inspector license",
       "exam_required": true,
-      "exam_type": "Open Book",
-      "application_fee": 100.0,
-      "exam_fee": 0.0,
-      "license_fee": 100.0
+      "exam_type": "Written only (computer-based)",
+      "application_fee": 55.0,
+      "exam_fee": 68.50,
+      "license_fee": 27.50
     }
   ],
+  
   "requirements": {
-    "minimum_age": 18,
-    "residency_required": false,
-    "background_check": true,
-    "education": "High school diploma or GED recommended but not required",
-    "experience_breakdown": {
-      "residential": "At least 2,000 hours recommended",
-      "commercial": "At least 2,000 hours recommended",
-      "supervision": "Must be under licensed Master Plumber"
-    }
+    "age": "18 years minimum",
+    "citizenship": "Current U.S. citizen/national OR immigrant eligible to work in Texas",
+    "education": "High school diploma or GED recommended. May grant up to 3 years credit toward experience requirement for accredited school/apprenticeship training (Journeyman level)",
+    "experience": "Must be verifiable through Employer Certification forms. For Tradesman: must be registered as Plumber's Apprentice in Texas. For Journeyman: 8,000 hours minimum. For Master: 4 years as licensed Journeyman (or 1 year + DOL apprenticeship)",
+    "training_requirements": {
+      "tradesman": "24-hour TSBPE-approved training course OR enrollment in DOL Office of Apprenticeship program",
+      "journeyman": "48-hour TSBPE-approved training course OR enrollment/completion of DOL Office of Apprenticeship program (not required if already licensed in another state)",
+      "master": "None beyond Journeyman requirements"
+    },
+    "fingerprinting": "Required for all applicants - must obtain fingerprints for DOJ/FBI background check review and approval"
   },
+  
   "examination": {
-    "provider": "Texas State Board (in-house)",
-    "test_format": "Open book, multiple choice",
-    "reference_materials": "IPC, UPC, Texas Plumbing License Law & Rules",
-    "required_books": [
-      {
-        "name": "2018 International Plumbing Code (IPC)",
-        "cost": 126.73,
-        "vendor": "ICC",
-        "required_for": [
-          "Tradesman",
-          "Journeyman",
-          "Master"
-        ]
-      },
-      {
-        "name": "Texas Plumbing License Law & Rules",
-        "cost": 0.0,
-        "vendor": "TSBPE (free download)",
-        "required_for": [
-          "Tradesman",
-          "Journeyman",
-          "Master"
-        ]
-      }
-    ],
+    "provider": "Pearson VUE",
+    "format": "Computer-based testing at Pearson VUE centers (written exams) + Hands-on practical at TSBPE Austin/Waco facilities",
+    "books_required": "2018 International Residential Code (Tradesman), 2018 International Plumbing Code and Fuel Gas Code (Journeyman/Master), Texas Plumbing License Law and Board Rules, OSHA regulations, Texas Accessibility Standards, NFPA-54 (Master only)",
+    "cost_estimate": 300.0,
     "test_details": {
-      "tradesman": {
-        "duration_hours": 4,
-        "questions": 80,
+      "tradesman_written": {
+        "duration_hours": 2,
+        "questions": 85,
         "passing_score": "70%",
-        "sections": [
-          "IPC (60 questions)",
-          "Texas Law (20 questions)"
-        ]
+        "sections": ["Plumbing code", "Water heaters", "License law and rules"]
       },
-      "journeyman": {
-        "duration_hours": 6,
+      "tradesman_practical": {
+        "duration_hours": 4,
+        "tasks": 6,
+        "description": "Hands-on: measuring, cutting, assembly of PVC, copper, threaded steel, cast iron; water heater installation review; design and install 2-story drainage/vent system"
+      },
+      "journeyman_written": {
+        "duration_hours": 2,
         "questions": 100,
         "passing_score": "70%",
-        "sections": [
-          "IPC (75 questions)",
-          "Texas Law (25 questions)"
-        ]
+        "sections": ["Plumbing code", "Water heaters", "License law and rules"]
       },
-      "master": {
-        "duration_hours": 8,
-        "questions": 120,
+      "journeyman_practical": {
+        "duration_hours": 4,
+        "tasks": 6,
+        "description": "Hands-on installation skills demonstration (Tradesman moving to Journeyman exempt from practical retake)"
+      },
+      "master_written": {
+        "duration_hours": 6.5,
+        "questions": 308,
         "passing_score": "70%",
-        "sections": [
-          "IPC (80 questions)",
-          "Texas Law (40 questions)"
-        ]
+        "sections": ["Plumbing codes (60 questions)", "Water heaters (25)", "OSHA (25)", "Texas Accessibility Standards (25)", "LP Gas (25)", "Mathematics (25)", "License Law/Rules (25)", "Plus pipe sizing charts and system design (98)"],
+        "break": "30-minute scheduled break midway"
       }
-    },
-    "scheduling": "Call TSBPE to schedule - tests given monthly in Austin",
-    "results": "Immediate (given at test site)",
-    "retake_policy": "Can retake after 30 days, unlimited attempts"
+    }
   },
+  
   "application_process": [
     {
       "step": 1,
-      "title": "Gather Experience Documentation",
-      "description": "Get employer verification forms signed for all work experience. Need detailed hour breakdowns.",
-      "forms_required": [
-        "Work Experience Verification Form (Form A)"
-      ],
-      "timeline": "2-4 weeks"
+      "description": "Register as Plumber's Apprentice with TSBPE (Tradesman applicants only). Begin documenting work hours with Employer Certification forms."
     },
     {
       "step": 2,
-      "title": "Submit Application",
-      "description": "Complete online application or mail paper application with all supporting documents",
-      "forms_required": [
-        "Application for Plumbing License",
-        "Criminal Background Consent"
-      ],
-      "fees": 50.0,
-      "timeline": "Submit at least 45 days before desired test date"
+      "description": "Complete required training: 24-hour course (Tradesman) or 48-hour course (Journeyman) approved by TSBPE, OR enroll in DOL apprenticeship program."
     },
     {
       "step": 3,
-      "title": "Background Check",
-      "description": "TSBPE conducts criminal background check",
-      "timeline": "2-3 weeks"
+      "description": "Obtain fingerprints for background check through approved vendor. See tsbpe.texas.gov/fingerprints for locations and instructions."
     },
     {
       "step": 4,
-      "title": "Application Approval",
-      "description": "Board reviews and approves application. You'll receive approval letter with test authorization.",
-      "timeline": "2-4 weeks after submission"
+      "description": "Apply online via Texas Online Licensing System (vo.licensing.hpc.texas.gov) OR download paper application from TSBPE website. Submit application fee, experience verification forms, and required documentation."
     },
     {
       "step": 5,
-      "title": "Schedule Exam",
-      "description": "Call TSBPE to schedule your exam date. Bring required books and photo ID.",
-      "timeline": "Tests offered monthly"
+      "description": "TSBPE reviews application and conducts background check (2-4 weeks). Upon approval, you receive 'Authorization to Test' email from Pearson VUE."
     },
     {
       "step": 6,
-      "title": "Take Exam",
-      "description": "Open book exam at TSBPE headquarters in Austin. Results given immediately.",
-      "timeline": "1 day"
+      "description": "Schedule written exam at Pearson VUE website (www.pearsonvue.com/tsbpe) or call (888) 304-3589. Must schedule at least 24 hours in advance."
     },
     {
       "step": 7,
-      "title": "Pay License Fee & Receive License",
-      "description": "If you pass, pay license activation fee. License card mailed within 2 weeks.",
-      "fees": 50.0,
-      "timeline": "2 weeks"
+      "description": "Take written exam at Pearson VUE test center. Bring government-issued photo ID. Results provided immediately. Written exam fee paid at scheduling."
+    },
+    {
+      "step": 8,
+      "description": "If written exam passed AND practical required (Tradesman/Journeyman): Receive second Authorization to Test email within 10 days. Schedule practical exam at TSBPE Austin or Waco facility (must schedule 10 days in advance)."
+    },
+    {
+      "step": 9,
+      "description": "Take practical exam at TSBPE facility (Tradesman/Journeyman only). Bring photo ID. No shorts or open-toed shoes allowed."
+    },
+    {
+      "step": 10,
+      "description": "Upon passing all required exams, pay initial license fee via TSBPE Online Licensing System. License certificate and pocket card mailed within 10-15 business days."
     }
   ],
+  
   "insurance_bonding": {
-    "liability_insurance_required": false,
     "bond_required": false,
-    "notes": "Insurance/bonds not required for individual licensure, but may be required by employers or for contractor licenses"
+    "insurance_required": "Not required for individual licensure. May be required by employer or for contractor registration.",
+    "liability_minimum": "Varies by employer/contractor requirements"
   },
+  
   "renewal": {
-    "period": "Annual (every year on birthday)",
-    "renewal_fee": 300.0,
+    "period": "Annual - random expiration date assigned at first issuance (6-18 months from exam pass date), then annually thereafter",
+    "renewal_fee": 0,
     "continuing_education_hours": 6,
-    "ce_topics": [
-      "Texas Plumbing Code updates",
-      "Safety",
-      "Business/Law"
-    ],
-    "ce_providers": [
-      "Approved by TSBPE - list on website"
-    ],
-    "late_renewal": "Can renew up to 2 years late with penalty fees",
-    "inactive_status": "Available - reduced fee, cannot practice"
+    "ce_providers": ["TSBPE-approved providers listed on website"],
+    "ce_requirements": "6 hours of continuing professional education required annually to renew"
   },
+  
   "reciprocity": {
-    "accepts_from": [
-      "None - Texas does not have reciprocity agreements"
-    ],
-    "endorsement_process": "Out-of-state plumbers must meet Texas experience requirements and pass TX exam",
-    "notes": "Texas has unique requirements - most states do not qualify for endorsement"
+    "available": true,
+    "requirements": "Louisiana and Arkansas Journeyman licensees may obtain license through reciprocity without examination. Other states must meet Texas experience requirements and pass exams.",
+    "states_accepted": "Louisiana, Arkansas (Journeyman level only)"
   },
+  
   "resources": {
-    "official_links": [
-      {
-        "name": "TSBPE Homepage",
-        "url": "https://www.tsbpe.texas.gov"
-      },
-      {
-        "name": "Online Application Portal",
-        "url": "https://www.tsbpe.texas.gov/applications"
-      },
-      {
-        "name": "License Verification",
-        "url": "https://www.tsbpe.texas.gov/verify"
-      }
-    ],
-    "study_materials": [
-      {
-        "name": "2018 IPC Code Book",
-        "vendor": "ICC",
-        "url": "https://www.iccsafe.org",
-        "cost": 126.73
-      },
-      {
-        "name": "Texas Plumbing License Law",
-        "vendor": "TSBPE",
-        "url": "https://www.tsbpe.texas.gov",
-        "cost": 0.0
-      }
-    ],
-    "prep_courses": [
-      {
-        "name": "Texas Plumbing Exam Prep",
-        "provider": "Various (not board-approved)",
-        "cost": "500-800",
-        "notes": "Optional - not required"
-      }
-    ]
+    "board_website": "https://tsbpe.texas.gov",
+    "exam_scheduling": "https://www.pearsonvue.com/tsbpe or call (888) 304-3589",
+    "license_lookup": "https://vo.licensing.hpc.texas.gov",
+    "study_guides": "Examination Review Courses available free at tsbpe.texas.gov/printableforms",
+    "online_licensing": "https://vo.licensing.hpc.texas.gov",
+    "contact_email": "exams@tsbpe.texas.gov",
+    "pearson_vue_support": "pearsonvuecustomerservice@pearson.com or Live Chat 8am-5pm CT Mon-Fri"
   },
+  
   "pro_tips": [
-    "Texas exams are OPEN BOOK - tab your code book extensively",
-    "Focus on knowing WHERE to find answers, not memorizing codes",
-    "The Texas Law section is NOT in the IPC - study the TSBPE rules booklet",
-    "Experience hours must be verified by a Texas-licensed Master Plumber",
-    "Apply 60 days before you want to test - processing takes time",
-    "Austin is the ONLY test location - plan travel if needed"
+    "Download FREE Examination Review Courses from TSBPE website - contains sample questions and content outlines",
+    "Initial Authorization to Test is good for 5 attempts on written exam - use them wisely",
+    "Wait times between retakes: 30 days after 1st failure, 60 days after 2nd, 90 days after 3rd+",
+    "All attempts must be completed within 1 year of initial application authorization",
+    "For Master exam: bring snacks/lunch - it's a 6.5 hour marathon with 308 questions",
+    "Tradesman/Journeyman: You must pass BOTH written AND practical - they're separate exams",
+    "Study the manufacturer installation instructions for PVC, copper, and threaded joints for practical",
+    "Pearson VUE test centers are throughout Texas - not just Austin (but practical IS Austin/Waco only)",
+    "NO personal items allowed in testing room - everything goes in locker including phone, watch, wallet",
+    "Review courses are topic-specific: separate courses for Tradesman, Journeyman, Master, Inspector",
+    "Take the 30-minute break on Master exam - it's built in and won't count against your time"
   ],
+  
   "common_pitfalls": [
-    "Not having experience properly documented - get signatures BEFORE employer leaves",
-    "Thinking you can substitute education for experience - you cannot",
-    "Not bringing required code books to exam - you'll be turned away",
-    "Waiting until last minute to renew - can take 2 weeks to process",
-    "Not understanding that Texas doesn't recognize most out-of-state licenses"
+    "Not obtaining fingerprints before applying - this will delay your authorization",
+    "Forgetting you need BOTH a 24-hour OR 48-hour training course certificate to apply",
+    "Applying before you're registered as an Apprentice (Tradesman applicants)",
+    "Not bringing government-issued photo ID to exam - you'll be turned away, no refund",
+    "Wearing shorts or open-toed shoes to practical exam - not allowed, you'll forfeit exam",
+    "Thinking the practical is easy because written is 'computer-based' - practical has ~50% fail rate",
+    "Not scheduling practical exam within your authorization window - it expires",
+    "Missing the fact that exam fees are SEPARATE from application fees - budget accordingly",
+    "Assuming passing written means you get license - Tradesman/Journeyman still need practical",
+    "Not checking Pearson VUE junk/spam folder for Authorization to Test email",
+    "Bringing prohibited items to test center - even having phone on you can disqualify you",
+    "Not understanding that vouchers and exam fees are non-refundable if you no-show or cancel late"
   ]
 }

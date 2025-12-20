@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}Director Dashboard{% endblock %}
+
+{% block content %}
+<div class="director-dashboard">
+    <div class="container-fluid px-4 py-3">
+        
+        <!-- Page Header -->
+        <div class="page-header-compact mb-4">
+            <h3>🏢 Director View - Company Overview</h3>
+            <p class="text-muted">Department Leadership Dashboard</p>
+        </div>
+
+        <!-- Quick Stats Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">📜</div>
+                    <div class="stat-value">{{ stats.total_licenses }}</div>
+                    <div class="stat-label">Total Licenses</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">🗺️</div>
+                    <div class="stat-value">{{ stats.active_states }}</div>
+                    <div class="stat-label">Active States</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card warning">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-value">{{ stats.expiring_soon }}</div>
+                    <div class="stat-label">Expiring <60 Days</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card success">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value">${{ "{:,.0f}".format(stats.annual_cost) }}</div>
+                    <div class="stat-label">Annual Costs</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active States Section -->
+        <div class="data-card mb-4">
+            <div class="card-header-compact">
+                <span class="card-icon">🗺️</span>
+                <span class="card-title">Active States</span>
+                <a href="/admin/active-states" class="btn btn-sm btn-outline-primary ms-auto">Manage States</a>
+            </div>
+            <div class="card-body-compact">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>State</th>
+                                <th>Status</th>
+                                <th>Team Members</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for state in coverage.covered_states %}
+                            <tr>
+                                <td><strong>{{ state }}</strong></td>
+                                <td><span class="badge bg-success">✅ Licensed</span></td>
+                                <td>
+                                    {% set holders = active_states_detail.get(state, {}).get('holders', []) %}
+                                    {{ holders|length }} license holder(s)
+                                </td>
+                                <td>
+                                    <a href="/state/{{ state }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            
+                            {% for state in coverage.in_progress_states %}
+                            <tr>
+                                <td><strong>{{ state }}</strong></td>
+                                <td><span class="badge bg-warning">🔄 In Progress</span></td>
+                                <td>-</td>
+                                <td>
+                                    <a href="/state/{{ state }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            
+                            {% for state in coverage.target_states %}
+                            <tr>
+                                <td><strong>{{ state }}</strong></td>
+                                <td><span class="badge bg-secondary">⭕ Target</span></td>
+                                <td>-</td>
+                                <td>
+                                    <a href="/state/{{ state }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Members Section -->
+        <div class="data-card mb-4">
+            <div class="card-header-compact">
+                <span class="card-icon">👥</span>
+                <span class="card-title">Team Members</span>
+                <a href="/team/manage" class="btn btn-sm btn-outline-primary ms-auto">Manage Team</a>
+            </div>
+            <div class="card-body-compact">
+                <div class="row g-3">
+                    {% for holder in team_members %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="team-member-card">
+                            <div class="member-header">
+                                <div class="member-avatar">{{ holder.name[0] }}</div>
+                                <div class="member-info">
+                                    <div class="member-name">{{ holder.name }}</div>
+                                    <div class="member-role">{{ holder.role }}</div>
+                                </div>
+                            </div>
+                            <div class="member-stats">
+                                <div class="member-stat">
+                                    <span class="stat-number">{{ holder.total_licenses }}</span>
+                                    <span class="stat-text">Licenses</span>
+                                </div>
+                                <div class="member-stat">
+                                    <span class="stat-number">{{ holder.states_count }}</span>
+                                    <span class="stat-text">States</span>
+                                </div>
+                                <div class="member-stat">
+                                    <span class="stat-number">{{ holder.expiring_count }}</span>
+                                    <span class="stat-text">Expiring</span>
+                                </div>
+                            </div>
+                            <a href="/team/view/{{ holder.user_id }}" class="btn btn-sm btn-primary w-100 mt-2">View Details →</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Alerts -->
+        {% if urgent_items %}
+        <div class="data-card">
+            <div class="card-header-compact">
+                <span class="card-icon">🚨</span>
+                <span class="card-title">Recent Alerts</span>
+            </div>
+            <div class="card-body-compact">
+                <div class="alerts-list">
+                    {% for alert in urgent_items %}
+                    <div class="alert alert-{{ alert.urgency }} mb-2">
+                        <strong>{{ alert.holder_name }}</strong> - {{ alert.jurisdiction }}: {{ alert.issue }}
+                        <a href="{{ alert.link }}" class="btn btn-sm btn-outline-{{ alert.urgency }} ms-2">{{ alert.action }}</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

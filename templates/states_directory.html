@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}State Requirements Directory{% endblock %}
+{% block content %}
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        
+        <div class="page-header-compact mb-3">
+            <h3>📚 State Licensing Requirements</h3>
+            <p class="text-muted">View detailed licensing information for all states</p>
+        </div>
+
+        <div class="netsuite-table-card">
+            <div class="p-3 border-bottom">
+                <h6 class="mb-0">All States ({{ states|length }} total)</h6>
+            </div>
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>State</th>
+                        <th>Governing Body</th>
+                        <th>Contact</th>
+                        <th>Info Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for state in states %}
+                    <tr>
+                        <td>
+                            <strong>{{ state.name }}</strong>
+                            <span class="text-muted">({{ state.abbr }})</span>
+                        </td>
+                        <td>{{ state.governing_body }}</td>
+                        <td>{{ state.board_phone }}</td>
+                        <td>
+                            <div class="progress" style="height: 20px; width: 150px;">
+                                <div class="progress-bar 
+                                    {% if state.completion >= 80 %}bg-success
+                                    {% elif state.completion >= 50 %}bg-warning
+                                    {% else %}bg-secondary{% endif %}" 
+                                    style="width: {{ state.completion }}%">
+                                    {{ state.completion }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="/state/{{ state.abbr }}" class="btn btn-sm btn-primary">
+                                👁️ View Requirements
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

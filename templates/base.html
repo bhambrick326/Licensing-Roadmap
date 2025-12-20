@@ -13,6 +13,7 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block styles %}{% endblock %}
 </head>
 <body class="dashboard-layout">
     <!-- Top Navigation Bar -->
@@ -48,11 +49,20 @@
                 <!-- Account Selector -->
                 <div class="sidebar-section account-selector-section">
                     <h6 class="sidebar-heading">Active Account</h6>
-                    <select id="accountSelector" class="account-selector">
-                        <option value="bhambrick" {% if holder and holder.user_id == 'bhambrick' %}selected{% endif %}>👤 Benjamin Hambrick</option>
-                        <option value="jsmith" {% if holder and holder.user_id == 'jsmith' %}selected{% endif %}>👤 John Smith</option>
-                        <option value="director" {% if not holder or holder.user_id == 'director' %}selected{% endif %}>👔 Director View</option>
-                    </select>
+                    {% if session.get('user_type') == 'manager' %}
+                        <!-- Manager can switch accounts -->
+                        <select id="accountSelector" class="account-selector">
+                            <option value="bhambrick" {% if holder and holder.user_id == 'bhambrick' %}selected{% endif %}>👤 Benjamin Hambrick</option>
+                            <option value="jsmith" {% if holder and holder.user_id == 'jsmith' %}selected{% endif %}>👤 John Smith</option>
+                            <option value="director" {% if not holder or holder.user_id == 'director' %}selected{% endif %}>👔 Director View</option>
+                        </select>
+                    {% else %}
+                        <!-- License holder sees only their account -->
+                        <div class="account-display">
+                            <div class="account-name">👤 {{ session.get('name', 'User') }}</div>
+                            <div class="account-role" style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">License Holder</div>
+                        </div>
+                    {% endif %}
                 </div>
                 
                 <!-- Stats Section -->
@@ -95,40 +105,87 @@
                 <!-- Navigation Section -->
                 <div class="sidebar-section sidebar-nav">
                     <h6 class="sidebar-heading">Navigation</h6>
-                    <a href="/?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
-                        <span class="sidebar-nav-icon">🏠</span>
-                        <span>Home</span>
-                    </a>
-                    <a href="/licensing-roadmap?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item active">
-                        <span class="sidebar-nav-icon">🗺️</span>
-                        <span>Map View</span>
-                    </a>
-                    <a href="/manage-licenses?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
-                        <span class="sidebar-nav-icon">📜</span>
-                        <span>Manage Licenses</span>
-                    </a>
-                    {% if holder and holder.user_id != 'director' %}
-                    <a href="/bio/{{ holder.user_id }}" class="sidebar-nav-item">
-                        <span class="sidebar-nav-icon">📝</span>
-                        <span>My Bio</span>
-                    </a>
+                    
+                    {% if session.get('user_type') == 'manager' %}
+                        <!-- MANAGER/DIRECTOR VIEW -->
+                        <div class="nav-group">
+                            <small class="nav-group-label">OVERVIEW</small>
+                            <a href="/?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">🏠</span>
+                                <span>Dashboard</span>
+                            </a>
+                            <a href="/licensing-roadmap?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">🗺️</span>
+                                <span>Map View</span>
+                            </a>
+                            <a href="/cost-analytics?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">💰</span>
+                                <span>Cost Analytics</span>
+                            </a>
+                        </div>
+                        
+                        <div class="nav-group mt-3">
+                            <small class="nav-group-label">TEAM</small>
+                            <a href="/team/manage?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">👥</span>
+                                <span>Team Members</span>
+                            </a>
+                            <a href="/manage-licenses?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">📜</span>
+                                <span>All Licenses</span>
+                            </a>
+                            <a href="/import-csv-page" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">📤</span>
+                                <span>Import Data</span>
+                            </a>
+                        </div>
+                        
+                        <div class="nav-group mt-3">
+                            <small class="nav-group-label">RESOURCES</small>
+                            <a href="/admin/state-encyclopedia" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">📚</span>
+                                <span>State Encyclopedia</span>
+                            </a>
+                            <a href="/settings?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">⚙️</span>
+                                <span>Settings</span>
+                            </a>
+                        </div>
+                        
+                    {% else %}
+                        <!-- LICENSE HOLDER VIEW -->
+                        <div class="nav-group">
+                            <small class="nav-group-label">MY LICENSES</small>
+                            <a href="/?account={{ session.get('user_id', 'bhambrick') }}" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">🏠</span>
+                                <span>My Dashboard</span>
+                            </a>
+                            <a href="/licensing-roadmap?account={{ session.get('user_id', 'bhambrick') }}" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">🗺️</span>
+                                <span>My Map View</span>
+                            </a>
+                            <a href="/manage-licenses?account={{ session.get('user_id', 'bhambrick') }}" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">📜</span>
+                                <span>My Licenses</span>
+                            </a>
+                            <a href="/bio/{{ session.get('user_id', 'bhambrick') }}" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">📝</span>
+                                <span>My Bio</span>
+                            </a>
+                        </div>
+                        
+                        <div class="nav-group mt-3">
+                            <small class="nav-group-label">RESOURCES</small>
+                            <a href="/states/directory" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">📚</span>
+                                <span>State Requirements</span>
+                            </a>
+                            <a href="/settings?account={{ session.get('user_id', 'bhambrick') }}" class="sidebar-nav-item">
+                                <span class="sidebar-nav-icon">⚙️</span>
+                                <span>My Settings</span>
+                            </a>
+                        </div>
                     {% endif %}
-                    <a href="/cost-analytics?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
-                        <span class="sidebar-nav-icon">💰</span>
-                        <span>Cost Analytics</span>
-                    </a>
-                    <a href="/team/manage?account={{ holder.user_id if holder else 'bhambrick' }}" class="sidebar-nav-item">
-                        <span class="sidebar-nav-icon">👥</span>
-                        <span>Manage Team</span>
-                    </a>
-                    <a href="/admin/licensing/states?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
-                        <span class="sidebar-nav-icon">📋</span>
-                        <span>Admin</span>
-                    </a>
-                    <a href="/settings?account={{ holder.user_id if holder else "bhambrick" }}" class="sidebar-nav-item">
-                        <span class="sidebar-nav-icon">⚙️</span>
-                        <span>Settings</span>
-                    </a>
                 </div>
             </div>
         </aside>
@@ -150,6 +207,8 @@
     
     <!-- Custom JavaScript -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <!-- Mapbox Map Script -->
     <script src="{{ url_for('static', filename='js/mapbox-map.js') }}"></script>
     
     <!-- Account Switcher -->

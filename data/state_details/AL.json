@@ -1,0 +1,86 @@
+{
+  "state": "Alabama",
+  "state_abbr": "AL",
+  "governing_body": "Alabama State Board of Plumbing",
+  "board_phone": "(000) 000-0000",
+  "board_website": "https://www.al.gov/plumbing",
+  "board_address": "Address TBD",
+  "license_types": [
+    {
+      "name": "Master Plumber",
+      "description": "Highest level plumbing license",
+      "experience_required": "TBD",
+      "exam_required": true,
+      "exam_type": "TBD",
+      "application_fee": 0.0,
+      "exam_fee": 0.0,
+      "license_fee": 0.0
+    }
+  ],
+  "requirements": {
+    "minimum_age": 18,
+    "residency_required": false,
+    "background_check": true,
+    "education": "TBD",
+    "experience_breakdown": {}
+  },
+  "examination": {
+    "provider": "TBD",
+    "test_format": "TBD",
+    "reference_materials": "TBD",
+    "required_books": [],
+    "test_details": {},
+    "scheduling": "TBD",
+    "results": "TBD",
+    "retake_policy": "TBD"
+  },
+  "application_process": [
+    {
+      "step": 1,
+      "title": "Research Requirements",
+      "description": "Contact the state board for specific requirements",
+      "timeline": "TBD"
+    }
+  ],
+  "insurance_bonding": {
+    "liability_insurance_required": false,
+    "bond_required": false,
+    "notes": "TBD"
+  },
+  "renewal": {
+    "period": "Annual",
+    "renewal_fee": 0.0,
+    "continuing_education_hours": 0,
+    "ce_topics": [],
+    "ce_providers": [
+      "Check state board website"
+    ],
+    "late_renewal": "TBD",
+    "inactive_status": "TBD"
+  },
+  "reciprocity": {
+    "accepts_from": [
+      "TBD"
+    ],
+    "endorsement_process": "TBD",
+    "notes": "Contact board for reciprocity information"
+  },
+  "resources": {
+    "official_links": [
+      {
+        "name": "Alabama Board Homepage",
+        "url": "https://www.al.gov"
+      }
+    ],
+    "study_materials": [],
+    "prep_courses": []
+  },
+  "pro_tips": [
+    "Contact the state board early in your application process",
+    "Keep detailed records of all work experience"
+  ],
+  "common_pitfalls": [
+    "Not having proper documentation",
+    "Missing application deadlines"
+  ]
+}

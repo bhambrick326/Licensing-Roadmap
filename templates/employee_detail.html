@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+{% block title %}{{ employee.name }} - Details{% endblock %}
+
+{% block content %}
+<div class="employee-detail-page">
+    <div class="container-fluid px-4 py-3">
+        
+        <!-- Back Button & Header -->
+        <div class="mb-3">
+            <a href="/?account=director" class="btn btn-sm btn-outline-secondary">← Back to Team</a>
+        </div>
+
+        <!-- Employee Header -->
+        <div class="employee-header mb-4">
+            <div class="employee-avatar-large">{{ employee.name[0] }}</div>
+            <div class="employee-header-info">
+                <h2 class="employee-name">{{ employee.name }}</h2>
+                <p class="employee-role">{{ employee.role }}</p>
+            </div>
+        </div>
+
+        <!-- Quick Stats Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card-small">
+                    <div class="stat-value">{{ employee.total_licenses }}</div>
+                    <div class="stat-label">Active Licenses</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-small">
+                    <div class="stat-value">{{ stats.states_count }}</div>
+                    <div class="stat-label">States Licensed</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-small warning">
+                    <div class="stat-value">{{ stats.expiring_count }}</div>
+                    <div class="stat-label">Expiring <60 Days</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-small success">
+                    <div class="stat-value">${{ "{:,.0f}".format(stats.annual_cost) }}</div>
+                    <div class="stat-label">Annual Cost</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs mb-3" id="employeeTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="licenses-tab" data-bs-toggle="tab" data-bs-target="#licenses" type="button">
+                    📜 Licenses
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="costs-tab" data-bs-toggle="tab" data-bs-target="#costs" type="button">
+                    💰 Costs
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="bio-tab" data-bs-toggle="tab" data-bs-target="#bio" type="button">
+                    📝 Bio
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="employeeTabContent">
+            
+            <!-- LICENSES TAB -->
+            <div class="tab-pane fade show active" id="licenses" role="tabpanel">
+                <div class="data-card">
+                    <div class="card-header-compact">
+                        <span class="card-icon">📍</span>
+                        <span class="card-title">Licenses by State ({{ employee.total_licenses }} total)</span>
+                    </div>
+                    <div class="card-body-compact">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>State</th>
+                                        <th>License Type</th>
+                                        <th>License #</th>
+                                        <th>Status</th>
+                                        <th>Expiration</th>
+                                        <th>Days Remaining</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for license in licenses %}
+                                    <tr>
+                                        <td><strong>{{ license.jurisdiction }}</strong></td>
+                                        <td>{{ license.license_type }}</td>
+                                        <td><code>{{ license.license_number }}</code></td>
+                                        <td>
+                                            {% if license.status == 'licensed' %}
+                                                <span class="badge bg-success">✅ Licensed</span>
+                                            {% elif license.status == 'in_progress' %}
+                                                <span class="badge bg-warning">🔄 In Progress</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Not Licensed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ license.expires_on or 'N/A' }}</td>
+                                        <td>
+                                            {% if license.days_remaining %}
+                                                {% if license.days_remaining < 0 %}
+                                                    <span class="badge bg-danger">OVERDUE</span>
+                                                {% elif license.days_remaining <= 30 %}
+                                                    <span class="badge bg-warning">{{ license.days_remaining }} days</span>
+                                                {% elif license.days_remaining <= 60 %}
+                                                    <span class="badge bg-info">{{ license.days_remaining }} days</span>
+                                                {% else %}
+                                                    <span class="text-muted">{{ license.days_remaining }} days</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COSTS TAB -->
+            <div class="tab-pane fade" id="costs" role="tabpanel">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-title">Total Estimated Costs</span>
+                            </div>
+                            <div class="card-body-compact text-center">
+                                <h2 class="text-primary">${{ "{:,.2f}".format(costs.total_estimated) }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-title">Total Actual Spent</span>
+                            </div>
+                            <div class="card-body-compact text-center">
+                                <h2 class="text-success">${{ "{:,.2f}".format(costs.total_actual) }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="data-card">
+                            <div class="card-header-compact">
+                                <span class="card-title">Annual Recurring</span>
+                            </div>
+                            <div class="card-body-compact text-center">
+                                <h2 class="text-warning">${{ "{:,.2f}".format(costs.annual_recurring) }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cost by State -->
+                <div class="data-card">
+                    <div class="card-header-compact">
+                        <span class="card-icon">📊</span>
+                        <span class="card-title">Cost Breakdown by State</span>
+                    </div>
+                    <div class="card-body-compact">
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>State</th>
+                                        <th>Initial Cost</th>
+                                        <th>Renewal Cost</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for state_cost in costs.by_state %}
+                                    <tr>
+                                        <td><strong>{{ state_cost.state }}</strong></td>
+                                        <td>${{ "{:,.2f}".format(state_cost.initial) }}</td>
+                                        <td>${{ "{:,.2f}".format(state_cost.renewal) }}</td>
+                                        <td><strong>${{ "{:,.2f}".format(state_cost.total) }}</strong></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BIO TAB -->
+            <div class="tab-pane fade" id="bio" role="tabpanel">
+                <div class="data-card">
+                    <div class="card-header-compact">
+                        <span class="card-icon">📝</span>
+                        <span class="card-title">Professional Bio</span>
+                        <a href="/bio/{{ employee.user_id }}" class="btn btn-sm btn-outline-primary ms-auto">Edit Bio</a>
+                    </div>
+                    <div class="card-body-compact">
+                        {% if bio %}
+                            <div class="bio-content">
+                                <h5>Contact Information</h5>
+                                <p><strong>Email:</strong> {{ bio.email or 'Not provided' }}</p>
+                                <p><strong>Phone:</strong> {{ bio.phone or 'Not provided' }}</p>
+                                
+                                {% if bio.summary %}
+                                <h5 class="mt-4">Professional Summary</h5>
+                                <p>{{ bio.summary }}</p>
+                                {% endif %}
+                                
+                                {% if bio.certifications %}
+                                <h5 class="mt-4">Certifications</h5>
+                                <ul>
+                                    {% for cert in bio.certifications %}
+                                    <li>{{ cert }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No bio information available yet.</p>
+                            <a href="/bio/{{ employee.user_id }}" class="btn btn-primary">Create Bio</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

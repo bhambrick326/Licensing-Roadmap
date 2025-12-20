@@ -1,0 +1,106 @@
+{
+  "application_process": [
+    {
+      "description": "Submit Application for Original Contractor License with $450 fee (includes initial exam fee). Submit Certification of Work Experience forms documenting 4 years.",
+      "step": 1
+    },
+    {
+      "description": "CSLB reviews application - nearly half are returned incomplete. Ensure accuracy!",
+      "step": 2
+    },
+    {
+      "description": "Live Scan fingerprinting for DOJ/FBI background check after application accepted.",
+      "step": 3
+    },
+    {
+      "description": "Schedule Law & Business + C-36 Trade exams with PSI once approved.",
+      "step": 4
+    },
+    {
+      "description": "Submit $25,000 contractor bond and workers' comp insurance (REQUIRED for C-36).",
+      "step": 5
+    },
+    {
+      "description": "License issued upon passing exams and meeting all requirements. Renew every 2 years.",
+      "step": 6
+    }
+  ],
+  "board_address": "9821 Business Park Drive, Sacramento, CA 95827",
+  "board_phone": "(800) 321-2752",
+  "board_website": "https://www.cslb.ca.gov",
+  "common_pitfalls": [
+    "Submitting incomplete applications - #1 cause of delays",
+    "Not documenting full 4 years of qualifying experience properly",
+    "Forgetting workers comp insurance BEFORE license can be issued",
+    "Not understanding RME requires PERMANENT employment (not 1099 contractor)",
+    "Thinking expunged convictions won't show - they WILL appear on background check"
+  ],
+  "examination": {
+    "books_required": "California Contractors License Law & Reference Book, California code books",
+    "cost_estimate": 450,
+    "format": "Computer-based, multiple choice",
+    "provider": "PSI Exams",
+    "test_details": {
+      "c36_plumbing": {
+        "duration_hours": 6,
+        "passing_score": "72%",
+        "questions": 100,
+        "sections": [
+          "Law & Business (7 sections)",
+          "C-36 Plumbing Trade"
+        ]
+      }
+    }
+  },
+  "governing_body": "Contractors State License Board (CSLB)",
+  "insurance_bonding": {
+    "bond_amount": 25000,
+    "bond_required": true,
+    "insurance_required": "Workers' compensation REQUIRED for C-36 even with no employees",
+    "liability_minimum": "For LLC: $1M minimum (5 or fewer personnel), up to $5M"
+  },
+  "license_types": [
+    {
+      "application_fee": 450,
+      "description": "Installation, alteration, repair of pipes, fittings, fixtures for sanitary drainage, water supply, fire protection systems",
+      "exam_fee": 0,
+      "exam_required": true,
+      "exam_type": "Law & Business + C-36 Trade",
+      "experience_required": "4 years journeyman-level or higher within last 10 years",
+      "license_fee": 200,
+      "name": "C-36 Plumbing Contractor"
+    }
+  ],
+  "pro_tips": [
+    "Nearly HALF of all applications are returned incomplete - take time to fill out completely!",
+    "C-36 Plumbing REQUIRES workers' comp even with zero employees - plan for this cost",
+    "If using RME as qualifier, they need their OWN $25K bond PLUS you need contractor bond",
+    "Study materials are FREE on CSLB website - don't pay for exam prep claiming CSLB affiliation",
+    "You have 18 months to pass both exams after application approval - use the time wisely"
+  ],
+  "reciprocity": {
+    "available": true,
+    "requirements": "Must hold current license in same classification in another recognized state. Trade exam may be waived. Law & Business still required if not passed in last 5 years.",
+    "states_accepted": "Check CSLB website for recognized states/classifications"
+  },
+  "renewal": {
+    "ce_providers": [],
+    "continuing_education_hours": 0,
+    "period": "Every 2 years",
+    "renewal_fee": 450
+  },
+  "requirements": {
+    "age": "18 years minimum",
+    "citizenship": "Not required - SSN or ITIN required for tax purposes",
+    "education": "May grant up to 3 years credit toward 4-year requirement for accredited school/apprenticeship training",
+    "experience": "4 years of journeyman-level experience in the classification within the last 10 years"
+  },
+  "resources": {
+    "board_website": "https://www.cslb.ca.gov",
+    "exam_scheduling": "https://test-takers.psiexams.com/cacon",
+    "license_lookup": "https://www.checkthelicensefirst.com",
+    "study_guides": "Free on CSLB website"
+  },
+  "state": "California",
+  "state_abbr": "CA"
+}

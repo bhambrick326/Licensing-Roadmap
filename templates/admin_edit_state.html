@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ state.state }} - Admin{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="container-fluid px-4 py-3">
+        
+        <div class="page-header-compact mb-3">
+            <a href="/admin/state-encyclopedia" class="btn btn-sm btn-outline-secondary mb-2">← Back to List</a>
+            <h3>Edit {{ state.state }} ({{ state.state_abbr }})</h3>
+            
+            {% if request.args.get('success') %}
+            <div class="alert alert-success mt-2">
+                ✅ State data saved successfully!
+            </div>
+            {% endif %}
+        </div>
+
+        <form method="POST" action="/admin/save-state/{{ state.state_abbr }}" id="stateForm">
+            
+            <!-- Hidden field with full JSON -->
+            <input type="hidden" name="state_data" id="stateDataInput">
+            
+            <!-- Tabs for different sections -->
+            <ul class="nav nav-tabs mb-3">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#basic">Basic Info</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#licenses">License Types</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#requirements">Requirements</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#exam">Examination</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#renewal">Renewal</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#json">Raw JSON</a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                
+                <!-- BASIC INFO TAB -->
+                <div class="tab-pane fade show active" id="basic">
+                    <div class="netsuite-table-card mb-3">
+                        <div class="p-3 border-bottom">
+                            <h6 class="mb-0">Board Contact Information</h6>
+                        </div>
+                        <div class="p-3">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Governing Body</label>
+                                    <input type="text" class="form-control form-control-sm" 
+                                           id="governing_body" value="{{ state.governing_body }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Board Phone</label>
+                                    <input type="text" class="form-control form-control-sm" 
+                                           id="board_phone" value="{{ state.board_phone }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Board Website</label>
+                                    <input type="url" class="form-control form-control-sm" 
+                                           id="board_website" value="{{ state.board_website }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Board Address</label>
+                                    <input type="text" class="form-control form-control-sm" 
+                                           id="board_address" value="{{ state.board_address }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RAW JSON TAB -->
+                <div class="tab-pane fade" id="json">
+                    <div class="netsuite-table-card mb-3">
+                        <div class="p-3 border-bottom">
+                            <h6 class="mb-0">Raw JSON Editor</h6>
+                            <p class="small text-muted mb-0">Advanced: Edit the raw JSON directly</p>
+                        </div>
+                        <div class="p-3">
+                            <textarea class="form-control" id="jsonEditor" rows="30" style="font-family: monospace; font-size: 0.813rem;">{{ state | tojson(indent=2) }}</textarea>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="formatJSON()">Format JSON</button>
+                                <button type="button" class="btn btn-sm btn-warning" onclick="validateJSON()">Validate JSON</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other tabs... (simplified for now) -->
+                <div class="tab-pane fade" id="licenses">
+                    <div class="alert alert-info">
+                        Use the Raw JSON tab to edit license types for now. Form builder coming soon!
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="requirements">
+                    <div class="alert alert-info">
+                        Use the Raw JSON tab to edit requirements for now. Form builder coming soon!
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="exam">
+                    <div class="alert alert-info">
+                        Use the Raw JSON tab to edit examination details for now. Form builder coming soon!
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="renewal">
+                    <div class="alert alert-info">
+                        Use the Raw JSON tab to edit renewal info for now. Form builder coming soon!
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Save Button -->
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                <a href="/admin/state-encyclopedia" class="btn btn-outline-secondary">Cancel</a>
+                <a href="/state/{{ state.state_abbr }}" target="_blank" class="btn btn-outline-info">👁️ Preview</a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+// Form submission handler
+document.getElementById('stateForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Get JSON from editor
+    const jsonText = document.getElementById('jsonEditor').value;
+    
+    try {
+        // Validate JSON
+        const stateData = JSON.parse(jsonText);
+        
+        // Update basic fields from form inputs
+        stateData.governing_body = document.getElementById('governing_body').value;
+        stateData.board_phone = document.getElementById('board_phone').value;
+        stateData.board_website = document.getElementById('board_website').value;
+        stateData.board_address = document.getElementById('board_address').value;
+        
+        // Set hidden input
+        document.getElementById('stateDataInput').value = JSON.stringify(stateData);
+        
+        // Submit form
+        this.submit();
+        
+    } catch (e) {
+        alert('Invalid JSON! Please check the Raw JSON tab for errors.\n\n' + e.message);
+    }
+});
+
+function formatJSON() {
+    try {
+        const data = JSON.parse(document.getElementById('jsonEditor').value);
+        document.getElementById('jsonEditor').value = JSON.stringify(data, null, 2);
+        alert('JSON formatted successfully!');
+    } catch (e) {
+        alert('Invalid JSON: ' + e.message);
+    }
+}
+
+function validateJSON() {
+    try {
+        JSON.parse(document.getElementById('jsonEditor').value);
+        alert('✅ JSON is valid!');
+    } catch (e) {
+        alert('❌ Invalid JSON:\n\n' + e.message);
+    }
+}
+</script>
+
+{% endblock %}

@@ -48,7 +48,6 @@
             <div class="sidebar-content">
                 <!-- Account Selector -->
                 <div class="sidebar-section account-selector-section">
-                    <h6 class="sidebar-heading">Active Account</h6>
                     {% if session.get('user_type') == 'manager' %}
                         <!-- Manager can switch accounts -->
                         <select id="accountSelector" class="account-selector">
@@ -60,137 +59,101 @@
                         <!-- License holder sees only their account -->
                         <div class="account-display">
                             <div class="account-name">👤 {{ session.get('name', 'User') }}</div>
-                            <div class="account-role" style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">License Holder</div>
+                            <div class="account-role">License Holder</div>
                         </div>
                     {% endif %}
                 </div>
                 
-                <!-- Stats Section -->
-                <div class="sidebar-section">
-                    <h6 class="sidebar-heading">License Overview</h6>
-                    
-                    <div class="sidebar-stat">
-                        <div class="sidebar-stat-icon stat-success">✓</div>
-                        <div class="sidebar-stat-content">
-                            <div class="sidebar-stat-value">{% block stat_licensed %}{{ stats.licensed if stats else 0 }}{% endblock %}</div>
-                            <div class="sidebar-stat-label">Licensed</div>
-                        </div>
+                <!-- Quick Stats Bar -->
+                <div class="sidebar-section stats-compact">
+                    <div class="stat-compact stat-success">
+                        <span class="stat-compact-value">{% block stat_licensed %}{{ stats.licensed if stats else 0 }}{% endblock %}</span>
+                        <span class="stat-compact-label">Licensed</span>
                     </div>
-                    
-                    <div class="sidebar-stat">
-                        <div class="sidebar-stat-icon stat-primary">⟳</div>
-                        <div class="sidebar-stat-content">
-                            <div class="sidebar-stat-value">{% block stat_progress %}{{ stats.in_progress if stats else 0 }}{% endblock %}</div>
-                            <div class="sidebar-stat-label">In Progress</div>
-                        </div>
-                    </div>
-                    
-                    <div class="sidebar-stat">
-                        <div class="sidebar-stat-icon stat-warning">⚠</div>
-                        <div class="sidebar-stat-content">
-                            <div class="sidebar-stat-value">{% block stat_due %}{{ stats.due_soon if stats and stats.due_soon else 0 }}{% endblock %}</div>
-                            <div class="sidebar-stat-label">Due Soon</div>
-                        </div>
-                    </div>
-                    
-                    <div class="sidebar-stat">
-                        <div class="sidebar-stat-icon stat-danger">!</div>
-                        <div class="sidebar-stat-content">
-                            <div class="sidebar-stat-value">{% block stat_overdue %}{{ stats.overdue if stats and stats.overdue else 0 }}{% endblock %}</div>
-                            <div class="sidebar-stat-label">Overdue</div>
-                        </div>
+                    <div class="stat-compact stat-warning">
+                        <span class="stat-compact-value">{% block stat_due %}{{ stats.due_soon if stats and stats.due_soon else 0 }}{% endblock %}</span>
+                        <span class="stat-compact-label">Due Soon</span>
                     </div>
                 </div>
 
                 <!-- Navigation Section -->
-                <div class="sidebar-section sidebar-nav">
-                    <h6 class="sidebar-heading">Navigation</h6>
-                    
+                <div class="sidebar-nav">
                     {% if session.get('user_type') == 'manager' %}
                         <!-- MANAGER/DIRECTOR VIEW -->
-                        <div class="nav-group">
-                            <small class="nav-group-label">OVERVIEW</small>
-                            <a href="/?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">🏠</span>
-                                <span>Dashboard</span>
-                            </a>
-                            <a href="/licensing-roadmap?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">🗺️</span>
-                                <span>Map View</span>
-                            </a>
-                            <a href="/cost-analytics?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">💰</span>
-                                <span>Cost Analytics</span>
-                            </a>
-                        </div>
+                        <a href="/?account={{ holder.user_id if holder else 'director' }}" class="nav-item">
+                            <span class="nav-icon">🏠</span>
+                            <span class="nav-label">Dashboard</span>
+                        </a>
+                        <a href="/licensing-roadmap?account={{ holder.user_id if holder else 'director' }}" class="nav-item">
+                            <span class="nav-icon">🗺️</span>
+                            <span class="nav-label">Map View</span>
+                        </a>
+                        <a href="/cost-analytics?account={{ holder.user_id if holder else 'director' }}" class="nav-item">
+                            <span class="nav-icon">💰</span>
+                            <span class="nav-label">Cost Analytics</span>
+                        </a>
                         
-                        <div class="nav-group mt-3">
-                            <small class="nav-group-label">TEAM</small>
-                            <a href="/team/manage?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">👥</span>
-                                <span>Team Members</span>
-                            </a>
-                            <a href="/manage-licenses?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">📜</span>
-                                <span>All Licenses</span>
-                            </a>
-                            <a href="/import-csv-page" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">📤</span>
-                                <span>Import Data</span>
-                            </a>
-                        </div>
+                        <div class="nav-divider"></div>
                         
-                        <div class="nav-group mt-3">
-                            <small class="nav-group-label">RESOURCES</small>
-                            <a href="/admin/state-encyclopedia" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">📚</span>
-                                <span>State Encyclopedia</span>
-                            </a>
-                            <a href="/settings?account={{ holder.user_id if holder else 'director' }}" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">⚙️</span>
-                                <span>Settings</span>
-                            </a>
-                        </div>
+                        <a href="/team/manage?account={{ holder.user_id if holder else 'director' }}" class="nav-item">
+                            <span class="nav-icon">👥</span>
+                            <span class="nav-label">Team Members</span>
+                        </a>
+                        <a href="/manage-licenses?account={{ holder.user_id if holder else 'director' }}" class="nav-item">
+                            <span class="nav-icon">📜</span>
+                            <span class="nav-label">All Licenses</span>
+                        </a>
+                        <a href="/import-csv-page" class="nav-item">
+                            <span class="nav-icon">📤</span>
+                            <span class="nav-label">Import Data</span>
+                        </a>
+                        
+                        <div class="nav-divider"></div>
+                        
+                        <a href="/admin/state-encyclopedia" class="nav-item">
+                            <span class="nav-icon">📚</span>
+                            <span class="nav-label">State Encyclopedia</span>
+                        </a>
+                        <a href="/settings?account={{ holder.user_id if holder else 'director' }}" class="nav-item">
+                            <span class="nav-icon">⚙️</span>
+                            <span class="nav-label">Settings</span>
+                        </a>
                         
                     {% else %}
                         <!-- LICENSE HOLDER VIEW -->
-                        <div class="nav-group">
-                            <small class="nav-group-label">MY LICENSES</small>
-                            <a href="/?account={{ session.get('user_id', 'bhambrick') }}" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">🏠</span>
-                                <span>My Dashboard</span>
-                            </a>
-                            <a href="/licensing-roadmap?account={{ session.get('user_id', 'bhambrick') }}" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">🗺️</span>
-                                <span>My Map View</span>
-                            </a>
-                            <a href="/manage-licenses?account={{ session.get('user_id', 'bhambrick') }}" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">📜</span>
-                                <span>My Licenses</span>
-                            </a>
-                            <a href="/bio/{{ session.get('user_id', 'bhambrick') }}" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">📝</span>
-                                <span>My Bio</span>
-                            </a>
-                        </div>
+                        <a href="/?account={{ session.get('user_id', 'bhambrick') }}" class="nav-item">
+                            <span class="nav-icon">🏠</span>
+                            <span class="nav-label">My Dashboard</span>
+                        </a>
+                        <a href="/licensing-roadmap?account={{ session.get('user_id', 'bhambrick') }}" class="nav-item">
+                            <span class="nav-icon">🗺️</span>
+                            <span class="nav-label">My Map View</span>
+                        </a>
+                        <a href="/manage-licenses?account={{ session.get('user_id', 'bhambrick') }}" class="nav-item">
+                            <span class="nav-icon">📜</span>
+                            <span class="nav-label">My Licenses</span>
+                        </a>
+                        <a href="/bio/{{ session.get('user_id', 'bhambrick') }}" class="nav-item">
+                            <span class="nav-icon">📝</span>
+                            <span class="nav-label">My Bio</span>
+                        </a>
                         
-                        <div class="nav-group mt-3">
-                            <small class="nav-group-label">RESOURCES</small>
-                            <a href="/states/directory" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">📚</span>
-                                <span>State Requirements</span>
-                            </a>
-                            <a href="/settings?account={{ session.get('user_id', 'bhambrick') }}" class="sidebar-nav-item">
-                                <span class="sidebar-nav-icon">⚙️</span>
-                                <span>My Settings</span>
-                            </a>
-                        </div>
+                        <div class="nav-divider"></div>
+                        
+                        <a href="/states/directory" class="nav-item">
+                            <span class="nav-icon">📚</span>
+                            <span class="nav-label">State Requirements</span>
+                        </a>
+                        <a href="/settings?account={{ session.get('user_id', 'bhambrick') }}" class="nav-item">
+                            <span class="nav-icon">⚙️</span>
+                            <span class="nav-label">My Settings</span>
+                        </a>
                     {% endif %}
                 </div>
             </div>
         </aside>
 
-        <!-- Main Content Area -->
+        <!-- Main Content Area -->        <!-- Main Content Area -->
         <main class="content-area">
             {% block content %}{% endblock %}
         </main>

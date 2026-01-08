@@ -498,7 +498,32 @@ function toggleBudget() {
 function deleteCost(licenseId, costIndex) {
     if (!confirm('Delete this cost entry?')) return;
     
-    fetch(`/settings/delete-cost/${licenseId}/${costIndex}`, {
+    fetch(
+'/settings/delete-cost/' + licenseId + '/' + costIndex, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error deleting cost');
+        }
+    });
+}
+`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error deleting cost');
+        }
+    });
+}
+`, {
         method: 'POST'
     })
     .then(response => response.json())

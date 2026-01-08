@@ -2807,6 +2807,7 @@ def export_cost_analytics_pdf():
     total_actual = 0
     total_recurring = 0
     years_data = {}
+    categories = {}
     
     for license in enhanced_licenses:
         total_actual += license['cost_totals']['actual_spent']
@@ -2833,6 +2834,13 @@ def export_cost_analytics_pdf():
             
             years_data[year]['total_spent'] += amount
             years_data[year]['license_count'].add(license.get('license_id'))
+            
+            # Track categories
+            category = cost_item.get('category', 'other_fee')
+            categories[category] = categories.get(category, 0) + amount
+    
+    # Sort categories by amount
+    categories = dict(sorted(categories.items(), key=lambda x: x[1], reverse=True))
     
     for year in years_data:
         years_data[year]['license_count'] = len(years_data[year]['license_count'])
@@ -2922,6 +2930,37 @@ def export_cost_analytics_pdf():
         ]))
         
         elements.append(year_table)
+        elements.append(Spacer(1, 0.2*inch))
+    
+    # Category breakdown
+    if categories:
+        category_data = [['SPENDING BY CATEGORY', '', '']]
+        category_data.append(['Category', 'Amount', 'Percentage'])
+        
+        for category, amount in categories.items():
+            percentage = (amount / total_actual * 100) if total_actual > 0 else 0
+            category_data.append([
+                category.replace('_', ' ').title(),
+                f"${amount:,.2f}",
+                f"{percentage:.1f}%"
+            ])
+        
+        category_table = Table(category_data, colWidths=[3*inch, 2*inch, 1.5*inch])
+        category_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a2634')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('SPAN', (0, 0), (-1, 0)),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+            ('FONTNAME', (0, 0), (-1, 1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 14),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor('#f8fafc')),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ]))
+        
+        elements.append(category_table)
         elements.append(PageBreak())
     
     # License details with Budget and Variance

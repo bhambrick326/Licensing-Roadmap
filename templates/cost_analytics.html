@@ -6,113 +6,124 @@
 <div class="settings-page">
     <div class="container-fluid px-4 py-3">
         
-        <!-- Header with Export -->
+        <!-- Compact Header -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                <h4 class="mb-0">📊 Cost Analytics Dashboard</h4>
+                <h4 class="mb-0">📊 Cost Analytics</h4>
                 <small class="text-muted">Financial overview and reporting</small>
             </div>
             {% if is_director %}
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="exportExcelReport()">
-                    📊 Export Excel
-                </button>
-                <button class="btn btn-outline-primary" onclick="exportPDFReport()">
-                    📄 Export PDF
-                </button>
+                <button class="btn btn-sm btn-primary" onclick="exportExcelReport()">📊 Excel</button>
+                <button class="btn btn-sm btn-outline-primary" onclick="exportPDFReport()">📄 PDF</button>
             </div>
             {% endif %}
         </div>
 
-        <!-- Summary Cards -->
+        <!-- Top Row: Stats + Year Breakdown Side by Side -->
         <div class="row g-3 mb-3">
-            <div class="col-md-3">
-                <div class="analytics-stat-card">
-                    <div class="stat-icon">💰</div>
-                    <div>
-                        <div class="stat-value">${{ "{:,.2f}".format(totals.total_actual) }}</div>
-                        <div class="stat-label">Total Spent</div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-md-3">
-                <div class="analytics-stat-card">
-                    <div class="stat-icon">🔄</div>
-                    <div>
-                        <div class="stat-value">${{ "{:,.2f}".format(totals.total_recurring) }}</div>
-                        <div class="stat-label">Annual Recurring</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Year-by-Year Breakdown -->
-        {% if years %}
-        <div class="analytics-card mb-3">
-            <div class="analytics-card-header">
-                <span>📅 Spending by Year</span>
-            </div>
-            <div class="analytics-card-body">
-                <div class="row g-3">
-                    {% for year_data in years %}
-                    <div class="col-md-4">
-                        <div class="year-card">
-                            <div class="year-header">
-                                <span class="year-number">{{ year_data.year }}</span>
-                                <span class="year-count">{{ year_data.license_count }} licenses</span>
-                            </div>
-                            <div class="year-amount">
-                                ${{ "{:,.2f}".format(year_data.total_spent) }}
-                            </div>
-                            <div class="year-categories">
-                                {% for category, amount in year_data.categories.items() %}
-                                {% if loop.index <= 3 %}
-                                <div class="category-line">
-                                    <span class="category-name">{{ category.replace('_', ' ').title() }}</span>
-                                    <span class="category-amount">${{ "{:,.0f}".format(amount) }}</span>
-                                </div>
-                                {% endif %}
-                                {% endfor %}
-                            </div>
+            <!-- Left: Summary Stats -->
+            <div class="col-lg-4">
+                <div class="compact-analytics-card">
+                    <div class="stat-row">
+                        <div class="stat-icon-mini">💰</div>
+                        <div class="stat-content">
+                            <div class="stat-label-mini">Total Spent</div>
+                            <div class="stat-value-mini">${{ "{:,.0f}".format(totals.total_actual) }}</div>
                         </div>
                     </div>
-                    {% endfor %}
+                    <hr class="stat-divider">
+                    <div class="stat-row">
+                        <div class="stat-icon-mini">🔄</div>
+                        <div class="stat-content">
+                            <div class="stat-label-mini">Annual Recurring</div>
+                            <div class="stat-value-mini">${{ "{:,.0f}".format(totals.total_recurring) }}</div>
+                        </div>
+                    </div>
+                    <hr class="stat-divider">
+                    <div class="stat-row">
+                        <div class="stat-icon-mini">📜</div>
+                        <div class="stat-content">
+                            <div class="stat-label-mini">Total Licenses</div>
+                            <div class="stat-value-mini">{{ licenses|length }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        {% endif %}
 
-        <!-- Cost by License Table -->
-        <div class="analytics-card mb-3">
-            <div class="analytics-card-header">
-                <span>💰 Costs by License</span>
+            <!-- Right: Year Breakdown - Compact Scrollable -->
+            {% if years %}
+            <div class="col-lg-8">
+                <div class="compact-analytics-card">
+                    <h6 class="card-subtitle mb-2">📅 Spending by Year</h6>
+                    <div class="years-scroll">
+                        {% for year_data in years %}
+                        <div class="year-pill">
+                            <div class="year-pill-label">{{ year_data.year }}</div>
+                            <div class="year-pill-amount">${{ "{:,.0f}".format(year_data.total_spent) }}</div>
+                            <div class="year-pill-count">{{ year_data.license_count }} lic</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-            <div class="analytics-card-body p-0">
-                <table class="table table-sm table-hover mb-0 analytics-table">
+            {% endif %}
+        </div>
+
+        <!-- License Table - Expandable Rows -->
+        <div class="compact-analytics-card mb-3">
+            <h6 class="card-subtitle mb-2">💰 License Costs (Click to expand)</h6>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0 compact-table">
                     <thead>
                         <tr>
+                            <th style="width: 30px;"></th>
                             {% if is_director %}<th>Holder</th>{% endif %}
                             <th>Jurisdiction</th>
-                            <th>License Type</th>
-                            <th class="text-end">Total Spent</th>
-                            <th class="text-end">Recurring/Year</th>
+                            <th>Type</th>
+                            <th class="text-end">Spent</th>
+                            <th class="text-end">Annual Recur.</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for license in licenses %}
-                        <tr>
+                        <tr class="license-row" onclick="toggleLicenseDetails('{{ license.license_id }}')">
+                            <td>
+                                <span class="expand-icon" id="icon-{{ license.license_id }}">▶</span>
+                            </td>
                             {% if is_director %}
-                            <td class="text-muted small">{{ license.holder_name }}</td>
+                            <td class="text-muted">{{ license.holder_name }}</td>
                             {% endif %}
                             <td class="fw-semibold">{{ license.jurisdiction }}</td>
                             <td class="text-muted small">{{ license.license_type }}</td>
                             <td class="text-end fw-bold">${{ "{:,.0f}".format(license.cost_totals.actual_spent) }}</td>
                             <td class="text-end">${{ "{:,.0f}".format(license.cost_totals.recurring_cost / license.recurring.renewal_period_years if license.recurring.renewal_period_years > 0 else 0) }}</td>
                         </tr>
+                        <tr class="license-details" id="details-{{ license.license_id }}" style="display: none;">
+                            <td colspan="{% if is_director %}6{% else %}5{% endif %}">
+                                <div class="details-content">
+                                    <strong>Cost Breakdown:</strong>
+                                    {% if license.actual_costs %}
+                                    <div class="row g-2 mt-2">
+                                        {% for cost in license.actual_costs %}
+                                        <div class="col-md-4">
+                                            <div class="cost-detail-item">
+                                                <span class="cost-detail-cat">{{ cost.category.replace('_', ' ').title() }}</span>
+                                                <span class="cost-detail-amt">${{ "{:,.2f}".format(cost.amount) }}</span>
+                                                <span class="cost-detail-date">{{ cost.date }}</span>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    <p class="text-muted small mt-2 mb-0">No cost entries recorded</p>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
                         {% endfor %}
-                        <tr class="totals-row">
+                        <tr class="table-total">
+                            <td></td>
                             <td colspan="{% if is_director %}3{% else %}2{% endif %}" class="fw-bold">TOTALS</td>
                             <td class="text-end fw-bold">${{ "{:,.2f}".format(totals.total_actual) }}</td>
                             <td class="text-end fw-bold">${{ "{:,.2f}".format(totals.total_recurring) }}</td>
@@ -122,24 +133,22 @@
             </div>
         </div>
 
-        <!-- Cost by Category -->
+        <!-- Category Breakdown - Compact -->
         {% if categories %}
-        <div class="analytics-card">
-            <div class="analytics-card-header">
-                <span>📂 Spending by Category</span>
-            </div>
-            <div class="analytics-card-body">
-                <div class="categories-grid">
-                    {% for category, amount in categories.items() %}
-                    <div class="category-item">
-                        <div class="category-bar" style="width: {{ (amount / totals.total_actual * 100) if totals.total_actual > 0 else 0 }}%"></div>
-                        <div class="category-info">
-                            <span class="category-label">{{ category.replace('_', ' ').title() }}</span>
-                            <span class="category-value">${{ "{:,.2f}".format(amount) }}</span>
+        <div class="compact-analytics-card">
+            <h6 class="card-subtitle mb-3">📂 Spending by Category</h6>
+            <div class="row g-2">
+                {% for category, amount in categories.items() %}
+                <div class="col-md-6">
+                    <div class="category-compact">
+                        <div class="category-compact-bar" style="width: {{ (amount / totals.total_actual * 100) if totals.total_actual > 0 else 0 }}%"></div>
+                        <div class="category-compact-info">
+                            <span class="category-compact-label">{{ category.replace('_', ' ').title() }}</span>
+                            <span class="category-compact-value">${{ "{:,.0f}".format(amount) }}</span>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
             </div>
         </div>
         {% endif %}
@@ -148,215 +157,262 @@
 </div>
 
 <style>
-.analytics-stat-card {
+/* Compact Cards */
+.compact-analytics-card {
     background: white;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 1rem;
+    padding: 1.25rem;
+}
+
+.card-subtitle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a2634;
+    margin: 0;
+}
+
+/* Stat Rows */
+.stat-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon-mini {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label-mini {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value-mini {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: #1a2634;
+    line-height: 1;
+}
+
+.stat-divider {
+    margin: 1rem 0;
+    border-color: #e2e8f0;
+}
+
+/* Years Scroll - Horizontal Pills */
+.years-scroll {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+}
+
+.years-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.years-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.year-pill {
+    flex: 0 0 auto;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
-.analytics-stat-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.analytics-stat-card.over-budget {
-    background: #fef2f2;
-    border-color: #fca5a5;
-}
-
-.analytics-stat-card.under-budget {
-    background: #f0fdf4;
-    border-color: #86efac;
-}
-
-.stat-icon {
-    font-size: 2rem;
-}
-
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    line-height: 1;
-    font-family: 'Courier New', monospace;
-}
-
-.stat-label {
-    font-size: 0.75rem;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 0.25rem;
-}
-
-.analytics-card {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.analytics-card-header {
-    background: #f8fafc;
-    padding: 0.875rem 1.25rem;
-    border-bottom: 1px solid #e2e8f0;
-    font-weight: 600;
-    font-size: 0.875rem;
-}
-
-.analytics-card-body {
-    padding: 1.25rem;
-}
-
-/* Year Cards */
-.year-card {
-    background: white;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 1rem;
-    transition: all 0.2s;
-}
-
-.year-card:hover {
+.year-pill:hover {
     border-color: #3b82f6;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
 }
 
-.year-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.year-number {
-    font-size: 1.25rem;
+.year-pill-label {
     font-weight: 700;
+    font-size: 0.875rem;
     color: #1a2634;
 }
 
-.year-count {
-    font-size: 0.75rem;
-    color: #64748b;
-}
-
-.year-amount {
-    font-size: 1.75rem;
+.year-pill-amount {
+    font-size: 0.875rem;
     font-weight: 700;
     font-family: 'Courier New', monospace;
     color: #0ea5e9;
-    margin-bottom: 0.75rem;
 }
 
-.year-categories {
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-}
-
-.category-line {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-}
-
-.category-name {
+.year-pill-count {
+    font-size: 0.7rem;
     color: #64748b;
 }
 
-.category-amount {
-    font-weight: 600;
-    color: #1a2634;
-}
-
-/* Analytics Table */
-.analytics-table {
+/* Compact Table */
+.compact-table {
     font-size: 0.875rem;
 }
 
-.analytics-table thead th {
+.compact-table thead th {
     background: #f8fafc;
-    padding: 0.75rem 1rem;
+    padding: 0.625rem 0.75rem;
     font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
     color: #64748b;
     font-weight: 600;
     border-bottom: 2px solid #e2e8f0;
 }
 
-.analytics-table tbody td {
-    padding: 0.75rem 1rem;
+.compact-table tbody td {
+    padding: 0.625rem 0.75rem;
     vertical-align: middle;
 }
 
-.totals-row {
+.license-row {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.license-row:hover {
+    background: #f8fafc;
+}
+
+.expand-icon {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: #64748b;
+    transition: transform 0.2s;
+}
+
+.expand-icon.expanded {
+    transform: rotate(90deg);
+}
+
+.license-details td {
+    background: #f8fafc;
+    border-top: none !important;
+}
+
+.details-content {
+    padding: 1rem;
+    font-size: 0.875rem;
+}
+
+.cost-detail-item {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.cost-detail-cat {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #1a2634;
+}
+
+.cost-detail-amt {
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: #0ea5e9;
+}
+
+.cost-detail-date {
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+.table-total {
     background: #f0f9ff;
     border-top: 2px solid #3b82f6;
 }
 
-/* Category Grid */
-.categories-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+.table-total td {
+    font-weight: 700;
 }
 
-.category-item {
+/* Category Compact */
+.category-compact {
     position: relative;
-}
-
-.category-bar {
-    height: 40px;
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    height: 36px;
+    background: #f8fafc;
     border-radius: 6px;
-    transition: all 0.3s;
+    overflow: hidden;
 }
 
-.category-info {
+.category-compact-bar {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    transition: width 0.3s;
+}
+
+.category-compact-info {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1rem;
+    height: 100%;
+    padding: 0 0.75rem;
+    z-index: 1;
 }
 
-.category-label {
+.category-compact-label {
+    font-size: 0.75rem;
     font-weight: 600;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    color: #1a2634;
 }
 
-.category-value {
+.category-compact-value {
+    font-size: 0.75rem;
     font-weight: 700;
     font-family: 'Courier New', monospace;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    color: #1a2634;
 }
 </style>
 
 <script>
+function toggleLicenseDetails(licenseId) {
+    const detailsRow = document.getElementById('details-' + licenseId);
+    const icon = document.getElementById('icon-' + licenseId);
+    
+    if (detailsRow.style.display === 'none') {
+        detailsRow.style.display = 'table-row';
+        icon.classList.add('expanded');
+    } else {
+        detailsRow.style.display = 'none';
+        icon.classList.remove('expanded');
+    }
+}
+
 function exportExcelReport() {
-    // Generate CSV report (Excel-compatible)
     let csv = 'Licensing Roadmap - Cost Analytics Report\n';
     csv += 'Generated: ' + new Date().toLocaleDateString() + '\n\n';
     
-    // Overall totals
     csv += 'EXECUTIVE SUMMARY\n';
     csv += 'Total Spent,${{ "{:.2f}".format(totals.total_actual) }}\n';
     csv += 'Annual Recurring,${{ "{:.2f}".format(totals.total_recurring) }}\n';
     csv += 'Total Licenses,{{ licenses|length }}\n\n';
     
-    // Year breakdown
     csv += 'SPENDING BY YEAR\n';
     csv += 'Year,Total Spent,License Count\n';
     {% for year_data in years %}
@@ -364,7 +420,6 @@ function exportExcelReport() {
     {% endfor %}
     csv += '\n';
     
-    // License details
     csv += 'COSTS BY LICENSE\n';
     csv += '{% if is_director %}Holder,{% endif %}Jurisdiction,License Type,Total Spent,Annual Recurring\n';
     {% for license in licenses %}
@@ -372,14 +427,12 @@ function exportExcelReport() {
     {% endfor %}
     csv += '\n';
     
-    // Category breakdown
     csv += 'SPENDING BY CATEGORY\n';
     csv += 'Category,Amount,Percentage\n';
     {% for category, amount in categories.items() %}
     csv += '{{ category.replace("_", " ").title() }},${{ "{:.2f}".format(amount) }},{{ "{:.1f}".format((amount / totals.total_actual * 100) if totals.total_actual > 0 else 0) }}%\n';
     {% endfor %}
     
-    // Download
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -392,7 +445,6 @@ function exportExcelReport() {
 }
 
 function exportPDFReport() {
-    // Redirect to PDF generation endpoint
     window.location.href = '/cost-analytics/export-pdf';
 }
 </script>

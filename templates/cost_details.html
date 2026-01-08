@@ -1,87 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Cost Details - {{ license.jurisdiction }}
-<!-- Edit Budget Modal -->
-<div class="modal fade" id="editBudgetModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Estimated Costs (Budget)</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" action="/settings/update-estimated-costs/{{ license.license_id }}">
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Application Fee</label>
-                            <input type="number" class="form-control" name="application_fee" 
-                                   value="{{ license.estimated_costs.application_fee or 0 }}" step="0.01">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Test Fee</label>
-                            <input type="number" class="form-control" name="test_fee" 
-                                   value="{{ license.estimated_costs.test_fee or 0 }}" step="0.01">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Trade Book Fee</label>
-                            <input type="number" class="form-control" name="trade_book_fee" 
-                                   value="{{ license.estimated_costs.trade_book_fee or 0 }}" step="0.01">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Business & Law Book Fee</label>
-                            <input type="number" class="form-control" name="business_law_book_fee" 
-                                   value="{{ license.estimated_costs.business_law_book_fee or 0 }}" step="0.01">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">License Activation Fee</label>
-                            <input type="number" class="form-control" name="activation_fee" 
-                                   value="{{ license.estimated_costs.activation_fee or 0 }}" step="0.01">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Prep Course Fee</label>
-                            <input type="number" class="form-control" name="prep_course_fee" 
-                                   value="{{ license.estimated_costs.prep_course_fee or 0 }}" step="0.01">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Travel Fee</label>
-                            <input type="number" class="form-control" name="travel_fee" 
-                                   value="{{ license.estimated_costs.travel_fee or 0 }}" step="0.01">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Shipping Fee</label>
-                            <input type="number" class="form-control" name="shipping_fee" 
-                                   value="{{ license.estimated_costs.shipping_fee or 0 }}" step="0.01">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Other Fees</label>
-                            <input type="number" class="form-control" name="other_fee" 
-                                   value="{{ license.estimated_costs.other_fee or 0 }}" step="0.01">
-                        </div>
-                        
-                        <div class="col-12"><hr></div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Est. Study Hours</label>
-                            <input type="number" class="form-control" name="est_study_hours" 
-                                   value="{{ license.planning.est_study_hours or 0 }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Test Duration (hours)</label>
-                            <input type="number" class="form-control" name="test_duration_hours" 
-                                   value="{{ license.planning.test_duration_hours or 0 }}" step="0.5">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">💾 Save Budget</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-{% endblock %}
+{% block title %}Cost Tracking - {{ license.jurisdiction }}{% endblock %}
 
 {% block content %}
 <div class="settings-page">
@@ -89,152 +8,175 @@
         <div class="row">
             <div class="col-12">
                 <!-- Header -->
-                <div class="page-header-compact">
+                <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <a href="/manage-licenses" class="btn btn-sm btn-outline-secondary mb-2">← Back to Licenses</a>
-                        <h3>💰 Cost Tracking - {{ license.jurisdiction }}</h3>
+                        <h4 class="mb-0">💰 Cost Tracking - {{ license.jurisdiction }}</h4>
                         <small class="text-muted">{{ license.license_type }} ({{ license.license_id }})</small>
                     </div>
-                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addCostModal">+ Add Cost</button>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCostModal">+ Add Cost</button>
                 </div>
 
                 <div class="row g-3">
-                    <!-- Left: Cost Summary (Spreadsheet Style) -->
+                    <!-- Main: Actual Costs Table -->
                     <div class="col-lg-8">
-                        <!-- Estimated Costs Table -->
-                        <div class="netsuite-table-card mb-3">
-                            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">📊 Estimated Costs (Budget)</h6>
-                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editBudgetModal">✏️ Edit Budget</button>
+                        <div class="cost-tracking-card">
+                            <div class="cost-card-header">
+                                <h6 class="mb-0">📝 Actual Costs Spent</h6>
                             </div>
-                            <table class="table table-sm mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Category</th>
-                                        <th class="text-end">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Application Fee</td>
-                                        <td class="text-end">${{ "%.2f"|format(license.estimated_costs.application_fee or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Test Fee</td>
-                                        <td class="text-end">${{ "%.2f"|format(license.estimated_costs.test_fee or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Trade Book Fee</td>
-                                        <td class="text-end">${{ "%.2f"|format(license.estimated_costs.trade_book_fee or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Business & Law Book Fee</td>
-                                        <td class="text-end">${{ "%.2f"|format(license.estimated_costs.business_law_book_fee or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>License Activation Fee</td>
-                                        <td class="text-end">${{ "%.2f"|format(license.estimated_costs.activation_fee or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Prep Course Fee</td>
-                                        <td class="text-end">${{ "%.2f"|format(license.estimated_costs.prep_course_fee or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Travel Fee</td>
-                                        <td class="text-end">${{ "%.2f"|format(license.estimated_costs.travel_fee or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Shipping Fee</td>
-                                        <td class="text-end">${{ "%.2f"|format(license.estimated_costs.shipping_fee or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Other Fees</td>
-                                        <td class="text-end">${{ "%.2f"|format(license.estimated_costs.other_fee or 0) }}</td>
-                                    </tr>
-                                    <tr class="table-active fw-bold">
-                                        <td>Initial Cost (Estimated)</td>
-                                        <td class="text-end">${{ "%.2f"|format(license.cost_totals.initial_estimated) }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="cost-card-body">
+                                {% if license.actual_costs %}
+                                <table class="table table-sm table-hover mb-0 cost-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Category</th>
+                                            <th>Amount</th>
+                                            <th>Vendor</th>
+                                            <th>Notes</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for cost in license.actual_costs %}
+                                        <tr>
+                                            <td>{{ cost.date }}</td>
+                                            <td><span class="cost-category-badge">{{ cost.category.replace('_', ' ').title() }}</span></td>
+                                            <td class="cost-amount">${{ "%.2f"|format(cost.amount) }}</td>
+                                            <td class="text-muted small">{{ cost.vendor or '—' }}</td>
+                                            <td class="text-muted small">{{ cost.notes or '—' }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteCost('{{ license.license_id }}', '{{ loop.index0 }}')">×</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        <tr class="total-row">
+                                            <td colspan="2" class="fw-bold">Total Actual Spent</td>
+                                            <td class="fw-bold cost-amount">${{ "%.2f"|format(license.cost_totals.actual_spent) }}</td>
+                                            <td colspan="3"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                {% else %}
+                                <div class="empty-state">
+                                    <p class="text-muted mb-2">No costs recorded yet</p>
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCostModal">+ Add First Cost</button>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
 
-                        <!-- Actual Costs (Line Items) -->
-                        <div class="netsuite-table-card">
-                            <div class="p-3 border-bottom">
-                                <h6 class="mb-0">📝 Actual Costs (Spent)</h6>
+                        <!-- Budget Section - Collapsible -->
+                        {% if session.get('user_type') == 'manager' %}
+                        <div class="budget-section mt-3">
+                            <button class="budget-toggle-btn" onclick="toggleBudget()">
+                                <span id="budget-icon">▶</span> View Budget (Director Only)
+                            </button>
+                            <div class="budget-content" id="budgetContent" style="display: none;">
+                                <div class="cost-tracking-card mt-2">
+                                    <div class="cost-card-header">
+                                        <h6 class="mb-0">📊 Estimated Budget</h6>
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editBudgetModal">✏️ Edit</button>
+                                    </div>
+                                    <div class="cost-card-body">
+                                        <table class="table table-sm mb-0 budget-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Category</th>
+                                                    <th class="text-end">Budget</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Application Fee</td>
+                                                    <td class="text-end">${{ "%.2f"|format(license.estimated_costs.application_fee or 0) }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Test Fee</td>
+                                                    <td class="text-end">${{ "%.2f"|format(license.estimated_costs.test_fee or 0) }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Trade Book Fee</td>
+                                                    <td class="text-end">${{ "%.2f"|format(license.estimated_costs.trade_book_fee or 0) }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Business & Law Book Fee</td>
+                                                    <td class="text-end">${{ "%.2f"|format(license.estimated_costs.business_law_book_fee or 0) }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>License Activation Fee</td>
+                                                    <td class="text-end">${{ "%.2f"|format(license.estimated_costs.activation_fee or 0) }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Prep Course Fee</td>
+                                                    <td class="text-end">${{ "%.2f"|format(license.estimated_costs.prep_course_fee or 0) }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Travel Fee</td>
+                                                    <td class="text-end">${{ "%.2f"|format(license.estimated_costs.travel_fee or 0) }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Shipping Fee</td>
+                                                    <td class="text-end">${{ "%.2f"|format(license.estimated_costs.shipping_fee or 0) }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Other Fees</td>
+                                                    <td class="text-end">${{ "%.2f"|format(license.estimated_costs.other_fee or 0) }}</td>
+                                                </tr>
+                                                <tr class="table-active fw-bold">
+                                                    <td>Total Budget (Estimated)</td>
+                                                    <td class="text-end">${{ "%.2f"|format(license.cost_totals.initial_estimated) }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                            {% if license.actual_costs %}
-                            <table class="table table-sm table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Category</th>
-                                        <th>Amount</th>
-                                        <th>Vendor</th>
-                                        <th>Notes</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for cost in license.actual_costs %}
-                                    <tr>
-                                        <td>{{ cost.date }}</td>
-                                        <td><span class="badge bg-secondary">{{ cost.category }}</span></td>
-                                        <td class="fw-semibold">${{ "%.2f"|format(cost.amount) }}</td>
-                                        <td class="text-muted">{{ cost.vendor or '—' }}</td>
-                                        <td class="text-muted small">{{ cost.notes or '—' }}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                    <tr class="table-success fw-bold">
-                                        <td colspan="2">Total Actual Spent</td>
-                                        <td>${{ "%.2f"|format(license.cost_totals.actual_spent) }}</td>
-                                        <td colspan="3"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            {% else %}
-                            <div class="p-4 text-center text-muted">
-                                <p>No costs recorded yet. Click "+ Add Cost" to track expenses.</p>
-                            </div>
-                            {% endif %}
                         </div>
+                        {% endif %}
                     </div>
 
-                    <!-- Right: Summary Stats -->
+                    <!-- Right: Cost Summary -->
                     <div class="col-lg-4">
                         <div class="compact-stats-card mb-3">
                             <h6 class="mb-3">💵 Cost Summary</h6>
-                            <div class="compact-stat-row">
-                                <span class="compact-stat-label">Estimated Total</span>
-                                <span class="compact-stat-value text-primary">${{ "%.2f"|format(license.cost_totals.initial_estimated) }}</span>
+                            <div class="summary-line">
+                                <span class="summary-label">Total Spent:</span>
+                                <span class="summary-value spent">${{ "%.2f"|format(license.cost_totals.actual_spent) }}</span>
                             </div>
-                            <div class="compact-stat-row">
-                                <span class="compact-stat-label">Actual Spent</span>
-                                <span class="compact-stat-value text-success">${{ "%.2f"|format(license.cost_totals.actual_spent) }}</span>
+                            {% if session.get('user_type') == 'manager' %}
+                            <div class="summary-line">
+                                <span class="summary-label">Estimated Budget:</span>
+                                <span class="summary-value">${{ "%.2f"|format(license.cost_totals.initial_estimated) }}</span>
                             </div>
-                            <div class="compact-stat-row">
-                                <span class="compact-stat-label">Variance</span>
-                                <span class="compact-stat-value {% if license.cost_totals.variance >= 0 %}text-success{% else %}text-danger{% endif %}">
-                                    ${{ "%.2f"|format(license.cost_totals.variance) }}
+                            <div class="summary-line {% if license.cost_totals.actual_spent > license.cost_totals.initial_estimated %}over-budget{% else %}under-budget{% endif %}">
+                                <span class="summary-label">Variance:</span>
+                                <span class="summary-value">
+                                    {% set variance = license.cost_totals.actual_spent - license.cost_totals.initial_estimated %}
+                                    {% if variance > 0 %}+{% endif %}${{ "%.2f"|format(variance) }}
                                 </span>
                             </div>
-                            <div class="compact-stat-divider"></div>
-                            <div class="compact-stat-row">
-                                <span class="compact-stat-label">Recurring Cost/Period</span>
-                                <span class="compact-stat-value text-warning">${{ "%.2f"|format(license.cost_totals.recurring_cost) }}</span>
+                            {% endif %}
+                            <hr>
+                            <div class="summary-line">
+                                <span class="summary-label">Renewal Fee:</span>
+                                <span class="summary-value">${{ "%.2f"|format(license.recurring.renewal_fee or 0) }}</span>
+                            </div>
+                            <div class="summary-line">
+                                <span class="summary-label">Renewal Period:</span>
+                                <span class="summary-value">{{ license.recurring.renewal_period_years }} years</span>
                             </div>
                         </div>
 
                         <div class="compact-stats-card">
                             <h6 class="mb-3">📅 Planning Data</h6>
-                            <div class="small text-muted">
-                                <p><strong>Est. Study Hours:</strong> {{ license.planning.est_study_hours or 0 }}</p>
-                                <p><strong>Test Duration:</strong> {{ license.planning.test_duration_hours or 0 }} hours</p>
-                                <p><strong>Renewal Period:</strong> {{ license.recurring.renewal_period_years }} years</p>
+                            <div class="summary-line">
+                                <span class="summary-label">Study Hours:</span>
+                                <span class="summary-value">{{ license.planning.est_study_hours or 0 }}h</span>
+                            </div>
+                            <div class="summary-line">
+                                <span class="summary-label">Test Duration:</span>
+                                <span class="summary-value">{{ license.planning.test_duration_hours or 0 }}h</span>
                             </div>
                         </div>
                     </div>
@@ -257,7 +199,8 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Date *</label>
-                        <input type="date" class="form-control" name="date" required>
+                        <input type="date" class="form-control" name="date" id="dateInput" required>
+                        <small class="text-muted">Type date (MM/DD/YYYY) or click calendar icon</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Category *</label>
@@ -277,7 +220,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Amount ($) *</label>
-                        <input type="number" class="form-control" name="amount" step="0.01" required>
+                        <input type="number" class="form-control" name="amount" step="0.01" required placeholder="0.00">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Vendor</label>
@@ -285,7 +228,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Notes</label>
-                        <textarea class="form-control" name="notes" rows="2"></textarea>
+                        <textarea class="form-control" name="notes" rows="2" placeholder="Optional details..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -297,12 +240,13 @@
     </div>
 </div>
 
-<!-- Edit Budget Modal -->
+<!-- Edit Budget Modal (Director Only) -->
+{% if session.get('user_type') == 'manager' %}
 <div class="modal fade" id="editBudgetModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit Estimated Costs (Budget)</h5>
+                <h5 class="modal-title">Edit Budget (Director Only)</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="/settings/update-estimated-costs/{{ license.license_id }}">
@@ -376,5 +320,205 @@
         </div>
     </div>
 </div>
+{% endif %}
+
+<style>
+.cost-tracking-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cost-card-header {
+    background: #f8fafc;
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cost-card-body {
+    padding: 0;
+}
+
+.cost-table {
+    font-size: 0.875rem;
+}
+
+.cost-table thead th {
+    background: white;
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    font-weight: 600;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.cost-table tbody td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+}
+
+.cost-category-badge {
+    background: #f1f5f9;
+    padding: 0.25rem 0.625rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.cost-amount {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #1a2634;
+}
+
+.total-row {
+    background: #f0fdf4;
+    border-top: 2px solid #10b981;
+}
+
+.total-row .cost-amount {
+    color: #059669;
+    font-size: 1.125rem;
+}
+
+.empty-state {
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+/* Budget Section */
+.budget-section {
+    margin-top: 1rem;
+}
+
+.budget-toggle-btn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.budget-toggle-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+#budget-icon {
+    display: inline-block;
+    transition: transform 0.2s;
+    margin-right: 0.5rem;
+}
+
+#budget-icon.rotated {
+    transform: rotate(90deg);
+}
+
+.budget-table {
+    font-size: 0.875rem;
+}
+
+.budget-table thead th {
+    background: #fafafa;
+    padding: 0.625rem 1rem;
+    font-size: 0.75rem;
+}
+
+.budget-table tbody td {
+    padding: 0.625rem 1rem;
+}
+
+/* Summary Cards */
+.compact-stats-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.25rem;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+}
+
+.summary-label {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.summary-value {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #1a2634;
+}
+
+.summary-value.spent {
+    color: #0ea5e9;
+    font-size: 1.125rem;
+}
+
+.over-budget .summary-value {
+    color: #dc2626;
+}
+
+.under-budget .summary-value {
+    color: #059669;
+}
+</style>
+
+<script>
+function toggleBudget() {
+    const content = document.getElementById('budgetContent');
+    const icon = document.getElementById('budget-icon');
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.classList.add('rotated');
+    } else {
+        content.style.display = 'none';
+        icon.classList.remove('rotated');
+    }
+}
+
+function deleteCost(licenseId, costIndex) {
+    if (!confirm('Delete this cost entry?')) return;
+    
+    fetch(`/settings/delete-cost/${licenseId}/${costIndex}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error deleting cost');
+        }
+    });
+}
+
+// Set today's date as default when modal opens
+document.getElementById('addCostModal').addEventListener('show.bs.modal', function () {
+    const dateInput = document.getElementById('dateInput');
+    if (dateInput && !dateInput.value) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+    }
+});
+</script>
 
 {% endblock %}

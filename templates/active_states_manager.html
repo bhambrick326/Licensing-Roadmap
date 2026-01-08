@@ -5,177 +5,168 @@
 <div class="active-states-page">
     <div class="container-fluid px-4 py-3">
         
-        <!-- Page Header -->
-        <div class="page-header-compact mb-4">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <h3>📊 Active States Management</h3>
-                    <p class="text-muted">Manage company market presence and expansion strategy</p>
+        <!-- Page Header - Compact with button on right -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="mb-0">📊 Active States Management</h4>
+                <small class="text-muted">Company market presence and expansion strategy</small>
+            </div>
+            <a href="/home?account=director" class="btn btn-outline-secondary btn-sm">← Back to Dashboard</a>
+        </div>
+
+        <!-- Summary Cards - Compact -->
+        <div class="row g-2 mb-3">
+            <div class="col-md-3">
+                <div class="mini-stat-card success">
+                    <span class="mini-stat-icon">✅</span>
+                    <div>
+                        <div class="mini-stat-value">{{ coverage.covered_states|length }}</div>
+                        <div class="mini-stat-label">Licensed States</div>
+                    </div>
                 </div>
-                <a href="/?account=director" class="btn btn-outline-secondary">← Back to Dashboard</a>
+            </div>
+            <div class="col-md-3">
+                <div class="mini-stat-card warning">
+                    <span class="mini-stat-icon">🔄</span>
+                    <div>
+                        <div class="mini-stat-value">{{ coverage.in_progress_states|length }}</div>
+                        <div class="mini-stat-label">In Progress</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="mini-stat-card">
+                    <span class="mini-stat-icon">⭕</span>
+                    <div>
+                        <div class="mini-stat-value">{{ coverage.target_states|length }}</div>
+                        <div class="mini-stat-label">Target States</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="mini-stat-card">
+                    <span class="mini-stat-icon">💰</span>
+                    <div>
+                        <div class="mini-stat-value">${{ "{:,.0f}".format(total_revenue|default(0)) }}</div>
+                        <div class="mini-stat-label">Total Revenue</div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Summary Cards -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="stat-card-small success">
-                    <div class="stat-value">{{ coverage.covered_states|length }}</div>
-                    <div class="stat-label">✅ Licensed States</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card-small warning">
-                    <div class="stat-value">{{ coverage.in_progress_states|length }}</div>
-                    <div class="stat-label">🔄 In Progress</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card-small">
-                    <div class="stat-value">{{ coverage.target_states|length }}</div>
-                    <div class="stat-label">⭕ Target States</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card-small">
-                    <div class="stat-value">{{ total_revenue|default(0)|format_currency }}</div>
-                    <div class="stat-label">Total Revenue</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Active States Table -->
-        <div class="data-card mb-4">
-            <div class="card-header-compact">
-                <span class="card-icon">✅</span>
-                <span class="card-title">Licensed States ({{ coverage.covered_states|length }})</span>
-                <button class="btn btn-sm btn-success ms-auto" data-bs-toggle="modal" data-bs-target="#addStateModal" data-status="covered">
-                    + Add Licensed State
-                </button>
-            </div>
-            <div class="card-body-compact">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>State</th>
-                                <th>Team Members Licensed</th>
-                                <th>Annual Revenue</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for state_abbr in coverage.covered_states %}
-                            <tr>
-                                <td>
-                                    <strong>{{ state_names.get(state_abbr, state_abbr) }}</strong>
-                                    <span class="text-muted">({{ state_abbr }})</span>
-                                </td>
-                                <td>
-                                    {% set holders = state_details.get(state_abbr, {}).get('holders', []) %}
-                                    {{ holders|length }} member(s)
-                                    {% if holders %}
-                                        <small class="text-muted d-block">{{ holders|join(', ') }}</small>
-                                    {% endif %}
-                                </td>
-                                <td>
+        <!-- Three Column Layout for States -->
+        <div class="row g-3">
+            
+            <!-- Licensed States -->
+            <div class="col-lg-4">
+                <div class="states-card">
+                    <div class="states-card-header success">
+                        <span>✅ Licensed ({{ coverage.covered_states|length }})</span>
+                        <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addStateModal" data-status="covered">+</button>
+                    </div>
+                    <div class="states-card-body">
+                        {% for state_abbr in coverage.covered_states %}
+                        <div class="state-item">
+                            <div class="state-item-header" onclick="toggleStateDetails('licensed-{{ state_abbr }}')">
+                                <span class="state-name">
+                                    <strong>{{ state_abbr }}</strong> - {{ state_names.get(state_abbr, state_abbr) }}
+                                </span>
+                                <span class="expand-arrow" id="arrow-licensed-{{ state_abbr }}">▼</span>
+                            </div>
+                            <div class="state-item-details" id="licensed-{{ state_abbr }}">
+                                {% set holders = state_details.get(state_abbr, {}).get('holders', []) %}
+                                <div class="state-detail-line">
+                                    <span class="detail-label">Team:</span>
+                                    <span class="detail-value">{{ holders|length }} member(s)</span>
+                                </div>
+                                {% if holders %}
+                                <div class="state-detail-line">
+                                    <small class="text-muted">{{ holders|join(', ') }}</small>
+                                </div>
+                                {% endif %}
+                                <div class="state-detail-line">
+                                    <span class="detail-label">Revenue:</span>
                                     <input type="number" 
-                                           class="form-control form-control-sm revenue-input" 
+                                           class="form-control form-control-sm revenue-input-mini" 
                                            value="{{ state_revenues.get(state_abbr, 0) }}"
                                            data-state="{{ state_abbr }}"
-                                           placeholder="$0"
-                                           style="max-width: 150px;">
-                                </td>
-                                <td>
-                                    <a href="/state/{{ state_abbr }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
-                                    <button class="btn btn-sm btn-outline-danger ms-1" onclick="removeState('{{ state_abbr }}', 'covered')">Remove</button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                           placeholder="$0">
+                                </div>
+                                <div class="state-actions">
+                                    <a href="/state/{{ state_abbr }}" class="btn-mini btn-mini-primary">View</a>
+                                    <button class="btn-mini btn-mini-danger" onclick="removeState('{{ state_abbr }}', 'covered')">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- In Progress States -->
-        <div class="data-card mb-4">
-            <div class="card-header-compact">
-                <span class="card-icon">🔄</span>
-                <span class="card-title">In Progress States ({{ coverage.in_progress_states|length }})</span>
-                <button class="btn btn-sm btn-warning ms-auto" data-bs-toggle="modal" data-bs-target="#addStateModal" data-status="in_progress">
-                    + Add In Progress State
-                </button>
-            </div>
-            <div class="card-body-compact">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>State</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for state_abbr in coverage.in_progress_states %}
-                            <tr>
-                                <td>
-                                    <strong>{{ state_names.get(state_abbr, state_abbr) }}</strong>
-                                    <span class="text-muted">({{ state_abbr }})</span>
-                                </td>
-                                <td><span class="badge bg-warning">Getting Licensed</span></td>
-                                <td>
-                                    <a href="/state/{{ state_abbr }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
-                                    <button class="btn btn-sm btn-success ms-1" onclick="moveState('{{ state_abbr }}', 'in_progress', 'covered')">Mark Licensed</button>
-                                    <button class="btn btn-sm btn-outline-danger ms-1" onclick="removeState('{{ state_abbr }}', 'in_progress')">Remove</button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <!-- In Progress States -->
+            <div class="col-lg-4">
+                <div class="states-card">
+                    <div class="states-card-header warning">
+                        <span>🔄 In Progress ({{ coverage.in_progress_states|length }})</span>
+                        <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addStateModal" data-status="in_progress">+</button>
+                    </div>
+                    <div class="states-card-body">
+                        {% for state_abbr in coverage.in_progress_states %}
+                        <div class="state-item">
+                            <div class="state-item-header" onclick="toggleStateDetails('progress-{{ state_abbr }}')">
+                                <span class="state-name">
+                                    <strong>{{ state_abbr }}</strong> - {{ state_names.get(state_abbr, state_abbr) }}
+                                </span>
+                                <span class="expand-arrow" id="arrow-progress-{{ state_abbr }}">▼</span>
+                            </div>
+                            <div class="state-item-details" id="progress-{{ state_abbr }}">
+                                <div class="state-detail-line">
+                                    <span class="badge bg-warning">Getting Licensed</span>
+                                </div>
+                                <div class="state-actions">
+                                    <a href="/state/{{ state_abbr }}" class="btn-mini btn-mini-primary">View</a>
+                                    <button class="btn-mini btn-mini-success" onclick="moveState('{{ state_abbr }}', 'in_progress', 'covered')">Mark Licensed</button>
+                                    <button class="btn-mini btn-mini-danger" onclick="removeState('{{ state_abbr }}', 'in_progress')">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Target States -->
-        <div class="data-card">
-            <div class="card-header-compact">
-                <span class="card-icon">⭕</span>
-                <span class="card-title">Target States ({{ coverage.target_states|length }})</span>
-                <button class="btn btn-sm btn-secondary ms-auto" data-bs-toggle="modal" data-bs-target="#addStateModal" data-status="target">
-                    + Add Target State
-                </button>
-            </div>
-            <div class="card-body-compact">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>State</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for state_abbr in coverage.target_states %}
-                            <tr>
-                                <td>
-                                    <strong>{{ state_names.get(state_abbr, state_abbr) }}</strong>
-                                    <span class="text-muted">({{ state_abbr }})</span>
-                                </td>
-                                <td><span class="badge bg-secondary">Future Expansion</span></td>
-                                <td>
-                                    <a href="/state/{{ state_abbr }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
-                                    <button class="btn btn-sm btn-warning ms-1" onclick="moveState('{{ state_abbr }}', 'target', 'in_progress')">Start Process</button>
-                                    <button class="btn btn-sm btn-outline-danger ms-1" onclick="removeState('{{ state_abbr }}', 'target')">Remove</button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <!-- Target States -->
+            <div class="col-lg-4">
+                <div class="states-card">
+                    <div class="states-card-header secondary">
+                        <span>⭕ Targets ({{ coverage.target_states|length }})</span>
+                        <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addStateModal" data-status="target">+</button>
+                    </div>
+                    <div class="states-card-body">
+                        {% for state_abbr in coverage.target_states %}
+                        <div class="state-item">
+                            <div class="state-item-header" onclick="toggleStateDetails('target-{{ state_abbr }}')">
+                                <span class="state-name">
+                                    <strong>{{ state_abbr }}</strong> - {{ state_names.get(state_abbr, state_abbr) }}
+                                </span>
+                                <span class="expand-arrow" id="arrow-target-{{ state_abbr }}">▼</span>
+                            </div>
+                            <div class="state-item-details" id="target-{{ state_abbr }}">
+                                <div class="state-detail-line">
+                                    <span class="badge bg-secondary">Future Expansion</span>
+                                </div>
+                                <div class="state-actions">
+                                    <a href="/state/{{ state_abbr }}" class="btn-mini btn-mini-primary">View</a>
+                                    <button class="btn-mini btn-mini-warning" onclick="moveState('{{ state_abbr }}', 'target', 'in_progress')">Start Process</button>
+                                    <button class="btn-mini btn-mini-danger" onclick="removeState('{{ state_abbr }}', 'target')">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
+
         </div>
 
     </div>
@@ -211,7 +202,248 @@
     </div>
 </div>
 
+<style>
+/* Mini Stats */
+.mini-stat-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.mini-stat-card.success {
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+
+.mini-stat-card.warning {
+    background: #fffbeb;
+    border-color: #fcd34d;
+}
+
+.mini-stat-icon {
+    font-size: 1.5rem;
+}
+
+.mini-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1;
+    font-family: 'Courier New', monospace;
+}
+
+.mini-stat-label {
+    font-size: 0.7rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* States Cards */
+.states-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    height: calc(100vh - 280px);
+    display: flex;
+    flex-direction: column;
+}
+
+.states-card-header {
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid;
+}
+
+.states-card-header.success {
+    background: #f0fdf4;
+    border-bottom-color: #10b981;
+}
+
+.states-card-header.warning {
+    background: #fffbeb;
+    border-bottom-color: #f59e0b;
+}
+
+.states-card-header.secondary {
+    background: #f8fafc;
+    border-bottom-color: #94a3b8;
+}
+
+.btn-add {
+    background: white;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add:hover {
+    transform: scale(1.1);
+    background: #f1f5f9;
+}
+
+.states-card-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+/* State Items */
+.state-item {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+}
+
+.state-item-header {
+    padding: 0.625rem 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.state-item-header:hover {
+    background: #f8fafc;
+}
+
+.state-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.expand-arrow {
+    font-size: 0.75rem;
+    color: #64748b;
+    transition: transform 0.2s;
+}
+
+.expand-arrow.rotated {
+    transform: rotate(180deg);
+}
+
+.state-item-details {
+    padding: 0.75rem;
+    border-top: 1px solid #f1f5f9;
+    display: none;
+}
+
+.state-item-details.show {
+    display: block;
+}
+
+.state-detail-line {
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #475569;
+    margin-right: 0.5rem;
+}
+
+.detail-value {
+    color: #64748b;
+}
+
+.revenue-input-mini {
+    width: 100%;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.state-actions {
+    display: flex;
+    gap: 0.375rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Mini Buttons */
+.btn-mini {
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-mini-primary {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.btn-mini-primary:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-mini-success {
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.btn-mini-success:hover {
+    background: #10b981;
+    color: white;
+}
+
+.btn-mini-warning {
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.btn-mini-warning:hover {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-mini-danger {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.btn-mini-danger:hover {
+    background: #ef4444;
+    color: white;
+}
+</style>
+
 <script>
+function toggleStateDetails(id) {
+    const details = document.getElementById(id);
+    const arrow = document.getElementById('arrow-' + id);
+    
+    if (details.classList.contains('show')) {
+        details.classList.remove('show');
+        arrow.classList.remove('rotated');
+    } else {
+        details.classList.add('show');
+        arrow.classList.add('rotated');
+    }
+}
+
 // Set the status when modal opens
 document.getElementById('addStateModal').addEventListener('show.bs.modal', function (event) {
     const button = event.relatedTarget;
@@ -282,7 +514,7 @@ function removeState(stateAbbr, status) {
 
 // Save revenue on change
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.revenue-input').forEach(input => {
+    document.querySelectorAll('.revenue-input-mini').forEach(input => {
         input.addEventListener('change', function() {
             const state = this.dataset.state;
             const revenue = parseFloat(this.value) || 0;

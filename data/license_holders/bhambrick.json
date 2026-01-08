@@ -17,28 +17,56 @@
       "expires_on": "2026-12-31",
       "designated_role": "master_of_record",
       "estimated_costs": {
-        "application_fee": 0.0,
-        "test_fee": 0.0,
+        "application_fee": 225.0,
+        "test_fee": 185.0,
         "trade_book_fee": 0.0,
-        "business_law_book_fee": 0.0,
+        "business_law_book_fee": 78.0,
         "activation_fee": 0.0,
         "prep_course_fee": 0.0,
         "travel_fee": 0.0,
-        "shipping_fee": 0.0
+        "shipping_fee": 0.0,
+        "other_fee": 0.0
       },
       "recurring": {
-        "renewal_fee": 0.0,
-        "continuing_ed_fee": 0.0,
+        "renewal_fee": 182.0,
+        "continuing_ed_fee": 39.0,
         "renewal_period_years": 2
       },
       "planning": {
         "est_study_hours": 0,
-        "test_duration_hours": 0
+        "test_duration_hours": 5.0
       },
       "board_name": "Alabama State Board",
-      "board_phone": "https://pgfb.alabama.gov/",
-      "board_url": null,
-      "actual_costs": []
+      "board_phone": "",
+      "board_url": "https://pgfb.alabama.gov/",
+      "actual_costs": [
+        {
+          "date": "2024-08-08",
+          "category": "application_fee",
+          "amount": 225.0,
+          "vendor": "State Board",
+          "notes": null,
+          "recurring": false
+        },
+        {
+          "date": "2024-08-08",
+          "category": "test_fee",
+          "amount": 185.0,
+          "vendor": "State Board",
+          "notes": null,
+          "recurring": false
+        },
+        {
+          "date": "2024-08-08",
+          "category": "business_law_book_fee",
+          "amount": 78.0,
+          "vendor": "NASCLA",
+          "notes": null,
+          "recurring": false
+        }
+      ],
+      "application_date": "",
+      "notes": ""
     },
     {
       "license_id": "AL-002",
@@ -1204,7 +1232,7 @@
       "status": "licensed",
       "license_number": "CER2024-12890",
       "issued_on": "2024-06-21",
-      "expires_on": "2025-12-31",
+      "expires_on": "2027-12-31",
       "designated_role": "master_of_record",
       "estimated_costs": {
         "application_fee": 35.0,
@@ -1225,10 +1253,12 @@
         "est_study_hours": 3,
         "test_duration_hours": 0
       },
-      "board_name": "Wichita KS State Board",
-      "board_phone": "",
-      "board_url": null,
-      "actual_costs": []
+      "board_name": "Metropolitan Area Building and Construction Department",
+      "board_phone": "3162684553",
+      "board_url": "https://www.wichita.gov/Licenses",
+      "actual_costs": [],
+      "application_date": "",
+      "notes": ""
     },
     {
       "license_id": "WY-036",
@@ -1301,7 +1331,7 @@
       "actual_costs": []
     }
   ],
-  "next_target_state": "NV",
+  "next_target_state": "AK",
   "account_status": "active",
   "locked_date": null,
   "locked_by": null

@@ -626,7 +626,7 @@ def licensing_roadmap():
                          stats=stats,
                          holder=holder_data,
                          training_roadmap=training_roadmap_json,
-)
+                         coverage_json=json.dumps({}))
 def render_director_view():
     """Render the director/leadership aggregated view with company coverage"""
     import glob
@@ -784,7 +784,8 @@ def render_director_view():
                          holder=director_data,
                          training_roadmap=training_roadmap_json,
                          team_members=all_holders,
-                         team_members_json=json.dumps([{'user_id': h.get('user_id'), 'name': h.get('name')} for h in all_holders]))
+                         team_members_json=json.dumps([{'user_id': h.get('user_id'), 'name': h.get('name')} for h in all_holders]),
+                         coverage_json=json.dumps(coverage))
 
 
 @app.route('/api/states')
@@ -908,6 +909,25 @@ def settings():
 @app.route('/manage-licenses')
 def manage_licenses():
     """License management page"""
+    # Check if manager is viewing a specific holder
+    requested_account = request.args.get('account')
+    is_manager = session.get('user_type') == 'manager'
+    
+    # If manager requests a specific holder, show that holder's licenses
+    if is_manager and requested_account and requested_account != 'director':
+        holder_data = load_license_holder_data(requested_account)
+        if not holder_data:
+            return "License holder not found", 404
+        
+        enhanced_licenses = []
+        for license in holder_data.get('licenses', []):
+            enhanced_licenses.append(enhance_license_data(license))
+        
+        return render_template('manage_licenses.html', 
+                             holder=holder_data,
+                             licenses=enhanced_licenses,
+                             is_director=True)
+    
     # Get account from session or URL parameter
     account = get_allowed_account()
     
@@ -925,7 +945,7 @@ def manage_licenses():
                 
                 for license in holder.get('licenses', []):
                     enhanced = enhance_license_data(license)
-                    enhanced['holder_name'] = holder['name']  # Track who owns it
+                    enhanced['holder_name'] = holder['name']
                     all_licenses.append(enhanced)
         
         director_data = {
@@ -2628,3 +2648,90 @@ def create_account():
         'name': name
     })
 
+
+@app.route('/settings/delete-cost/<license_id>/<int:cost_index>', methods=['POST'])
+def delete_cost(license_id, cost_index):
+    """Delete a cost entry"""
+    account = get_allowed_account()
+    holder = load_license_holder_data(account)
+    
+    if not holder:
+        return jsonify({'success': False, 'error': 'Holder not found'}), 404
+    
+    # Find the license
+    license = next((lic for lic in holder.get('licenses', []) if lic.get('license_id') == license_id), None)
+    
+    if not license:
+        return jsonify({'success': False, 'error': 'License not found'}), 404
+    
+    # Delete the cost entry
+    actual_costs = license.get('actual_costs', [])
+    if 0 <= cost_index < len(actual_costs):
+        del actual_costs[cost_index]
+        
+        # Recalculate totals
+        license['cost_totals']['actual_spent'] = sum(c.get('amount', 0) for c in actual_costs)
+        
+        # Save
+        holder_file = f'data/license_holders/{account}.json'
+        with open(holder_file, 'w') as f:
+            json.dump(holder, f, indent=2)
+        
+        return jsonify({'success': True})
+    
+    return jsonify({'success': False, 'error': 'Invalid cost index'}), 400
+
+
+@app.route('/team/set-goal/<user_id>', methods=['POST'])
+def set_license_goal(user_id):
+    """Set next license goal for a holder (Director only)"""
+    print(f"DEBUG: set_license_goal called with user_id={user_id}")
+    print(f"DEBUG: user_type={session.get('user_type')}")
+    
+    if session.get('user_type') != 'manager':
+        print("DEBUG: Not a manager, redirecting")
+        return redirect('/home')
+    
+    target_state = request.form.get('target_state')
+    print(f"DEBUG: target_state={target_state}")
+    
+    holder_file = f'data/license_holders/{user_id}.json'
+    print(f"DEBUG: holder_file={holder_file}, exists={os.path.exists(holder_file)}")
+    
+    if not os.path.exists(holder_file):
+        print("DEBUG: Holder file not found")
+        return redirect('/team/manage')
+    
+    with open(holder_file, 'r') as f:
+        holder = json.load(f)
+    
+    holder['next_target_state'] = target_state
+    
+    with open(holder_file, 'w') as f:
+        json.dump(holder, f, indent=2)
+    
+    return redirect(f'/manage-licenses?account={user_id}')
+
+@app.route('/team/clear-goal/<user_id>', methods=['POST'])
+def clear_license_goal(user_id):
+    """Clear next license goal for a holder (Director only)"""
+    if session.get('user_type') != 'manager':
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    holder_file = f'data/license_holders/{user_id}.json'
+    if not os.path.exists(holder_file):
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    
+    with open(holder_file, 'r') as f:
+        holder = json.load(f)
+    
+    holder['next_target_state'] = None
+    
+    with open(holder_file, 'w') as f:
+        json.dump(holder, f, indent=2)
+    
+    return jsonify({'success': True})
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)

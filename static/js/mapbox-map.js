@@ -150,9 +150,38 @@ function getExpirationColor(state) {
 }
 
 function getLeadershipColor(state) {
-    // Leadership view: show coverage intensity
-    if (state.status === 'licensed') return '#10b981';
-    if (state.status === 'in_progress') return '#60a5fa';
+    // Leadership view: Company market presence
+    const coverage = window.companyCoverage || {};
+    const stateAbbr = state.state_abbr || Object.keys(window.statesData || {}).find(
+        abbr => window.statesData[abbr].name === state.name
+    );
+    
+    // Check company coverage status
+    const coveredStates = coverage.covered_states || [];
+    const inProgressStates = coverage.in_progress_states || [];
+    const targetStates = coverage.target_states || [];
+    
+    // Active Markets (Green) - Licensed AND in covered states
+    if (state.status === 'licensed' && coveredStates.includes(stateAbbr)) {
+        return '#10b981'; // Green - Active market
+    }
+    
+    // Licensed but Not Active Market (Light Blue)
+    if (state.status === 'licensed' && !coveredStates.includes(stateAbbr)) {
+        return '#7dd3fc'; // Sky blue - Licensed but not active
+    }
+    
+    // In Progress (Yellow/Orange)
+    if (inProgressStates.includes(stateAbbr)) {
+        return '#fbbf24'; // Amber - Working on it
+    }
+    
+    // Target States (Purple)
+    if (targetStates.includes(stateAbbr)) {
+        return '#a78bfa'; // Purple - Future target
+    }
+    
+    // Not Licensed (Light Gray)
     return '#d1d5db';
 }
 
@@ -226,11 +255,13 @@ function updateLegend(view) {
             ]
         },
         leadership: {
-            title: 'Coverage Status',
+            title: 'Market Presence',
             items: [
-                { color: 'licensed', label: 'Licensed' },
-                { color: 'custom', customColor: '#60a5fa', label: 'In Progress' },
-                { color: 'custom', customColor: '#d1d5db', label: 'No Coverage' }
+                { color: 'custom', customColor: '#10b981', label: 'Active Markets' },
+                { color: 'custom', customColor: '#7dd3fc', label: 'Licensed (Not Active)' },
+                { color: 'custom', customColor: '#fbbf24', label: 'In Progress' },
+                { color: 'custom', customColor: '#a78bfa', label: 'Target States' },
+                { color: 'custom', customColor: '#d1d5db', label: 'Not Licensed' }
             ]
         },
         projects: {

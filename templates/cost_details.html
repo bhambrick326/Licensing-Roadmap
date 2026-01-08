@@ -46,7 +46,7 @@
                                             <td class="text-muted small">{{ cost.vendor or '—' }}</td>
                                             <td class="text-muted small">{{ cost.notes or '—' }}</td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteCost('{{ license.license_id }}', '{{ loop.index0 }}')">×</button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteCost('{{ license.license_id }}', {{ loop.index0 }})">×</button>
                                             </td>
                                         </tr>
                                         {% endfor %}
@@ -495,55 +495,33 @@ function toggleBudget() {
     }
 }
 
+// Updated: 1767907500
 function deleteCost(licenseId, costIndex) {
     if (!confirm('Delete this cost entry?')) return;
     
-    fetch(
-'/settings/delete-cost/' + licenseId + '/' + costIndex, {
-        method: 'POST'
+    fetch('/settings/remove-cost', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            license_id: licenseId,
+            cost_index: costIndex
+        })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             location.reload();
         } else {
-            alert('Error deleting cost');
+            alert('Error: ' + (data.error || 'Unknown error'));
         }
-    });
-}
-`, {
-        method: 'POST'
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Error deleting cost');
-        }
+    .catch(error => {
+        alert('Network error: ' + error);
     });
 }
-`, {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Error deleting cost');
-        }
-    });
-}
-
-// Set today's date as default when modal opens
-document.getElementById('addCostModal').addEventListener('show.bs.modal', function () {
-    const dateInput = document.getElementById('dateInput');
-    if (dateInput && !dateInput.value) {
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.value = today;
-    }
-});
 </script>
 
 {% endblock %}

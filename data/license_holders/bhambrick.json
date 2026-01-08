@@ -42,14 +42,6 @@
       "actual_costs": [
         {
           "date": "2024-08-08",
-          "category": "application_fee",
-          "amount": 225.0,
-          "vendor": "State Board",
-          "notes": null,
-          "recurring": false
-        },
-        {
-          "date": "2024-08-08",
           "category": "test_fee",
           "amount": 185.0,
           "vendor": "State Board",
@@ -66,7 +58,10 @@
         }
       ],
       "application_date": "",
-      "notes": ""
+      "notes": "",
+      "cost_totals": {
+        "actual_spent": 263.0
+      }
     },
     {
       "license_id": "AL-002",

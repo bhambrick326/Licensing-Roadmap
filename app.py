@@ -901,6 +901,44 @@ def leadership_data():
 
 
 
+
+# DELETE COST ROUTES - MOVED TO TOP
+@app.route('/settings/test-delete/<string:license_id>/<int:cost_index>', methods=['POST', 'GET'])
+def test_delete_cost(license_id, cost_index):
+    return jsonify({'test': 'success', 'license_id': license_id, 'cost_index': cost_index, 'type': type(cost_index).__name__})
+
+@app.route('/settings/delete-cost/<license_id>/<cost_index>', methods=['POST'])
+def delete_cost(license_id, cost_index):
+    """Delete a cost entry"""
+    cost_index = int(cost_index)  # Convert to int
+    holder = load_license_holder_data(account)
+    
+    if not holder:
+        return jsonify({'success': False, 'error': 'Holder not found'}), 404
+    
+    # Find the license
+    license = next((lic for lic in holder.get('licenses', []) if lic.get('license_id') == license_id), None)
+    
+    if not license:
+        return jsonify({'success': False, 'error': 'License not found'}), 404
+    
+    # Delete the cost entry
+    actual_costs = license.get('actual_costs', [])
+    if 0 <= cost_index < len(actual_costs):
+        del actual_costs[cost_index]
+        
+        # Recalculate totals
+        license['cost_totals']['actual_spent'] = sum(c.get('amount', 0) for c in actual_costs)
+        
+        # Save
+        holder_file = f'data/license_holders/{account}.json'
+        with open(holder_file, 'w') as f:
+            json.dump(holder, f, indent=2)
+        
+        return jsonify({'success': True})
+    
+    return jsonify({'success': False, 'error': 'Invalid cost index'}), 400
+
 @app.route('/settings')
 def settings():
     """Application settings page"""
@@ -1267,6 +1305,42 @@ def add_cost(license_id):
         json.dump(holder_data, f, indent=2)
     
     return redirect(f'/settings/cost-details/{license_id}?account={account}')
+
+@app.route('/settings/remove-cost', methods=['POST'])
+def remove_cost():
+    """Remove a cost entry"""
+    from flask import request
+    data = request.get_json()
+    license_id = data.get('license_id')
+    cost_index = int(data.get('cost_index'))
+    
+    account = get_allowed_account()
+    holder = load_license_holder_data(account)
+    
+    if not holder:
+        return jsonify({'success': False, 'error': 'Holder not found'}), 404
+    
+    license = next((lic for lic in holder.get('licenses', []) if lic.get('license_id') == license_id), None)
+    if not license:
+        return jsonify({'success': False, 'error': 'License not found'}), 404
+    
+    actual_costs = license.get('actual_costs', [])
+    if 0 <= cost_index < len(actual_costs):
+        del actual_costs[cost_index]
+        
+        # Ensure cost_totals exists
+        if 'cost_totals' not in license:
+            license['cost_totals'] = {}
+        
+        license['cost_totals']['actual_spent'] = sum(c.get('amount', 0) for c in actual_costs)
+        
+        holder_file = f'data/license_holders/{account}.json'
+        with open(holder_file, 'w') as f:
+            json.dump(holder, f, indent=2)
+        
+        return jsonify({'success': True})
+    
+    return jsonify({'success': False, 'error': 'Invalid cost index'}), 400
 
 @app.route('/settings/update-estimated-costs/<license_id>', methods=['POST'])
 def update_estimated_costs(license_id):
@@ -2682,37 +2756,8 @@ def create_account():
     })
 
 
-@app.route('/settings/delete-cost/<license_id>/<int:cost_index>', methods=['POST'])
-def delete_cost(license_id, cost_index):
-    """Delete a cost entry"""
-    account = get_allowed_account()
-    holder = load_license_holder_data(account)
-    
-    if not holder:
-        return jsonify({'success': False, 'error': 'Holder not found'}), 404
-    
-    # Find the license
-    license = next((lic for lic in holder.get('licenses', []) if lic.get('license_id') == license_id), None)
-    
-    if not license:
-        return jsonify({'success': False, 'error': 'License not found'}), 404
-    
-    # Delete the cost entry
-    actual_costs = license.get('actual_costs', [])
-    if 0 <= cost_index < len(actual_costs):
-        del actual_costs[cost_index]
-        
-        # Recalculate totals
-        license['cost_totals']['actual_spent'] = sum(c.get('amount', 0) for c in actual_costs)
-        
-        # Save
-        holder_file = f'data/license_holders/{account}.json'
-        with open(holder_file, 'w') as f:
-            json.dump(holder, f, indent=2)
-        
-        return jsonify({'success': True})
-    
-    return jsonify({'success': False, 'error': 'Invalid cost index'}), 400
+
+
 
 
 @app.route('/team/set-goal/<user_id>', methods=['POST'])

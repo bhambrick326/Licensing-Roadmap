@@ -42,14 +42,6 @@
       "actual_costs": [
         {
           "date": "2024-08-08",
-          "category": "test_fee",
-          "amount": 185.0,
-          "vendor": "State Board",
-          "notes": null,
-          "recurring": false
-        },
-        {
-          "date": "2024-08-08",
           "category": "business_law_book_fee",
           "amount": 78.0,
           "vendor": "NASCLA",
@@ -60,7 +52,7 @@
       "application_date": "",
       "notes": "",
       "cost_totals": {
-        "actual_spent": 263.0
+        "actual_spent": 78.0
       }
     },
     {

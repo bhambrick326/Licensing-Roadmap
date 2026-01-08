@@ -1,6 +1,6 @@
 # 🔧 Licensing Roadmap - Professional License Management System
 
-A comprehensive web application for tracking professional plumbing licenses across multiple U.S. states, managing costs, and maintaining detailed professional bio information for license applications.
+A comprehensive web application for tracking professional plumbing licenses across multiple U.S. states, managing costs with financial reporting, and maintaining detailed professional bio information for license applications.
 
 **Built by a licensed plumber for plumbers** - solving real compliance and licensing challenges.
 
@@ -12,17 +12,106 @@ A comprehensive web application for tracking professional plumbing licenses acro
 - Track licenses for multiple team members (Benjamin, John, etc.)
 - Team Overview (Director) mode for aggregated view
 - Individual license holder views
-- Easy account switching with persistent context
+- Easy account switching with PIN-based authentication
+- License goal assignment system (Director assigns next target state)
 
 ### **Interactive Map Visualization**
 - **4 Map Views:**
   1. **License Status** - Visual overview of all licenses (licensed, in progress, overdue)
   2. **Expiration Tracker** - Color-coded by days until expiration
-  3. **Leadership View** - Team-wide coverage map
+  3. **Leadership View** - 5-tier market presence analysis:
+     - 🟢 Dark Green: Active Markets (licensed + in company coverage)
+     - 🔵 Light Blue: Licensed but not active market
+     - 🟡 Amber: In Progress
+     - 🟣 Purple: Target expansion states
+     - ⚪ Gray: Not licensed
   4. **Training Roadmap** - Recommended licensing paths
 - Powered by Mapbox GL JS with custom styling
 - Click states for detailed information
 - Real-time status updates
+
+### **💰 Advanced Cost Tracking & Analytics**
+**NEW: Professional financial reporting system for senior leadership**
+
+#### **Cost Tracking Per License**
+- **Line-Item Expense Tracking:**
+  - Date, category, amount, vendor, notes
+  - Delete individual cost entries
+  - Native date picker (type or calendar)
+  - Auto-calculating totals
+  
+- **Cost Categories:**
+  - Application Fees, Test Fees
+  - Trade Books & Business/Law Books
+  - License Activation Fees
+  - Prep Course Fees
+  - Travel & Shipping
+  - Renewal Fees, Continuing Education
+
+- **Budget vs Actual:**
+  - Estimated costs (planning tool)
+  - Actual costs (what was really spent)
+  - Variance analysis
+  - Budget hidden from license holders (director only)
+
+#### **Cost Analytics Dashboard** 
+**Director-level financial reporting:**
+- **Executive Summary:**
+  - Total Spent (company-wide)
+  - Annual Recurring Costs
+  - Total Licenses tracked
+  
+- **Year-by-Year Analysis:**
+  - Horizontal scrollable year pills
+  - Spending per year with license counts
+  - Trends over time
+  
+- **Expandable License Details:**
+  - Click any license to see cost breakdown
+  - Individual expenses by category
+  - Budget vs. actual per license
+  
+- **Category Spending Visualization:**
+  - Visual breakdown by expense type
+  - Percentage of total spend
+
+#### **Dual Export System**
+1. **📊 Excel/CSV Export:**
+   - Complete data dump
+   - All licenses, years, categories
+   - Spreadsheet-ready format
+
+2. **📄 Professional PDF Report:**
+   - Executive summary with introduction
+   - Budget methodology explanation
+   - Year-by-year spending tables
+   - Category analysis with percentages
+   - Detailed license costs (Budget/Actual/Variance)
+   - Portrait layout, professional styling
+   - Ready for senior leadership review
+
+**Budget Methodology:**
+- Budgets based on historical data from actual license acquisition costs
+- Serve as planning benchmarks for estimating new license expenses
+- Variance analysis shows which licenses cost more/less than expected
+
+### **📋 Active States Management**
+**Track company market presence and expansion strategy:**
+- **3-Column Layout:**
+  - Licensed States (we have coverage)
+  - In Progress (applications pending)
+  - Target States (future expansion)
+- Expandable state cards showing license holders
+- Company coverage sync
+- Fits on one screen (minimal scrolling)
+
+### **🎯 License Goal Assignment**
+**Director assigns next license targets for each team member:**
+- Set goal via Team Members → View Licenses → Set Goal
+- Goal appears on license holder's dashboard
+- Auto-hides when holder achieves license
+- Tracks individual development paths
+- Stored in holder profile
 
 ### **Comprehensive License Management**
 - Full CRUD operations (Create, Read, Update, Delete)
@@ -34,27 +123,7 @@ A comprehensive web application for tracking professional plumbing licenses acro
   - Board contact information
   - Renewal tracking
   - Master of Record / Designated Employee designation
-  - Next target state for each license holder
-
-### **💰 Cost Tracking System**
-Track every dollar spent on licensing - from initial costs to recurring renewals.
-
-**Cost Categories:**
-- Application Fees
-- Test Fees  
-- Trade Books & Business/Law Books
-- License Activation Fees
-- Prep Course Fees
-- Travel & Shipping
-- Renewal Fees
-- Continuing Education
-
-**Features:**
-- **Estimated vs. Actual Tracking** - Budget planning and variance analysis
-- **Line-Item Expense Tracking** - Individual expenses with dates, vendors, notes
-- **Cost Analytics Dashboard** - Total spend by state, by category, by license holder
-- **Annual Recurring Projections** - Forecast renewal costs
-- **CSV Export** - Export data in spreadsheet format
+  - Cost tracking per license
 
 ### **📝 Professional Bio Builder**
 **The game-changer:** Build your professional profile ONCE, use it for EVERY application.
@@ -131,19 +200,22 @@ Comprehensive employment records with:
 **All sections include "Copy to Clipboard" functionality** - format once, paste into any application!
 
 ### **👥 Team Management**
-- Add/edit license holders
+- Add/edit/delete license holders
+- Lock/unlock accounts (preserves data)
 - Set "Next Target State" for each team member
 - Track total licenses and certificates per holder
+- Auto-generated PINs for new accounts
 - Quick navigation to individual license views
 
 ---
 
-## 🛠️ Technical Stack
+## ��️ Technical Stack
 
 ### **Backend**
 - **Python 3.12**
 - **Flask 3.0** - Web framework
-- **JSON-based data storage** - Simple file-based persistence (PostgreSQL migration planned)
+- **JSON-based data storage** - Simple file-based persistence
+- **ReportLab** - PDF generation for financial reports
 
 ### **Frontend**
 - **Bootstrap 5.3** - Responsive UI framework
@@ -156,44 +228,49 @@ Comprehensive employment records with:
 - Technical typography (DM Sans, JetBrains Mono)
 - Compact form layouts (0.5rem padding, 0.875rem fonts)
 - Professional color palette for plumbing industry
+- Industrial aesthetic with warm metallics
 
 ---
 
 ## 📁 Project Structure
 ```
 /workspaces/Licensing-Roadmap/
-├── app.py                          # Flask application with all routes
+├── app.py                          # Flask application (~3000 lines)
 ├── templates/
 │   ├── base.html                   # Base layout with sidebar navigation
 │   ├── home.html                   # Dashboard with urgent items, stats
 │   ├── licensing_roadmap.html      # Interactive map with 4 views
-│   ├── manage_licenses.html        # License table with CRUD operations
+│   ├── manage_licenses.html        # License table with goal setting
 │   ├── edit_license.html           # Edit individual license
 │   ├── add_license.html            # Add new license form
 │   ├── cost_details.html           # Cost tracking per license
-│   ├── cost_analytics.html         # Cost analytics dashboard
+│   ├── cost_analytics.html         # Financial analytics dashboard
+│   ├── director_dashboard.html     # Team overview with expandable states
+│   ├── active_states_manager.html  # 3-column market presence view
 │   ├── bio_builder.html            # Professional bio builder (8 sections)
-│   ├── manage_team.html            # Team management
+│   ├── manage_team.html            # Team account management
 │   ├── edit_holder.html            # Edit license holder info
 │   ├── settings.html               # App settings
-│   └── login.html                  # Password protection
+│   ├── login.html                  # PIN authentication
+│   └── landing.html                # Pre-login landing page
 ├── static/
 │   ├── css/
-│   │   └── main.css                # ~3000+ lines of custom styling
+│   │   └── main.css                # 3000+ lines of custom styling
 │   └── js/
 │       ├── main.js                 # Offcanvas, search, interactions
-│       └── mapbox-map.js           # Map initialization, view switching
+│       └── mapbox-map.js           # Map initialization, 5-color system
 ├── data/
 │   ├── license_holders/
-│   │   ├── bhambrick.json          # Benjamin's licenses & bio
-│   │   └── jsmith.json             # John's licenses & bio
+│   │   ├── bhambrick.json          # Benjamin's licenses, costs & bio
+│   │   ├── jsmith.json             # John's licenses, costs & bio
+│   │   └── director.json           # Director account data
 │   ├── training_roadmaps/
 │   │   └── master_plumber_southwest.json
 │   ├── company/
-│   │   └── coverage.json
+│   │   └── coverage.json           # Company market presence
 │   ├── bio_templates/
 │   │   └── default_bio.json        # Bio structure template
-│   └── backups/                    # Automatic backups of data migrations
+│   └── backups/                    # Automatic backups
 └── README.md
 ```
 
@@ -201,15 +278,18 @@ Comprehensive employment records with:
 
 ## 💾 Data Structure
 
-### **License Holder Profile**
+### **License Holder Profile with Costs**
 ```json
 {
   "user_id": "bhambrick",
   "name": "Benjamin Hambrick",
   "role": "Master Plumber",
-  "total_licenses": 29,
+  "total_licenses": 37,
   "total_certificates": 42,
-  "next_target_state": "AZ",
+  "next_target_state": "AK",
+  "pin": "200002",
+  "locked": false,
+  
   "licenses": [
     {
       "license_id": "TX-001",
@@ -237,12 +317,26 @@ Comprehensive employment records with:
           "amount": 225.00,
           "vendor": "Texas State Board",
           "notes": "Initial application"
+        },
+        {
+          "date": "2020-03-01",
+          "category": "travel",
+          "amount": 450.00,
+          "vendor": "American Airlines",
+          "notes": "Flight to Austin for test"
         }
       ],
       
+      "cost_totals": {
+        "initial_estimated": 351.73,
+        "actual_spent": 675.00,
+        "variance": -323.27,
+        "recurring_cost": 300.00
+      },
+      
       "recurring": {
         "renewal_fee": 300.00,
-        "continuing_ed_fee": 100.00,
+        "continuing_ed_fee": 0.00,
         "renewal_period_years": 1
       },
       
@@ -257,19 +351,7 @@ Comprehensive employment records with:
     "work_history": [ ... ],
     "plumbing_experience": {
       "total_years": 12,
-      "residential_hours": 8000,
-      "commercial_hours": 6000,
-      "job_projects": [
-        {
-          "project_name": "24-unit apartment building",
-          "location": "Houston, TX",
-          "completion_date": "2023-06-15",
-          "job_type": "commercial",
-          "project_value": 145000,
-          "scope_summary": "Complete rough-in and finish plumbing...",
-          "your_role": "Lead Plumber"
-        }
-      ]
+      "job_projects": [ ... ]
     },
     "education": { ... },
     "references": [ ... ],
@@ -281,7 +363,7 @@ Comprehensive employment records with:
 
 ---
 
-## �� Installation & Setup
+## 🚀 Installation & Setup
 
 ### **Prerequisites**
 - Python 3.12+
@@ -296,8 +378,10 @@ cd Licensing-Roadmap
 
 # Install dependencies
 pip install flask --break-system-packages
+pip install reportlab --break-system-packages
+pip install pillow --break-system-packages
 
-# Set environment variables (optional - uses defaults if not set)
+# Set environment variables (optional)
 export MAPBOX_ACCESS_TOKEN="your_mapbox_token"
 
 # Run the application
@@ -307,7 +391,9 @@ python app.py
 The app will be available at `http://localhost:5000`
 
 ### **Default Login**
-- **Password:** `TeamLicense2024` (change in `app.py` line ~15)
+- **Director PIN:** `100001`
+- **Benjamin PIN:** `200002`
+- **John PIN:** `200001`
 
 ---
 
@@ -319,6 +405,15 @@ The app will be available at `http://localhost:5000`
 - Consistent spacing and typography
 - Quick actions always visible
 - Reduced padding/margins throughout (25-40% smaller than Bootstrap defaults)
+- Single-screen views wherever possible
+
+### **Financial Reporting Standards**
+- Executive-ready PDF reports
+- Professional introduction and methodology explanations
+- Budget vs. actual variance analysis
+- Year-over-year trending
+- Category-based spending analysis
+- Export options for spreadsheet analysis
 
 ### **Copy-to-Clipboard First**
 Every section of the bio builder includes formatted text outputs that can be copied directly into applications. No more retyping the same information 50 times.
@@ -344,31 +439,69 @@ All pages adapt to tablet and mobile screens (though desktop is optimal for deta
 - **Gray** - No license
 
 ### **Leadership View** (Director Mode)
-Shows aggregated team coverage - tracks who's licensed where across all team members.
+**5-tier market presence analysis:**
+- 🟢 **Dark Green:** Active Markets (licensed AND in company coverage)
+- 🔵 **Light Blue:** Licensed but not in active market coverage
+- �� **Amber:** In Progress (applications pending)
+- 🟣 **Purple:** Target expansion states
+- ⚪ **Gray:** Not licensed
 
 ### **Training Roadmap View**
 Recommended licensing paths based on your role and experience level.
 
 ---
 
+## 💰 Cost Analytics Workflow
+
+### **For License Holders:**
+1. Go to "Manage Licenses"
+2. Click "💰 Costs" for any license
+3. Add actual expenses (date, category, amount, vendor, notes)
+4. View cost summary (actual spent, recurring costs)
+5. Budget section hidden (director only)
+
+### **For Directors:**
+1. Navigate to "Cost Analytics"
+2. View executive summary (Total Spent, Annual Recurring)
+3. Scroll through year-by-year spending
+4. Click licenses to expand cost details
+5. Review category spending breakdown
+6. Export PDF report for senior leadership
+7. Export Excel for detailed analysis
+
+### **Understanding the Reports:**
+- **Budget:** Estimated costs based on historical data (planning tool)
+- **Actual:** What was really spent (financial truth)
+- **Variance:** Actual - Budget (positive = over budget, negative = under budget)
+- **Annual Recurring:** Normalized renewal costs per year
+
+---
+
 ## 🔮 Future Enhancements
 
-### **Phase 1: Production Deployment**
-- [ ] Migrate to PostgreSQL database
-- [ ] Deploy to Render with production configs
+### **Phase 1: Near-Term**
+- [ ] Fix delete cost button (JavaScript syntax issue)
+- [ ] Complete cost data entry for all 37 Benjamin licenses
 - [ ] Email/SMS renewal notifications
 - [ ] Document upload (PDFs, receipts, certificates)
+- [ ] Advanced filtering in Cost Analytics
 
-### **Phase 2: Advanced Features**
-- [ ] CSV import/export for bulk data
+### **Phase 2: Database Migration**
+- [ ] Migrate to PostgreSQL
+- [ ] Relational data model
+- [ ] Better query performance
+- [ ] Transaction history
+
+### **Phase 3: Advanced Features**
 - [ ] Calendar integration (Google Calendar, Outlook)
-- [ ] Advanced analytics (cost trends, ROI per state)
+- [ ] Multi-year budget forecasting
+- [ ] ROI analysis per state
 - [ ] Mobile app (iOS/Android)
-- [ ] Reference letter storage and templates
+- [ ] Reference letter templates
 
-### **Phase 3: SaaS Conversion** (Long-term)
+### **Phase 4: SaaS Conversion** (Long-term)
 - [ ] Multi-company support
-- [ ] Role-based permissions (admin, manager, license holder)
+- [ ] Role-based permissions
 - [ ] Email-based user accounts
 - [ ] Subscription billing
 - [ ] API for third-party integrations
@@ -379,23 +512,27 @@ Recommended licensing paths based on your role and experience level.
 
 ### **Individual License Holder**
 - Track all your licenses in one place
+- Add expenses as they occur
 - Set renewal reminders
 - Build professional bio once, use everywhere
 - Filter job history by date for specific applications
-- Track how much you've spent on licensing
+- See how much you've spent on licensing
 
 ### **Department Manager**
 - See team-wide license coverage
 - Track costs across all team members
 - Assign "next target states" to employees
 - Monitor upcoming expirations
-- Generate compliance reports
+- Generate financial reports
+- Export data for senior leadership
 
-### **Business Owner**
-- Know who's your Master of Record in each state
-- Budget for licensing costs
-- Plan expansion based on current coverage
-- Track employee certifications
+### **Business Owner / CFO**
+- Know licensing costs company-wide
+- Budget for expansion into new states
+- Year-over-year spending trends
+- Category analysis (where is money going?)
+- Variance analysis (over/under budget per license)
+- Professional PDF reports for board meetings
 
 ---
 
@@ -411,7 +548,16 @@ Hawaii requires "List all jobs completed in the last 4 years with detailed descr
 4. Paste into application
 5. Done in 30 seconds instead of 3 hours
 
-### **Bio Builder vs. Traditional Method**
+### **Executive Financial Reporting**
+**Before:** Spreadsheets, manual tracking, guessing at costs
+**After:** One-click PDF reports ready for senior leadership with:
+- Professional introduction
+- Budget methodology explanation
+- Year-over-year analysis
+- Category breakdowns
+- Variance analysis per license
+
+### **Bio Builder Time Savings**
 **Traditional:** Retype name, address, work history, references for every application (15-30 min per app × 20 states = 5-10 hours)
 
 **With Bio Builder:** Fill out comprehensive profile once (1 hour), then copy/paste sections into each application (2-3 min per app × 20 states = 40 min-1 hour)
@@ -421,11 +567,25 @@ Hawaii requires "List all jobs completed in the last 4 years with detailed descr
 ---
 
 ## 📊 Current Stats (Example Data)
-- **8 licenses** tracked (TX, CA, FL, WA, NV, AZ, NY, CO)
-- **3 statuses** (licensed, in progress, not licensed)
-- **29 total licenses** and **42 certificates** across team
-- **$15,000+** in licensing costs tracked
+- **37 licenses** tracked across 8 states
+- **3 team members** (Director, Benjamin, John)
+- **Comprehensive cost tracking** with line-item expenses
+- **Year-by-year analysis** with expandable details
+- **Professional PDF reports** for executive review
 - **8 comprehensive bio sections** covering every application question
+- **Job projects library** with date/type filtering
+
+---
+
+## ⚠️ Known Issues
+
+### **Delete Cost Button**
+- **Status:** Not working
+- **Location:** Cost tracking page (templates/cost_details.html)
+- **Issue:** JavaScript `fetch()` syntax error
+- **Impact:** Cannot delete individual cost entries
+- **Workaround:** Edit JSON files directly or wait for fix
+- **Priority:** High - fix planned for next session
 
 ---
 
@@ -443,9 +603,9 @@ Proprietary - Internal use only
 
 ## 👨‍🔧 About
 
-Built by Benjamin Hambrick, Master Plumber, to solve real licensing compliance challenges in the plumbing industry. 
+Built by Benjamin Hambrick, Master Plumber (37 active licenses across 8 states), to solve real licensing compliance and financial tracking challenges in the plumbing industry. 
 
-**"Stop filling out the same forms 50 times. Build it once, use it forever."**
+**"Stop filling out the same forms 50 times. Track every licensing dollar. Build it once, use it forever."**
 
 ---
 
@@ -455,5 +615,5 @@ For questions or issues, contact the development team.
 
 ---
 
-**Last Updated:** December 2024
-**Version:** 2.0 - Bio Builder Release
+**Last Updated:** January 8, 2026
+**Version:** 3.0 - Cost Analytics & Financial Reporting Release

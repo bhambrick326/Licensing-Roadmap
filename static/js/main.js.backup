@@ -1,0 +1,832 @@
+/**
+ * Main JavaScript - Enhanced Offcanvas Content with 4 Different Views
+ */
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeBootstrapComponents();
+    
+    const searchInput = document.getElementById('stateSearch');
+    if (searchInput) {
+        initializeSearch();
+    }
+});
+
+function initializeBootstrapComponents() {
+    const tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+}
+
+function initializeSearch() {
+    const searchInput = document.getElementById('stateSearch');
+    const searchResults = document.getElementById('searchResults');
+    
+    if (!searchInput || !searchResults) return;
+    
+    searchInput.addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase().trim();
+        
+        if (query.length === 0) {
+            searchResults.classList.remove('active');
+            searchResults.innerHTML = '';
+            document.querySelectorAll('.state').forEach(state => {
+                state.style.opacity = '';
+            });
+            return;
+        }
+        
+        const matches = [];
+        for (const [abbr, stateData] of Object.entries(window.statesData || {})) {
+            if (
+                stateData.name.toLowerCase().includes(query) ||
+                abbr.toLowerCase().includes(query)
+            ) {
+                matches.push({ abbr, ...stateData });
+            }
+        }
+        
+        if (matches.length > 0) {
+            searchResults.innerHTML = matches.map(state => `
+                <div class="search-result-item" data-state="${state.abbr}">
+                    <strong>${state.name}</strong> (${state.abbr})
+                    <span class="badge bg-secondary ms-2">${state.badge_text}</span>
+                </div>
+            `).join('');
+            searchResults.classList.add('active');
+            
+            searchResults.querySelectorAll('.search-result-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const stateAbbr = this.getAttribute('data-state');
+                    handleStateClick(stateAbbr);
+                    searchInput.value = '';
+                    searchResults.classList.remove('active');
+                    searchResults.innerHTML = '';
+                });
+            });
+        } else {
+            searchResults.innerHTML = '<div class="search-result-item">No states found</div>';
+            searchResults.classList.add('active');
+        }
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.classList.remove('active');
+        }
+    });
+}
+
+function handleStateClick(stateAbbr) {
+    const stateData = window.statesData[stateAbbr];
+    if (!stateData) return;
+    
+    // Determine which view is active
+    const activeView = document.querySelector('.view-tab.active')?.getAttribute('data-view') || 'status';
+    
+    // Populate offcanvas based on active view
+    populateOffcanvasForView(stateAbbr, stateData, activeView);
+    
+    const offcanvas = new bootstrap.Offcanvas(document.getElementById('stateOffcanvas'));
+    offcanvas.show();
+}
+
+function populateOffcanvasForView(stateAbbr, stateData, view) {
+    switch(view) {
+        case 'status':
+            populateLicenseStatusView(stateAbbr, stateData);
+            break;
+        case 'expiration':
+            populateExpirationTrackerView(stateAbbr, stateData);
+            break;
+        case 'leadership':
+            populateLeadershipView(stateAbbr, stateData);
+            break;
+        case 'training':
+            populateTrainingRoadmapView(stateAbbr, stateData);
+            break;
+        default:
+            populateLicenseStatusView(stateAbbr, stateData);
+    }
+}
+
+// ============================================================================
+// VIEW 1: LICENSE STATUS VIEW
+// Shows: Active licenses, Master of Record status, bond/insurance info
+// ============================================================================
+function populateLicenseStatusView(stateAbbr, stateData) {
+    const offcanvasTitle = document.getElementById('stateOffcanvasLabel');
+    const offcanvasContent = document.getElementById('offcanvasContent');
+    
+    offcanvasTitle.textContent = stateData.name;
+    
+    let html = `
+        <div class="offcanvas-state-content">
+            <!-- View Indicator -->
+            <div class="view-indicator">
+                <span class="view-icon">📊</span>
+                <span class="view-name">License Status</span>
+            </div>
+            
+            <!-- Status Badge -->
+            <div class="status-badge-container">
+                <span class="status-badge-large status-${stateData.status_class}">
+                    ${getStatusIcon(stateData.status_class)} ${stateData.badge_text}
+                </span>
+            </div>
+    `;
+    
+    if (stateData.status === 'licensed') {
+        // Licensed state - show full details
+        html += `
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">📜</span>
+                    <span class="info-card-title">Active License</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="info-row">
+                        <span class="info-label">License Type</span>
+                        <span class="info-value">${stateData.license_type || 'Master Plumber'}</span>
+                    </div>
+                    ${stateData.license_number ? `
+                    <div class="info-row">
+                        <span class="info-label">License Number</span>
+                        <span class="info-value"><code>${stateData.license_number}</code></span>
+                    </div>
+                    ` : ''}
+                    ${stateData.issued_on ? `
+                    <div class="info-row">
+                        <span class="info-label">Issue Date</span>
+                        <span class="info-value">${formatDate(stateData.issued_on)}</span>
+                    </div>
+                    ` : ''}
+                    ${stateData.expires_on ? `
+                    <div class="info-row">
+                        <span class="info-label">Expiration Date</span>
+                        <span class="info-value">${formatDate(stateData.expires_on)}</span>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+            
+            <!-- Master of Record / Designated Role -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">👤</span>
+                    <span class="info-card-title">Designation</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="info-row">
+                        <span class="info-label">Role</span>
+                        <span class="info-value">
+                            ${stateData.designated_role === 'master_of_record' ? 
+                                '<span class="badge bg-primary">Master of Record</span>' : 
+                                stateData.designated_role === 'designated_employee' ?
+                                '<span class="badge bg-info">Designated Employee</span>' :
+                                '<span class="badge bg-secondary">Standard License</span>'
+                            }
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bond & Insurance (Placeholder - add to data structure later) -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">🛡️</span>
+                    <span class="info-card-title">Bond & Insurance</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="info-row">
+                        <span class="info-label">Bond Status</span>
+                        <span class="info-value">
+                            <span class="badge bg-success">Active</span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Insurance</span>
+                        <span class="info-value">
+                            <span class="badge bg-success">Current</span>
+                        </span>
+                    </div>
+                    <p class="text-muted small mt-2">Bond and insurance tracking coming soon</p>
+                </div>
+            </div>
+        `;
+    } else if (stateData.status === 'in_progress') {
+        // In progress - show application status
+        html += `
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">⟳</span>
+                    <span class="info-card-title">Application Status</span>
+                </div>
+                <div class="info-card-body">
+                    <p class="summary-text">Application in progress for ${stateData.name}.</p>
+                    <div class="progress-bar-container mt-3">
+                        <div class="progress-bar-fill progress-info" style="width: 45%"></div>
+                    </div>
+                    <p class="text-muted small mt-2">Track application milestones in the detailed guide below</p>
+                </div>
+            </div>
+        `;
+    } else {
+        // Not licensed - show requirements preview
+        html += `
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">📋</span>
+                    <span class="info-card-title">Licensing Requirements</span>
+                </div>
+                <div class="info-card-body">
+                    <p class="summary-text">Not yet licensed in ${stateData.name}.</p>
+                    <p class="text-muted small">View the complete licensing guide below for requirements, costs, and application process.</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Board Information
+    if (stateData.board_name) {
+        html += `
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">🏛️</span>
+                    <span class="info-card-title">Licensing Board</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="board-name">${stateData.board_name}</div>
+                    ${stateData.board_phone ? `
+                    <div class="board-contact mt-2">
+                        <span class="contact-icon">📞</span>
+                        <span>${stateData.board_phone}</span>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Action Buttons
+    html += `
+        <div class="action-buttons">
+            <a href="/state/${stateAbbr}" class="btn-action btn-primary-action">
+                <span>📖</span> Complete Licensing Guide
+            </a>
+            ${stateData.board_url && stateData.board_url !== '#' ? `
+            <a href="${stateData.board_url}" target="_blank" class="btn-action btn-secondary-action">
+                <span>🔗</span> Visit Board Website
+            </a>
+            ` : ''}
+        </div>
+    `;
+    
+    html += '</div>';
+    offcanvasContent.innerHTML = html;
+}
+
+// ============================================================================
+// VIEW 2: EXPIRATION TRACKER VIEW
+// Shows: Renewal dates, CE requirements, CE completed
+// ============================================================================
+function populateExpirationTrackerView(stateAbbr, stateData) {
+    const offcanvasTitle = document.getElementById('stateOffcanvasLabel');
+    const offcanvasContent = document.getElementById('offcanvasContent');
+    
+    offcanvasTitle.textContent = stateData.name;
+    
+    let html = `
+        <div class="offcanvas-state-content">
+            <!-- View Indicator -->
+            <div class="view-indicator">
+                <span class="view-icon">⏰</span>
+                <span class="view-name">Expiration Tracker</span>
+            </div>
+    `;
+    
+    if (stateData.status === 'licensed' && stateData.expires_on) {
+        const daysRemaining = stateData.days_remaining;
+        let progressPercent = 0;
+        let progressClass = 'success';
+        let expiryText = '';
+        let urgencyLevel = 'good';
+        
+        if (daysRemaining < 0) {
+            progressPercent = 100;
+            progressClass = 'danger';
+            urgencyLevel = 'overdue';
+            expiryText = `OVERDUE by ${Math.abs(daysRemaining)} days`;
+        } else if (daysRemaining <= 30) {
+            progressPercent = 100 - ((daysRemaining / 30) * 100);
+            progressClass = 'danger';
+            urgencyLevel = 'critical';
+            expiryText = `${daysRemaining} days remaining`;
+        } else if (daysRemaining <= 90) {
+            progressPercent = 100 - ((daysRemaining / 90) * 100);
+            progressClass = 'warning';
+            urgencyLevel = 'soon';
+            expiryText = `${daysRemaining} days remaining`;
+        } else {
+            progressPercent = 20;
+            progressClass = 'success';
+            urgencyLevel = 'good';
+            expiryText = `${daysRemaining} days remaining`;
+        }
+        
+        html += `
+            <!-- Expiration Status Card -->
+            <div class="info-card-pro expiry-card urgency-${urgencyLevel}">
+                <div class="info-card-header">
+                    <span class="info-card-icon">📅</span>
+                    <span class="info-card-title">Renewal Status</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="expiry-date-large">${formatDate(stateData.expires_on)}</div>
+                    <div class="expiry-countdown ${progressClass}">${expiryText}</div>
+                    <div class="progress-bar-container mt-3">
+                        <div class="progress-bar-fill progress-${progressClass}" style="width: ${progressPercent}%"></div>
+                    </div>
+                    ${urgencyLevel === 'overdue' || urgencyLevel === 'critical' ? `
+                    <div class="alert alert-danger mt-3 mb-0">
+                        <strong>⚠️ Action Required:</strong> Renewal needed immediately
+                    </div>
+                    ` : urgencyLevel === 'soon' ? `
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <strong>⚠️ Upcoming:</strong> Begin renewal process soon
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+            
+            <!-- Continuing Education Requirements -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">🎓</span>
+                    <span class="info-card-title">Continuing Education (CE)</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="info-row">
+                        <span class="info-label">Required Hours</span>
+                        <span class="info-value">
+                            <strong>TBD</strong>
+                            <span class="text-muted small">(varies by state)</span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Completed</span>
+                        <span class="info-value">
+                            <span class="badge bg-secondary">0 hours</span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">
+                            <span class="badge bg-warning">Not Started</span>
+                        </span>
+                    </div>
+                    <p class="text-muted small mt-3">CE tracking feature coming soon - check state licensing guide for specific requirements</p>
+                </div>
+            </div>
+            
+            <!-- Renewal Checklist -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">✅</span>
+                    <span class="info-card-title">Renewal Checklist</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="checklist-item">
+                        <input type="checkbox" disabled>
+                        <span>Complete CE requirements</span>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" disabled>
+                        <span>Submit renewal application</span>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" disabled>
+                        <span>Pay renewal fee</span>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" disabled>
+                        <span>Update insurance/bond info</span>
+                    </div>
+                    <p class="text-muted small mt-3">Interactive checklist coming soon</p>
+                </div>
+            </div>
+        `;
+    } else {
+        html += `
+            <div class="status-badge-container">
+                <span class="status-badge-large status-${stateData.status_class}">
+                    ${getStatusIcon(stateData.status_class)} ${stateData.badge_text}
+                </span>
+            </div>
+            
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">⏰</span>
+                    <span class="info-card-title">Expiration Tracking</span>
+                </div>
+                <div class="info-card-body">
+                    <p class="summary-text">No active license to track in ${stateData.name}.</p>
+                    <p class="text-muted small">Once licensed, renewal dates and CE requirements will appear here.</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Action Buttons
+    html += `
+        <div class="action-buttons">
+            <a href="/state/${stateAbbr}" class="btn-action btn-primary-action">
+                <span>📖</span> View Licensing Guide
+            </a>
+        </div>
+    `;
+    
+    html += '</div>';
+    offcanvasContent.innerHTML = html;
+}
+
+// ============================================================================
+// VIEW 3: LEADERSHIP VIEW
+// Shows: Active vs dormant, team coverage, revenue potential
+// ============================================================================
+function populateLeadershipView(stateAbbr, stateData) {
+    const offcanvasTitle = document.getElementById('stateOffcanvasLabel');
+    const offcanvasContent = document.getElementById('offcanvasContent');
+    
+    offcanvasTitle.textContent = stateData.name;
+    
+    let html = `
+        <div class="offcanvas-state-content">
+            <!-- View Indicator -->
+            <div class="view-indicator">
+                <span class="view-icon">👔</span>
+                <span class="view-name">Leadership View</span>
+            </div>
+            
+            <!-- Status Badge -->
+            <div class="status-badge-container">
+                <span class="status-badge-large status-${stateData.status_class}">
+                    ${getStatusIcon(stateData.status_class)} ${stateData.badge_text}
+                </span>
+            </div>
+    `;
+    
+    if (stateData.status === 'licensed') {
+        html += `
+            <!-- Coverage Status -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">📊</span>
+                    <span class="info-card-title">Coverage Status</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">
+                            <span class="badge bg-success">Active</span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">License Health</span>
+                        <span class="info-value">
+                            ${stateData.days_remaining && stateData.days_remaining > 90 ?
+                                '<span class="badge bg-success">Healthy</span>' :
+                                stateData.days_remaining && stateData.days_remaining > 30 ?
+                                '<span class="badge bg-warning">Needs Attention</span>' :
+                                '<span class="badge bg-danger">Critical</span>'
+                            }
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Last Activity</span>
+                        <span class="info-value text-muted">Recently active</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Team Coverage (for multi-holder view) -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">👥</span>
+                    <span class="info-card-title">Team Coverage</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="info-row">
+                        <span class="info-label">License Holders</span>
+                        <span class="info-value"><strong>1</strong></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Master of Record</span>
+                        <span class="info-value">
+                            ${stateData.designated_role === 'master_of_record' ?
+                                '<span class="badge bg-primary">Yes</span>' :
+                                '<span class="badge bg-secondary">No</span>'
+                            }
+                        </span>
+                    </div>
+                    <p class="text-muted small mt-2">Multi-holder team view coming soon</p>
+                </div>
+            </div>
+            
+            <!-- Revenue Potential -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">💰</span>
+                    <span class="info-card-title">Revenue Potential</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="info-row">
+                        <span class="info-label">Market Size</span>
+                        <span class="info-value text-muted">Data coming soon</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Active Projects</span>
+                        <span class="info-value">
+                            <span class="badge bg-info">0</span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">YTD Revenue</span>
+                        <span class="info-value text-muted">Tracking coming soon</span>
+                    </div>
+                    <p class="text-muted small mt-2">Revenue analytics feature in development</p>
+                </div>
+            </div>
+        `;
+    } else {
+        html += `
+            <!-- Coverage Gap -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">📊</span>
+                    <span class="info-card-title">Coverage Gap</span>
+                </div>
+                <div class="info-card-body">
+                    <p class="summary-text">No coverage in ${stateData.name}.</p>
+                    <div class="info-row mt-3">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">
+                            <span class="badge bg-secondary">No Coverage</span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Priority Level</span>
+                        <span class="info-value text-muted">To be determined</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Strategic Value -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">🎯</span>
+                    <span class="info-card-title">Strategic Value</span>
+                </div>
+                <div class="info-card-body">
+                    <p class="text-muted">Evaluate this state for expansion opportunities.</p>
+                    <div class="info-row mt-3">
+                        <span class="info-label">Market Opportunity</span>
+                        <span class="info-value text-muted">Research needed</span>
+                    </div>
+                    <p class="text-muted small mt-2">Market analysis tools coming soon</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Action Buttons
+    html += `
+        <div class="action-buttons">
+            <a href="/state/${stateAbbr}" class="btn-action btn-primary-action">
+                <span>📖</span> View Licensing Guide
+            </a>
+            <a href="/cost-analytics" class="btn-action btn-secondary-action">
+                <span>💰</span> Cost Analytics
+            </a>
+        </div>
+    `;
+    
+    html += '</div>';
+    offcanvasContent.innerHTML = html;
+}
+
+// ============================================================================
+// VIEW 4: TRAINING ROADMAP VIEW
+// Shows: Career development path (already implemented)
+// ============================================================================
+function populateTrainingRoadmapView(stateAbbr, stateData) {
+    const trainingRoadmap = window.trainingRoadmap;
+    
+    if (trainingRoadmap && trainingRoadmap.path) {
+        const trainingStep = trainingRoadmap.path.find(step => step.state === stateAbbr);
+        if (trainingStep) {
+            populateTrainingRoadmapOffcanvas(stateAbbr, stateData, trainingStep, trainingRoadmap);
+            return;
+        }
+    }
+    
+    // If not in training roadmap, show generic view
+    const offcanvasTitle = document.getElementById('stateOffcanvasLabel');
+    const offcanvasContent = document.getElementById('offcanvasContent');
+    
+    offcanvasTitle.textContent = stateData.name;
+    
+    let html = `
+        <div class="offcanvas-state-content">
+            <!-- View Indicator -->
+            <div class="view-indicator">
+                <span class="view-icon">🎓</span>
+                <span class="view-name">Training Roadmap</span>
+            </div>
+            
+            <!-- Status Badge -->
+            <div class="status-badge-container">
+                <span class="status-badge-large status-${stateData.status_class}">
+                    ${getStatusIcon(stateData.status_class)} ${stateData.badge_text}
+                </span>
+            </div>
+            
+            <!-- Not in Roadmap -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">🎓</span>
+                    <span class="info-card-title">Training Path</span>
+                </div>
+                <div class="info-card-body">
+                    <p class="summary-text">${stateData.name} is not currently in your training roadmap.</p>
+                    <p class="text-muted small">View the licensing guide to learn about requirements and add this state to your career development plan.</p>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/state/${stateAbbr}" class="btn-action btn-primary-action">
+                    <span>📖</span> Complete Licensing Guide
+                </a>
+            </div>
+        </div>
+    `;
+    
+    offcanvasContent.innerHTML = html;
+}
+
+function populateTrainingRoadmapOffcanvas(stateAbbr, stateData, trainingStep, roadmap) {
+    const offcanvasTitle = document.getElementById('stateOffcanvasLabel');
+    const offcanvasContent = document.getElementById('offcanvasContent');
+    
+    offcanvasTitle.textContent = stateData.name;
+    
+    let html = `
+        <div class="offcanvas-state-content">
+            <!-- View Indicator -->
+            <div class="view-indicator">
+                <span class="view-icon">🎓</span>
+                <span class="view-name">Training Roadmap</span>
+            </div>
+            
+            <!-- Training Step Badge -->
+            <div class="training-step-badge">
+                <div class="step-number">Step ${trainingStep.step}</div>
+                <div class="step-priority priority-${trainingStep.priority}">${trainingStep.priority.toUpperCase()}</div>
+            </div>
+            
+            <!-- Training Info Card -->
+            <div class="info-card-pro training-card">
+                <div class="info-card-header">
+                    <span class="info-card-icon">🎓</span>
+                    <span class="info-card-title">Training Path Details</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="info-row">
+                        <span class="info-label">License Type</span>
+                        <span class="info-value">${trainingStep.license_type}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Timeline</span>
+                        <span class="info-value">${trainingStep.estimated_timeline}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Cost Estimate</span>
+                        <span class="info-value"><strong>${trainingStep.cost_estimate}</strong></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Why This State -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">💡</span>
+                    <span class="info-card-title">Strategic Rationale</span>
+                </div>
+                <div class="info-card-body">
+                    <p class="summary-text">${trainingStep.reason}</p>
+                </div>
+            </div>
+            
+            <!-- Prerequisites -->
+            ${trainingStep.prerequisites && trainingStep.prerequisites.length > 0 ? `
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">✅</span>
+                    <span class="info-card-title">Prerequisites</span>
+                </div>
+                <div class="info-card-body">
+                    <ul class="prerequisites-list">
+                        ${trainingStep.prerequisites.map(req => `<li>${req}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+            ` : ''}
+            
+            <!-- Roadmap Overview -->
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">🗺️</span>
+                    <span class="info-card-title">Full Roadmap</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="roadmap-summary">
+                        <div class="roadmap-stat">
+                            <strong>${roadmap.path.length}</strong> Total Steps
+                        </div>
+                        <div class="roadmap-stat">
+                            <strong>${roadmap.estimated_duration}</strong> Duration
+                        </div>
+                        <div class="roadmap-stat">
+                            <strong>${roadmap.total_cost_estimate}</strong> Total Cost
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Board Information -->
+            ${stateData.board_name ? `
+            <div class="info-card-pro">
+                <div class="info-card-header">
+                    <span class="info-card-icon">🏛️</span>
+                    <span class="info-card-title">Licensing Board</span>
+                </div>
+                <div class="info-card-body">
+                    <div class="board-name">${stateData.board_name}</div>
+                    ${stateData.board_phone ? `
+                    <div class="board-contact">
+                        <span class="contact-icon">📞</span>
+                        <span>${stateData.board_phone}</span>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+            ` : ''}
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/state/${stateAbbr}" class="btn-action btn-primary-action">
+                    <span>📖</span> Complete Licensing Guide
+                </a>
+                <a href="${stateData.board_url || '#'}" target="_blank" class="btn-action btn-secondary-action">
+                    <span>🔗</span> Visit Licensing Board
+                </a>
+            </div>
+        </div>
+    `;
+    
+    offcanvasContent.innerHTML = html;
+}
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+function getStatusIcon(statusClass) {
+    const icons = {
+        'licensed': '✓',
+        'in_progress': '⟳',
+        'due-soon': '⚠',
+        'overdue': '!',
+        'not_licensed': '○'
+    };
+    return icons[statusClass] || '○';
+}
+
+function formatDate(isoString) {
+    if (!isoString) return 'N/A';
+    
+    try {
+        const date = new Date(isoString);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+    } catch (e) {
+        return isoString;
+    }
+}
+
+window.handleStateClick = handleStateClick;

@@ -1,19 +1,20 @@
 {
   "company_name": "Your Plumbing Company",
   "total_license_holders": 1,
-  "total_states_covered": 3,
-  "total_states_in_progress": 2,
+  "total_states_covered": 4,
+  "total_states_in_progress": 3,
   "covered_states": [
     "TX",
     "CA",
-    "FL"
+    "FL",
+    "CO"
   ],
   "in_progress_states": [
     "WA",
-    "NV"
+    "NV",
+    "AZ"
   ],
   "target_states": [
-    "AZ",
     "NY",
     "CO"
   ],

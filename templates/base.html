@@ -46,25 +46,25 @@
         <!-- Left Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-content">
-                <!-- Account Selector -->
+                <!-- Current User Display -->
                 <div class="sidebar-section account-selector-section">
-                    {% if session.get('user_type') == 'manager' %}
-                        <!-- Manager can switch accounts -->
-                        <select id="accountSelector" class="account-selector">
-                            <option value="bhambrick" {% if holder and holder.user_id == 'bhambrick' %}selected{% endif %}>👤 Benjamin Hambrick</option>
-                            <option value="jsmith" {% if holder and holder.user_id == 'jsmith' %}selected{% endif %}>👤 John Smith</option>
-                            <option value="director" {% if not holder or holder.user_id == 'director' %}selected{% endif %}>👔 Director View</option>
-                        </select>
-                    {% else %}
-                        <!-- License holder sees only their account -->
-                        <div class="account-display">
-                            <div class="account-name">👤 {{ session.get('name', 'User') }}</div>
-                            <div class="account-role">License Holder</div>
-                        </div>
-                    {% endif %}
+                    <div class="account-display">
+                        {% if session.get('user_type') == 'manager' %}
+                            <div class="account-icon">👔</div>
+                            <div>
+                                <div class="account-label">Signed in as</div>
+                                <div class="account-name">Department Director</div>
+                            </div>
+                        {% else %}
+                            <div class="account-icon">👤</div>
+                            <div>
+                                <div class="account-label">Signed in as</div>
+                                <div class="account-name">{{ session.get('name', 'User') }}</div>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
                 
-                <!-- Quick Stats Bar -->
                 <div class="sidebar-section stats-compact">
                     <div class="stat-compact stat-success">
                         <span class="stat-compact-value">{% block stat_licensed %}{{ stats.licensed if stats else 0 }}{% endblock %}</span>
@@ -80,7 +80,7 @@
                 <div class="sidebar-nav">
                     {% if session.get('user_type') == 'manager' %}
                         <!-- MANAGER/DIRECTOR VIEW -->
-                        <a href="/?account={{ holder.user_id if holder else 'director' }}" class="nav-item">
+                        <a href="/home?account={{ holder.user_id if holder else 'director' }}" class="nav-item">
                             <span class="nav-icon">🏠</span>
                             <span class="nav-label">Dashboard</span>
                         </a>
@@ -121,7 +121,7 @@
                         
                     {% else %}
                         <!-- LICENSE HOLDER VIEW -->
-                        <a href="/?account={{ session.get('user_id', 'bhambrick') }}" class="nav-item">
+                        <a href="/home?account={{ session.get('user_id', 'bhambrick') }}" class="nav-item">
                             <span class="nav-icon">🏠</span>
                             <span class="nav-label">My Dashboard</span>
                         </a>
@@ -174,14 +174,6 @@
     <!-- Mapbox Map Script -->
     <script src="{{ url_for('static', filename='js/mapbox-map.js') }}"></script>
     
-    <!-- Account Switcher -->
-    <script>
-        document.getElementById('accountSelector')?.addEventListener('change', function() {
-            const account = this.value;
-            // Preserve current page, just change account
-            const currentPath = window.location.pathname;
-            window.location.href = currentPath + '?account=' + account;
-        });
-    </script>
+
 </body>
 </html>

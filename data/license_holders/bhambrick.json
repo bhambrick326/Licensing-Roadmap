@@ -1,7 +1,7 @@
 {
   "user_id": "bhambrick",
   "name": "Benjamin Hambrick",
-  "role": "Master Plumber",
+  "role": "Service License Manager",
   "total_licenses": 37,
   "total_certificates": 0,
   "licenses": [
@@ -1301,5 +1301,8 @@
       "actual_costs": []
     }
   ],
-  "next_target_state": "NV"
+  "next_target_state": "NV",
+  "account_status": "active",
+  "locked_date": null,
+  "locked_by": null
 }

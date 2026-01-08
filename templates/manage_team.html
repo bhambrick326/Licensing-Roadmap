@@ -10,46 +10,64 @@
                 <!-- Header -->
                 <div class="page-header-compact">
                     <h3>👥 Manage License Holders</h3>
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addHolderModal">+ Add License Holder</button>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addHolderModal">
+                        <span style="font-size: 1.1rem;">+</span> Add New Member
+                    </button>
                 </div>
 
-                <!-- Team Members Table -->
-                <div class="netsuite-table-card">
-                    <table class="table table-sm table-hover mb-0 netsuite-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Role</th>
-                                <th>Total Licenses</th>
-                                <th>Next Target State</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for holder in holders %}
-                            <tr>
-                                <td class="fw-semibold">{{ holder.name }}</td>
-                                <td class="text-muted">{{ holder.role }}</td>
-                                <td class="text-center">{{ holder.total_licenses }}</td>
-                                <td>
-                                    {% if holder.next_target_state %}
-                                    <span class="badge bg-warning">→ {{ holder.next_target_state }}</span>
+                <!-- Team Members Cards -->
+                <div class="row g-3">
+                    {% for holder in holders %}
+                    <div class="col-12">
+                        <div class="team-member-card">
+                            <div class="team-member-header">
+                                <div class="team-member-info">
+                                    <div class="team-member-avatar">
+                                        👤
+                                    </div>
+                                    <div>
+                                        <h5 class="team-member-name">{{ holder.name }}</h5>
+                                        <div class="team-member-meta">
+                                            {{ holder.role }} • {{ holder.total_licenses }} Licenses • PIN: 
+                                            <code class="pin-display">{{ holder.pin or 'Not Set' }}</code>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="team-member-status">
+                                    {% if holder.account_status == 'locked' %}
+                                    <span class="status-badge status-locked">🔒 Locked</span>
                                     {% else %}
-                                    <span class="text-muted">Not set</span>
+                                    <span class="status-badge status-active">✓ Active</span>
                                     {% endif %}
-                                </td>
-                                <td>
-                                    <span class="status-badge status-licensed">● Active</span>
-                                </td>
-                                <td>
-                                    <a href="/team/edit-holder/{{ holder.user_id }}" class="btn-table-action">Edit</a>
-                                    <a href="/manage-licenses?account={{ holder.user_id }}" class="btn-table-action text-primary">View Licenses</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="team-member-actions">
+                                {% if holder.account_status == 'locked' %}
+                                <button class="btn btn-sm btn-outline-success" onclick="unlockAccount('{{ holder.user_id }}', '{{ holder.name }}')">
+                                    🔓 Unlock Account
+                                </button>
+                                {% else %}
+                                <button class="btn btn-sm btn-outline-warning" onclick="lockAccount('{{ holder.user_id }}', '{{ holder.name }}')">
+                                    🔒 Lock Account
+                                </button>
+                                {% endif %}
+                                
+                                <a href="/team/edit-holder/{{ holder.user_id }}" class="btn btn-sm btn-outline-primary">
+                                    ✏️ Edit Info
+                                </a>
+                                
+                                <a href="/manage-licenses?account={{ holder.user_id }}" class="btn btn-sm btn-outline-info">
+                                    📜 View Licenses
+                                </a>
+                                
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAccount('{{ holder.user_id }}', '{{ holder.name }}')">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
 
             </div>
@@ -57,48 +75,270 @@
     </div>
 </div>
 
-<!-- Add License Holder Modal -->
+<!-- Add New Member Modal -->
 <div class="modal fade" id="addHolderModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add License Holder</h5>
+                <h5 class="modal-title">Add New License Holder</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" action="/team/add-holder">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Full Name *</label>
-                        <input type="text" class="form-control" name="name" required placeholder="e.g., John Smith">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Role/Title</label>
-                        <input type="text" class="form-control" name="role" placeholder="e.g., Journey Plumber">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">User ID *</label>
-                        <input type="text" class="form-control" name="user_id" required placeholder="e.g., jsmith (lowercase, no spaces)">
-                        <small class="text-muted">Used for internal tracking - must be unique</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Next Target State</label>
-                        <select class="form-select" name="next_target_state">
-                            <option value="">Not set yet</option>
-                            <option value="TX">Texas</option>
-                            <option value="CA">California</option>
-                            <option value="FL">Florida</option>
-                            <option value="NY">New York</option>
-                            <option value="VA">Virginia</option>
-                            <!-- Add more as needed -->
-                        </select>
-                    </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" class="form-control" id="holderName" placeholder="e.g., John Smith" required>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Add License Holder</button>
+                <div class="mb-3">
+                    <label class="form-label">Role/Title</label>
+                    <input type="text" class="form-control" id="holderRole" placeholder="e.g., Master Plumber" value="License Holder">
                 </div>
-            </form>
+                <div class="mb-3">
+                    <label class="form-label">Email (Optional)</label>
+                    <input type="email" class="form-control" id="holderEmail" placeholder="email@example.com">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="createAccount()">Create Account</button>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Success Modal (shows PIN) -->
+<div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">✅ Account Created Successfully!</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <h4 class="mb-3">Account created for <strong id="successName"></strong></h4>
+                <div class="alert alert-info">
+                    <p class="mb-2"><strong>Access PIN:</strong></p>
+                    <h2 class="mb-0" id="successPin" style="font-family: 'Courier New', monospace; letter-spacing: 3px;"></h2>
+                </div>
+                <p class="text-muted mt-3">Give this PIN to the license holder. They will use it to log in and set up their profile.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got It</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.team-member-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.2s;
+}
+
+.team-member-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.team-member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.team-member-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.team-member-avatar {
+    width: 50px;
+    height: 50px;
+    background: #f0f9ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.team-member-name {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a2634;
+}
+
+.team-member-meta {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+
+.pin-display {
+    background: #f1f5f9;
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+}
+
+.team-member-status {
+    display: flex;
+    align-items: center;
+}
+
+.status-badge {
+    padding: 0.375rem 0.875rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-locked {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.team-member-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.page-header-compact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+</style>
+
+<script>
+function createAccount() {
+    const name = document.getElementById('holderName').value.trim();
+    const role = document.getElementById('holderRole').value.trim();
+    const email = document.getElementById('holderEmail').value.trim();
+    
+    if (!name) {
+        alert('Please enter a name');
+        return;
+    }
+    
+    fetch('/api/account/create', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, role, email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close add modal
+            const addModal = bootstrap.Modal.getInstance(document.getElementById('addHolderModal'));
+            addModal.hide();
+            
+            // Show success modal with PIN
+            document.getElementById('successName').textContent = data.name;
+            document.getElementById('successPin').textContent = data.pin;
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+            
+            // Reload page after closing success modal
+            document.getElementById('successModal').addEventListener('hidden.bs.modal', function () {
+                location.reload();
+            }, { once: true });
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error creating account: ' + error);
+    });
+}
+
+function lockAccount(userId, name) {
+    if (!confirm(`Lock account for ${name}?\n\nThey will not be able to log in until unlocked.`)) {
+        return;
+    }
+    
+    fetch(`/api/account/lock/${userId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error locking account: ' + error);
+    });
+}
+
+function unlockAccount(userId, name) {
+    if (!confirm(`Unlock account for ${name}?`)) {
+        return;
+    }
+    
+    fetch(`/api/account/unlock/${userId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error unlocking account: ' + error);
+    });
+}
+
+function deleteAccount(userId, name) {
+    if (!confirm(`DELETE account for ${name}?\n\nThis will permanently remove:\n• All their licenses\n• All their data\n• Their login access\n\nThis cannot be undone!`)) {
+        return;
+    }
+    
+    // Double confirmation for delete
+    const confirmation = prompt(`Type "${name}" to confirm deletion:`);
+    if (confirmation !== name) {
+        alert('Deletion cancelled - name did not match');
+        return;
+    }
+    
+    fetch(`/api/account/delete/${userId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error deleting account: ' + error);
+    });
+}
+</script>
 {% endblock %}

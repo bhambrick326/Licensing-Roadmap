@@ -4,5 +4,8 @@
   "role": "Journey Plumber",
   "total_licenses": 0,
   "total_certificates": 0,
-  "licenses": []
+  "licenses": [],
+  "account_status": "active",
+  "locked_date": null,
+  "locked_by": null
 }

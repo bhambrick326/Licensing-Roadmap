@@ -60,9 +60,9 @@ def get_allowed_account():
     user_type = session.get('user_type')
     user_id = session.get('user_id')
     
-    # Managers can view any account via URL parameter
+    # Managers always see director view (no account switching)
     if user_type == 'manager':
-        return request.args.get('account', user_id)
+        return 'director'
     
     # License holders can ONLY see their own account
     else:
@@ -81,6 +81,13 @@ def login():
         # Check if PIN exists in USERS
         if pin in USERS:
             user = USERS[pin]
+            
+            # For license holders, check if account is locked
+            if user['user_type'] == 'license_holder':
+                holder = load_license_holder_data(user['user_id'])
+                if holder and holder.get('account_status') == 'locked':
+                    return render_template('login.html', error='Account locked. Contact your manager.')
+            
             session['logged_in'] = True
             session['pin'] = pin
             session['user_type'] = user['user_type']
@@ -328,7 +335,9 @@ def landing_page():
     """Landing page for non-logged-in users"""
     # If already logged in, go to home
     if session.get('logged_in'):
-        return redirect('/home?account=bhambrick')
+        # Preserve current account or default to bhambrick
+        account = request.args.get('account') or session.get('account', 'bhambrick')
+        return redirect(f'/home?account={account}')
     
     return render_template('landing.html')
 
@@ -1381,6 +1390,15 @@ def manage_team():
     for holder_file in holder_files:
         with open(holder_file, 'r') as f:
             holder = json.load(f)
+            
+            # Find the PIN for this holder
+            holder_pin = None
+            for pin, user in USERS.items():
+                if user.get('user_id') == holder.get('user_id'):
+                    holder_pin = pin
+                    break
+            
+            holder['pin'] = holder_pin
             holders.append(holder)
     
     # Sort by name
@@ -2451,3 +2469,151 @@ def admin_active_states_update_revenue():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+# ==================== ACCOUNT MANAGEMENT ROUTES (DIRECTOR ONLY) ====================
+
+@app.route('/api/account/lock/<user_id>', methods=['POST'])
+def lock_account(user_id):
+    """Lock a license holder account"""
+    if session.get('user_type') != 'manager':
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    holder_file = f'data/license_holders/{user_id}.json'
+    if not os.path.exists(holder_file):
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    
+    with open(holder_file, 'r') as f:
+        holder = json.load(f)
+    
+    holder['account_status'] = 'locked'
+    holder['locked_date'] = datetime.now().strftime('%Y-%m-%d')
+    holder['locked_by'] = session.get('name', 'Manager')
+    
+    with open(holder_file, 'w') as f:
+        json.dump(holder, f, indent=2)
+    
+    return jsonify({'success': True, 'message': f"Account locked for {holder['name']}"})
+
+@app.route('/api/account/unlock/<user_id>', methods=['POST'])
+def unlock_account(user_id):
+    """Unlock a license holder account"""
+    if session.get('user_type') != 'manager':
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    holder_file = f'data/license_holders/{user_id}.json'
+    if not os.path.exists(holder_file):
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    
+    with open(holder_file, 'r') as f:
+        holder = json.load(f)
+    
+    holder['account_status'] = 'active'
+    holder['locked_date'] = None
+    holder['locked_by'] = None
+    
+    with open(holder_file, 'w') as f:
+        json.dump(holder, f, indent=2)
+    
+    return jsonify({'success': True, 'message': f"Account unlocked for {holder['name']}"})
+
+@app.route('/api/account/delete/<user_id>', methods=['POST'])
+def delete_account(user_id):
+    """Delete a license holder account"""
+    if session.get('user_type') != 'manager':
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    holder_file = f'data/license_holders/{user_id}.json'
+    if not os.path.exists(holder_file):
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    
+    # Load holder info for confirmation message
+    with open(holder_file, 'r') as f:
+        holder = json.load(f)
+    
+    # Delete the file
+    os.remove(holder_file)
+    
+    # Also remove from USERS dict if exists
+    pin_to_remove = None
+    for pin, user in USERS.items():
+        if user['user_id'] == user_id:
+            pin_to_remove = pin
+            break
+    
+    if pin_to_remove:
+        del USERS[pin_to_remove]
+    
+    return jsonify({'success': True, 'message': f"Account deleted for {holder['name']}"})
+
+@app.route('/api/account/create', methods=['POST'])
+def create_account():
+    """Create a new license holder account"""
+    if session.get('user_type') != 'manager':
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    role = data.get('role', 'License Holder').strip()
+    email = data.get('email', '').strip()
+    
+    if not name:
+        return jsonify({'success': False, 'error': 'Name is required'}), 400
+    
+    # Generate user_id from name (lowercase, no spaces)
+    user_id = name.lower().replace(' ', '').replace('.', '')[:20]
+    
+    # Check if user_id already exists
+    holder_file = f'data/license_holders/{user_id}.json'
+    if os.path.exists(holder_file):
+        # Add a number suffix
+        counter = 2
+        while os.path.exists(f'data/license_holders/{user_id}{counter}.json'):
+            counter += 1
+        user_id = f'{user_id}{counter}'
+        holder_file = f'data/license_holders/{user_id}.json'
+    
+    # Generate unique PIN (200XXX series)
+    import random
+    existing_pins = set(USERS.keys())
+    while True:
+        pin = f'2{random.randint(10000, 99999)}'
+        if pin not in existing_pins:
+            break
+    
+    # Create holder data
+    holder = {
+        'user_id': user_id,
+        'name': name,
+        'role': role,
+        'email': email,
+        'account_status': 'active',
+        'locked_date': None,
+        'locked_by': None,
+        'total_licenses': 0,
+        'total_certificates': 0,
+        'licenses': [],
+        'created_date': datetime.now().strftime('%Y-%m-%d'),
+        'created_by': session.get('name', 'Manager')
+    }
+    
+    # Save to file
+    with open(holder_file, 'w') as f:
+        json.dump(holder, f, indent=2)
+    
+    # Add to USERS dict
+    USERS[pin] = {
+        'pin': pin,
+        'user_type': 'license_holder',
+        'name': name,
+        'email': email,
+        'user_id': user_id
+    }
+    
+    return jsonify({
+        'success': True,
+        'message': f"Account created for {name}",
+        'pin': pin,
+        'user_id': user_id,
+        'name': name
+    })
+

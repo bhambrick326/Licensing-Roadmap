@@ -311,6 +311,11 @@ def load_license_holder_data(user_id='bhambrick'):
                     'variance': actual_spent - initial_estimated,
                     'recurring_cost': recurring_cost
                 }
+                
+                license_dict['planning'] = {
+                    'est_study_hours': 0,
+                    'test_duration_hours': 0
+                }
             
             holder_data['licenses'].append(license_dict)
         
@@ -1446,12 +1451,12 @@ def add_cost(license_id):
     license_data['actual_costs'].append(new_cost)
     
     # Save to database
-    success = update_estimated_costs_in_db(account, license_id, license_data['estimated_costs'])
+    success = add_cost_to_db(account, license_id, new_cost)
     
     if success:
         return redirect(f'/settings/cost-details/{license_id}?account={account}')
     else:
-        return "Error updating estimated costs", 500
+        return "Error adding cost", 500
 
 @app.route('/settings/remove-cost', methods=['POST'])
 def remove_cost():
@@ -1479,13 +1484,13 @@ def remove_cost():
         if 'cost_totals' not in license:
             license['cost_totals'] = {}
         
-        license['cost_totals']['actual_spent'] = sum(c.get('amount', 0) for c in actual_costs)
+        # Delete from database
+        success = delete_cost_from_db(account, license_id, cost_index)
         
-        holder_file = f'data/license_holders/{account}.json'
-        with open(holder_file, 'w') as f:
-            json.dump(holder, f, indent=2)
-        
-        return jsonify({'success': True})
+        if success:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Database delete failed'}), 500
     
     return jsonify({'success': False, 'error': 'Invalid cost index'}), 400
 
@@ -1545,12 +1550,12 @@ def update_estimated_costs(license_id):
     }
     
     # Save to database
-    success = update_estimated_costs_in_db(account, license_id, license_data['estimated_costs'])
+    success = add_cost_to_db(account, license_id, new_cost)
     
     if success:
         return redirect(f'/settings/cost-details/{license_id}?account={account}')
     else:
-        return "Error updating estimated costs", 500
+        return "Error adding cost", 500
 
 
 
@@ -1561,33 +1566,37 @@ def cost_analytics():
     
     account = get_allowed_account()
     
-    # Handle director view - aggregate all holders
+    # Handle director view - aggregate all holders from database
     if account == 'director':
-        import glob
-        all_licenses = []
-        all_holders = []
-        
-        holder_files = glob.glob('data/license_holders/*.json')
-        for holder_file in holder_files:
-            with open(holder_file, 'r') as f:
-                holder = json.load(f)
-                all_holders.append(holder)
-                
-                for license in holder.get('licenses', []):
-                    enhanced = enhance_license_data(license)
-                    enhanced['holder_name'] = holder['name']
-                    all_licenses.append(enhanced)
-        
-        director_data = {
-            'user_id': 'director',
-            'name': 'Director View',
-            'role': 'Department Leadership',
-            'total_licenses': sum(h.get('total_licenses', 0) for h in all_holders),
-            'total_certificates': sum(h.get('total_certificates', 0) for h in all_holders)
-        }
-        
-        holder_data = director_data
-        enhanced_licenses = all_licenses
+        db = SessionLocal()
+        try:
+            all_licenses = []
+            all_holders_db = db.query(RSLicenseHolder).all()
+            all_holders = []
+            
+            for holder in all_holders_db:
+                # Load each holder's data using our function
+                holder_dict = load_license_holder_data(holder.employee_id or holder.pin)
+                if holder_dict:
+                    all_holders.append(holder_dict)
+                    
+                    for license in holder_dict.get('licenses', []):
+                        enhanced = enhance_license_data(license)
+                        enhanced['holder_name'] = holder_dict['name']
+                        all_licenses.append(enhanced)
+            
+            director_data = {
+                'user_id': 'director',
+                'name': 'Director View',
+                'role': 'Department Leadership',
+                'total_licenses': sum(h.get('total_licenses', 0) for h in all_holders),
+                'total_certificates': sum(h.get('total_certificates', 0) for h in all_holders)
+            }
+            
+            holder_data = director_data
+            enhanced_licenses = all_licenses
+        finally:
+            db.close()
     else:
         holder_data = load_license_holder_data(account)
         if not holder_data:

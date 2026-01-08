@@ -236,6 +236,7 @@ def delete_license_from_db(account, license_id):
 
 def add_cost_to_db(account, license_id, cost_data):
     """Add a cost entry to a license"""
+    print(f"DEBUG add_cost_to_db: account={account}, license_id={license_id}, cost_data={cost_data}")
     db = SessionLocal()
     try:
         # Find holder
@@ -279,6 +280,7 @@ def add_cost_to_db(account, license_id, cost_data):
 
 def delete_cost_from_db(account, license_id, cost_index):
     """Delete a cost entry"""
+    print(f"DEBUG delete_cost_from_db: account={account}, license_id={license_id}, cost_index={cost_index}")
     db = SessionLocal()
     try:
         # Find holder

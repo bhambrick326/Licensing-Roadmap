@@ -384,8 +384,19 @@ def home():
             if abbr:
                 if abbr not in active_states_detail:
                     active_states_detail[abbr] = {'holders': []}
-                if license.get('holder_name') not in active_states_detail[abbr]['holders']:
-                    active_states_detail[abbr]['holders'].append(license.get('holder_name'))
+                
+                # Store holder info (name + user_id) to make links work
+                holder_name = license.get('holder_name')
+                holder_user_id = next((h.get('user_id') for h in all_holders if h.get('name') == holder_name), None)
+                
+                holder_info = {
+                    'name': holder_name,
+                    'user_id': holder_user_id
+                }
+                
+                # Only add if not already in list
+                if not any(h['name'] == holder_name for h in active_states_detail[abbr]['holders']):
+                    active_states_detail[abbr]['holders'].append(holder_info)
             
             # Count expiring
             days = license.get('days_remaining')

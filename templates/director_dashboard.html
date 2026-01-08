@@ -5,158 +5,181 @@
 <div class="director-dashboard">
     <div class="container-fluid px-4 py-3">
         
-        <!-- Page Header -->
-        <div class="page-header-compact mb-4">
-            <h3>🏢 Director View - Company Overview</h3>
-            <p class="text-muted">Department Leadership Dashboard</p>
-        </div>
-
-        <!-- Quick Stats Row -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-icon">📜</div>
-                    <div class="stat-value">{{ stats.total_licenses }}</div>
-                    <div class="stat-label">Total Licenses</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-icon">🗺️</div>
-                    <div class="stat-value">{{ stats.active_states }}</div>
-                    <div class="stat-label">Active States</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card warning">
-                    <div class="stat-icon">⚠️</div>
-                    <div class="stat-value">{{ stats.expiring_soon }}</div>
-                    <div class="stat-label">Expiring <60 Days</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card success">
-                    <div class="stat-icon">💰</div>
-                    <div class="stat-value">${{ "{:,.0f}".format(stats.annual_cost) }}</div>
-                    <div class="stat-label">Annual Costs</div>
-                </div>
+        <!-- Page Header - Compact -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">🏢 Director Dashboard</h4>
+            <div class="d-flex gap-2">
+                <a href="/admin/active-states" class="btn btn-sm btn-outline-primary">Manage States</a>
+                <a href="/team/manage" class="btn btn-sm btn-outline-primary">Manage Team</a>
             </div>
         </div>
 
-        <!-- Active States Section -->
-        <div class="data-card mb-4">
-            <div class="card-header-compact">
-                <span class="card-icon">🗺️</span>
-                <span class="card-title">Active States</span>
-                <a href="/admin/active-states" class="btn btn-sm btn-outline-primary ms-auto">Manage States</a>
+        <!-- Quick Stats Row - Compact -->
+        <div class="row g-2 mb-3">
+            <div class="col-md-3">
+                <div class="stat-card-compact">
+                    <div class="stat-compact-icon">📜</div>
+                    <div>
+                        <div class="stat-compact-value">{{ stats.total_licenses }}</div>
+                        <div class="stat-compact-label">Total Licenses</div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body-compact">
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>State</th>
-                                <th>Status</th>
-                                <th>Team Members</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for state in coverage.covered_states %}
-                            <tr>
-                                <td><strong>{{ state }}</strong></td>
-                                <td><span class="badge bg-success">✅ Licensed</span></td>
-                                <td>
-                                    {% set holders = active_states_detail.get(state, {}).get('holders', []) %}
-                                    {{ holders|length }} license holder(s)
-                                </td>
-                                <td>
-                                    <a href="/state/{{ state }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            
-                            {% for state in coverage.in_progress_states %}
-                            <tr>
-                                <td><strong>{{ state }}</strong></td>
-                                <td><span class="badge bg-warning">🔄 In Progress</span></td>
-                                <td>-</td>
-                                <td>
-                                    <a href="/state/{{ state }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            
-                            {% for state in coverage.target_states %}
-                            <tr>
-                                <td><strong>{{ state }}</strong></td>
-                                <td><span class="badge bg-secondary">⭕ Target</span></td>
-                                <td>-</td>
-                                <td>
-                                    <a href="/state/{{ state }}" class="btn btn-sm btn-outline-secondary">View Requirements</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <div class="col-md-3">
+                <div class="stat-card-compact">
+                    <div class="stat-compact-icon">🗺️</div>
+                    <div>
+                        <div class="stat-compact-value">{{ stats.active_states }}</div>
+                        <div class="stat-compact-label">Active States</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-compact warning">
+                    <div class="stat-compact-icon">⚠️</div>
+                    <div>
+                        <div class="stat-compact-value">{{ stats.expiring_soon }}</div>
+                        <div class="stat-compact-label">Expiring Soon</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-compact success">
+                    <div class="stat-compact-icon">💰</div>
+                    <div>
+                        <div class="stat-compact-value">${{ "{:,.0f}".format(stats.annual_cost) }}</div>
+                        <div class="stat-compact-label">Annual Cost</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Team Members Section -->
-        <div class="data-card mb-4">
-            <div class="card-header-compact">
-                <span class="card-icon">👥</span>
-                <span class="card-title">Team Members</span>
-                <a href="/team/manage" class="btn btn-sm btn-outline-primary ms-auto">Manage Team</a>
-            </div>
-            <div class="card-body-compact">
-                <div class="row g-3">
-                    {% for holder in team_members %}
-                    <div class="col-md-6 col-lg-4">
-                        <div class="team-member-card">
-                            <div class="member-header">
-                                <div class="member-avatar">{{ holder.name[0] }}</div>
-                                <div class="member-info">
-                                    <div class="member-name">{{ holder.name }}</div>
-                                    <div class="member-role">{{ holder.role }}</div>
-                                </div>
-                            </div>
-                            <div class="member-stats">
-                                <div class="member-stat">
-                                    <span class="stat-number">{{ holder.total_licenses }}</span>
-                                    <span class="stat-text">Licenses</span>
-                                </div>
-                                <div class="member-stat">
-                                    <span class="stat-number">{{ holder.states_count }}</span>
-                                    <span class="stat-text">States</span>
-                                </div>
-                                <div class="member-stat">
-                                    <span class="stat-number">{{ holder.expiring_count }}</span>
-                                    <span class="stat-text">Expiring</span>
-                                </div>
-                            </div>
-                            <a href="/team/view/{{ holder.user_id }}" class="btn btn-sm btn-primary w-100 mt-2">View Details →</a>
+        <!-- Two Column Layout -->
+        <div class="row g-3">
+            
+            <!-- Left Column: Active States -->
+            <div class="col-lg-6">
+                <div class="compact-card">
+                    <div class="compact-card-header">
+                        <span>🗺️ Active States ({{ coverage.covered_states|length + coverage.in_progress_states|length }})</span>
+                    </div>
+                    <div class="compact-card-body">
+                        <div class="compact-table-wrapper">
+                            <table class="table table-sm mb-0 compact-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60px;"></th>
+                                        <th>State</th>
+                                        <th>Status</th>
+                                        <th>License Holders</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for state in coverage.covered_states[:10] %}
+                                    <tr class="state-row" onclick="toggleStateDetail('{{ state }}')">
+                                        <td class="expand-cell">
+                                            <span class="expand-icon" id="icon-{{ state }}">▶</span>
+                                        </td>
+                                        <td><strong>{{ state }}</strong></td>
+                                        <td><span class="status-dot status-licensed">●</span> Licensed</td>
+                                        <td class="text-muted">{{ active_states_detail.get(state, {}).get('holders', [])|length }}</td>
+                                    </tr>
+                                    <tr class="state-detail-row" id="detail-{{ state }}" style="display: none;">
+                                        <td colspan="4">
+                                            <div class="state-detail-content">
+                                                <div class="detail-header">License Holders in {{ state }}:</div>
+                                                {% set holders = active_states_detail.get(state, {}).get('holders', []) %}
+                                                <!-- DEBUG: {{ holders }} -->
+                                                {% if holders %}
+                                                <div class="holders-list">
+                                                    {% for holder in holders %}
+                                                    <div class="holder-item" onclick="event.stopPropagation(); window.location.href='/team/view/{{ holder.user_id }}'" style="cursor: pointer;">
+                                                        <span class="holder-icon">👤</span>
+                                                        <span class="holder-name">{{ holder.name }}</span>
+                                                        <span class="holder-arrow">→</span>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                                {% else %}
+                                                <p class="text-muted mb-0">No license holders assigned yet.</p>
+                                                {% endif %}
+                                                <a href="/state/{{ state }}" class="btn btn-sm btn-outline-primary mt-2">View State Requirements →</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    
+                                    {% for state in coverage.in_progress_states[:5] %}
+                                    <tr class="state-row" onclick="toggleStateDetail('{{ state }}')">
+                                        <td class="expand-cell">
+                                            <span class="expand-icon" id="icon-{{ state }}">▶</span>
+                                        </td>
+                                        <td><strong>{{ state }}</strong></td>
+                                        <td><span class="status-dot status-progress">●</span> In Progress</td>
+                                        <td class="text-muted">-</td>
+                                    </tr>
+                                    <tr class="state-detail-row" id="detail-{{ state }}" style="display: none;">
+                                        <td colspan="4">
+                                            <div class="state-detail-content">
+                                                <div class="detail-header">{{ state }} - In Progress</div>
+                                                <p class="text-muted mb-2">No active license holders yet. This state is currently being pursued.</p>
+                                                <a href="/state/{{ state }}" class="btn btn-sm btn-outline-primary">View State Requirements →</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
             </div>
+
+            <!-- Right Column: Team Members -->
+            <div class="col-lg-6">
+                <div class="compact-card">
+                    <div class="compact-card-header">
+                        <span>👥 Team Members ({{ team_members|length }})</span>
+                    </div>
+                    <div class="compact-card-body">
+                        <div class="team-list-compact">
+                            {% for holder in team_members %}
+                            <div class="team-item-compact" onclick="window.location.href='/team/view/{{ holder.user_id }}'" style="cursor: pointer;">
+                                <div class="team-item-avatar">{{ holder.name[0] }}</div>
+                                <div class="team-item-info">
+                                    <div class="team-item-name">{{ holder.name }}</div>
+                                    <div class="team-item-meta">{{ holder.role }}</div>
+                                </div>
+                                <div class="team-item-stats">
+                                    <span class="mini-stat"><strong>{{ holder.total_licenses }}</strong> licenses</span>
+                                    <span class="mini-stat"><strong>{{ holder.states_count }}</strong> states</span>
+                                    {% if holder.expiring_count > 0 %}
+                                    <span class="mini-stat text-warning"><strong>{{ holder.expiring_count }}</strong> expiring</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- Recent Alerts -->
+        <!-- Recent Alerts - Compact & Collapsible -->
         {% if urgent_items %}
-        <div class="data-card">
-            <div class="card-header-compact">
-                <span class="card-icon">🚨</span>
-                <span class="card-title">Recent Alerts</span>
+        <div class="compact-card mt-3">
+            <div class="compact-card-header" data-bs-toggle="collapse" data-bs-target="#alertsCollapse" style="cursor: pointer;">
+                <span>🚨 Recent Alerts ({{ urgent_items|length }})</span>
+                <small class="text-muted ms-2">Click to expand</small>
             </div>
-            <div class="card-body-compact">
-                <div class="alerts-list">
-                    {% for alert in urgent_items %}
-                    <div class="alert alert-{{ alert.urgency }} mb-2">
-                        <strong>{{ alert.holder_name }}</strong> - {{ alert.jurisdiction }}: {{ alert.issue }}
-                        <a href="{{ alert.link }}" class="btn btn-sm btn-outline-{{ alert.urgency }} ms-2">{{ alert.action }}</a>
+            <div class="collapse" id="alertsCollapse">
+                <div class="compact-card-body p-3">
+                    {% for alert in urgent_items[:5] %}
+                    <div class="alert-item-compact alert-{{ alert.urgency }}">
+                        <span class="alert-holder">{{ alert.holder_name }}</span>
+                        <span class="alert-state">{{ alert.jurisdiction }}</span>
+                        <span class="alert-issue">{{ alert.issue }}</span>
                     </div>
                     {% endfor %}
                 </div>
@@ -166,4 +189,311 @@
 
     </div>
 </div>
+
+<style>
+/* Compact Stats */
+.stat-card-compact {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s;
+}
+
+.stat-card-compact:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.stat-compact-icon {
+    font-size: 1.75rem;
+    opacity: 0.8;
+}
+
+.stat-compact-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    font-family: 'Courier New', monospace;
+}
+
+.stat-compact-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.stat-card-compact.warning {
+    background: #fffbeb;
+    border-color: #fcd34d;
+}
+
+.stat-card-compact.success {
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+
+/* Compact Cards */
+.compact-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 100%;
+}
+
+.compact-card-header {
+    background: #f8fafc;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.compact-card-body {
+    padding: 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Compact Table */
+.compact-table-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.compact-table {
+    font-size: 0.875rem;
+}
+
+.compact-table thead th {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.compact-table tbody td {
+    padding: 0.625rem 0.75rem;
+    vertical-align: middle;
+}
+
+.state-row {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.state-row:hover {
+    background: #f8fafc;
+}
+
+.expand-cell {
+    text-align: center;
+    width: 40px;
+}
+
+.expand-icon {
+    display: inline-block;
+    transition: transform 0.2s;
+    color: #64748b;
+    font-size: 0.75rem;
+}
+
+.expand-icon.expanded {
+    transform: rotate(90deg);
+}
+
+.state-detail-row {
+    background: #f8fafc;
+}
+
+.state-detail-content {
+    padding: 1rem;
+    border-left: 3px solid #3b82f6;
+}
+
+.detail-header {
+    font-weight: 600;
+    color: #1a2634;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.holders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.holder-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.holder-icon {
+    font-size: 1rem;
+}
+
+.holder-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1a2634;
+}
+
+.status-dot {
+    font-size: 0.75rem;
+    margin-right: 0.25rem;
+}
+
+.status-dot.status-licensed { color: #10b981; }
+.status-dot.status-progress { color: #3b82f6; }
+
+/* Team List Compact */
+.team-list-compact {
+    display: flex;
+    flex-direction: column;
+}
+
+.team-item-compact {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.2s;
+}
+
+.team-item-compact:hover {
+    background: #f8fafc;
+}
+
+.team-item-compact:last-child {
+    border-bottom: none;
+}
+
+.team-item-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.team-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.team-item-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #1a2634;
+}
+
+.team-item-meta {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.team-item-stats {
+    display: flex;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.mini-stat {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+/* Alert Items */
+.alert-item-compact {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.625rem 1rem;
+    border-left: 3px solid;
+    background: #f8fafc;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.alert-item-compact:last-child {
+    margin-bottom: 0;
+}
+
+.alert-item-compact.alert-warning {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.alert-item-compact.alert-danger {
+    border-left-color: #ef4444;
+    background: #fef2f2;
+}
+
+.alert-holder {
+    font-weight: 600;
+    min-width: 150px;
+}
+
+.alert-state {
+    font-weight: 600;
+    color: #3b82f6;
+    min-width: 60px;
+}
+
+.alert-issue {
+    color: #64748b;
+}
+
+.holder-arrow {
+    margin-left: auto;
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.holder-item:hover {
+    background: #f0f9ff;
+    border-color: #3b82f6;
+}
+</style>
+
+<script>
+function toggleStateDetail(state) {
+    const detailRow = document.getElementById('detail-' + state);
+    const icon = document.getElementById('icon-' + state);
+    
+    if (detailRow.style.display === 'none') {
+        detailRow.style.display = 'table-row';
+        icon.classList.add('expanded');
+    } else {
+        detailRow.style.display = 'none';
+        icon.classList.remove('expanded');
+    }
+}
+</script>
 {% endblock %}

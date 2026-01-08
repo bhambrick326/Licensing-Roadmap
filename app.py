@@ -3,7 +3,7 @@ Licensing Roadmap Flask Application
 A plumber-focused state licensing tracking system
 """
 
-from flask import Flask, render_template, jsonify, abort, request, redirect, session
+from flask import Flask, render_template, jsonify, abort, request, redirect, session, send_file
 import json
 import os
 from datetime import datetime, timedelta
@@ -1319,8 +1319,9 @@ def update_estimated_costs(license_id):
 
 @app.route('/cost-analytics')
 def cost_analytics():
-    """Cost analytics dashboard"""
-    # Get account from session or URL parameter
+    """Cost analytics dashboard with year-by-year breakdown"""
+    from datetime import datetime
+    
     account = get_allowed_account()
     
     # Handle director view - aggregate all holders
@@ -1351,7 +1352,6 @@ def cost_analytics():
         holder_data = director_data
         enhanced_licenses = all_licenses
     else:
-        # Individual holder
         holder_data = load_license_holder_data(account)
         if not holder_data:
             return "License holder not found", 404
@@ -1361,38 +1361,71 @@ def cost_analytics():
             enhanced = enhance_license_data(license)
             enhanced_licenses.append(enhanced)
     
-    # Process all licenses
-    enhanced_licenses = []
+    # Calculate totals and year breakdown
     total_estimated = 0
     total_actual = 0
     total_variance = 0
     total_recurring = 0
     
-    # Category breakdown
+    # Year-by-year breakdown
+    years_data = {}
     categories = {}
     
-    for license in holder_data.get('licenses', []):
-        enhanced = enhance_license_data(license)
-        enhanced_licenses.append(enhanced)
+    for license in enhanced_licenses:
+        # Sum overall totals
+        total_estimated += license['cost_totals']['initial_estimated']
+        total_actual += license['cost_totals']['actual_spent']
+        total_variance += license['cost_totals']['variance']
         
-        # Sum totals
-        total_estimated += enhanced['cost_totals']['initial_estimated']
-        total_actual += enhanced['cost_totals']['actual_spent']
-        total_variance += enhanced['cost_totals']['variance']
-        
-        # Calculate annual recurring (normalize to per year)
-        period_years = enhanced.get('recurring', {}).get('renewal_period_years', 2)
-        recurring_per_period = enhanced['cost_totals']['recurring_cost']
+        # Calculate annual recurring
+        period_years = license.get('recurring', {}).get('renewal_period_years', 2)
+        recurring_per_period = license['cost_totals']['recurring_cost']
         annual_recurring = recurring_per_period / period_years if period_years > 0 else 0
         total_recurring += annual_recurring
         
-        # Break down by category
-        for cost_item in enhanced.get('actual_costs', []):
-            category = cost_item.get('category', 'other_fee')
+        # Break down actual costs by year
+        for cost_item in license.get('actual_costs', []):
+            date_str = cost_item.get('date', '')
             amount = cost_item.get('amount', 0)
+            category = cost_item.get('category', 'other_fee')
+            
+            # Extract year from date
+            try:
+                if date_str:
+                    year = datetime.strptime(date_str, '%Y-%m-%d').year
+                else:
+                    year = 'Unknown'
+            except:
+                year = 'Unknown'
+            
+            # Add to year totals
+            if year not in years_data:
+                years_data[year] = {
+                    'year': year,
+                    'total_spent': 0,
+                    'license_count': set(),
+                    'categories': {}
+                }
+            
+            years_data[year]['total_spent'] += amount
+            years_data[year]['license_count'].add(license.get('license_id'))
+            
+            # Category breakdown within year
+            if category not in years_data[year]['categories']:
+                years_data[year]['categories'][category] = 0
+            years_data[year]['categories'][category] += amount
+            
+            # Overall category totals
             categories[category] = categories.get(category, 0) + amount
     
-    # Sort categories by amount (descending)
+    # Convert year license counts from set to int
+    for year in years_data:
+        years_data[year]['license_count'] = len(years_data[year]['license_count'])
+    
+    # Sort years (most recent first)
+    years_list = sorted(years_data.values(), key=lambda x: x['year'] if isinstance(x['year'], int) else 0, reverse=True)
+    
+    # Sort categories by amount
     categories = dict(sorted(categories.items(), key=lambda x: x[1], reverse=True))
     
     totals = {
@@ -1403,12 +1436,12 @@ def cost_analytics():
     }
     
     return render_template('cost_analytics.html',
+                         holder=holder_data,
                          licenses=enhanced_licenses,
                          totals=totals,
                          categories=categories,
-                         holder=holder_data)
-
-
+                         years=years_list,
+                         is_director=(account == 'director'))
 
 @app.route('/team/manage')
 def manage_team():
@@ -2732,6 +2765,221 @@ def clear_license_goal(user_id):
     
     return jsonify({'success': True})
 
+
+
+@app.route('/cost-analytics/export-pdf')
+def export_cost_analytics_pdf():
+    """Generate PDF cost analytics report"""
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import letter, landscape
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+    from io import BytesIO
+    from datetime import datetime
+    
+    # Get the same data as the analytics page
+    account = get_allowed_account()
+    
+    if account == 'director':
+        import glob
+        all_licenses = []
+        
+        holder_files = glob.glob('data/license_holders/*.json')
+        for holder_file in holder_files:
+            with open(holder_file, 'r') as f:
+                holder = json.load(f)
+                for license in holder.get('licenses', []):
+                    enhanced = enhance_license_data(license)
+                    enhanced['holder_name'] = holder['name']
+                    all_licenses.append(enhanced)
+        
+        enhanced_licenses = all_licenses
+    else:
+        holder_data = load_license_holder_data(account)
+        enhanced_licenses = []
+        for license in holder_data.get('licenses', []):
+            enhanced = enhance_license_data(license)
+            enhanced_licenses.append(enhanced)
+    
+    # Calculate totals and year breakdown
+    total_actual = 0
+    total_recurring = 0
+    years_data = {}
+    
+    for license in enhanced_licenses:
+        total_actual += license['cost_totals']['actual_spent']
+        
+        period_years = license.get('recurring', {}).get('renewal_period_years', 2)
+        recurring_per_period = license['cost_totals']['recurring_cost']
+        annual_recurring = recurring_per_period / period_years if period_years > 0 else 0
+        total_recurring += annual_recurring
+        
+        for cost_item in license.get('actual_costs', []):
+            date_str = cost_item.get('date', '')
+            amount = cost_item.get('amount', 0)
+            
+            try:
+                if date_str:
+                    year = datetime.strptime(date_str, '%Y-%m-%d').year
+                else:
+                    year = 'Unknown'
+            except:
+                year = 'Unknown'
+            
+            if year not in years_data:
+                years_data[year] = {'year': year, 'total_spent': 0, 'license_count': set()}
+            
+            years_data[year]['total_spent'] += amount
+            years_data[year]['license_count'].add(license.get('license_id'))
+    
+    for year in years_data:
+        years_data[year]['license_count'] = len(years_data[year]['license_count'])
+    
+    years_list = sorted(years_data.values(), key=lambda x: x['year'] if isinstance(x['year'], int) else 0, reverse=True)
+    
+    # Create PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=18)
+    
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Title
+    title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=24, textColor=colors.HexColor('#1a2634'), spaceAfter=20, alignment=TA_CENTER)
+    elements.append(Paragraph('Licensing Roadmap - Cost Analytics Report', title_style))
+    
+    subtitle_style = ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=10, textColor=colors.grey, alignment=TA_CENTER, spaceAfter=20)
+    elements.append(Paragraph(f'Generated: {datetime.now().strftime("%B %d, %Y")}', subtitle_style))
+    
+    # Introduction
+    intro_style = ParagraphStyle('Intro', parent=styles['Normal'], fontSize=10, leading=14, spaceAfter=20, alignment=4)
+    intro_text = '''
+    <b>Report Overview:</b> This financial analysis provides a comprehensive breakdown of licensing costs 
+    for Repipe Specialists' compliance operations across all active jurisdictions. The report includes 
+    actual expenditures, recurring annual costs, and year-over-year spending trends.<br/><br/>
+    
+    <b>Budget Methodology:</b> Budget figures represent estimated licensing costs based on historical 
+    data derived from actual expenditures incurred during the initial license acquisition process. 
+    These estimates serve as planning benchmarks and may vary based on jurisdiction-specific requirements, 
+    examination outcomes, and application timelines. Variance analysis identifies licenses where actual 
+    costs exceeded or fell below initial projections.
+    '''
+    elements.append(Paragraph(intro_text, intro_style))
+    elements.append(Spacer(1, 0.2*inch))
+    
+    # Executive Summary
+    summary_data = [
+        ['EXECUTIVE SUMMARY', ''],
+        ['Total Spent', f'${total_actual:,.2f}'],
+        ['Annual Recurring', f'${total_recurring:,.2f}'],
+        ['Total Licenses', str(len(enhanced_licenses))]
+    ]
+    
+    summary_table = Table(summary_data, colWidths=[3*inch, 2*inch])
+    summary_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a2634')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (1, 1), (1, -1), 'RIGHT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 1), (-1, -1), 11),
+    ]))
+    
+    elements.append(summary_table)
+    elements.append(Spacer(1, 0.3*inch))
+    
+    # Year breakdown
+    if years_list:
+        year_data = [['SPENDING BY YEAR', '', '']]
+        year_data.append(['Year', 'Total Spent', 'License Count'])
+        
+        for year in years_list:
+            year_data.append([
+                str(year['year']),
+                f"${year['total_spent']:,.2f}",
+                str(year['license_count'])
+            ])
+        
+        year_table = Table(year_data, colWidths=[2*inch, 2*inch, 2*inch])
+        year_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a2634')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('SPAN', (0, 0), (-1, 0)),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 14),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor('#f8fafc')),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ]))
+        
+        elements.append(year_table)
+        elements.append(PageBreak())
+    
+    # License details with Budget and Variance
+    license_data = [['COSTS BY LICENSE', '', '', '', '', '']]
+    if account == 'director':
+        license_data.append(['Holder', 'Jurisdiction', 'Budget', 'Actual', 'Variance', 'Ann. Recur.'])
+    else:
+        license_data.append(['Jurisdiction', 'Type', 'Budget', 'Actual', 'Variance', 'Ann. Recur.'])
+    
+    for license in enhanced_licenses:
+        annual_rec = license['cost_totals']['recurring_cost'] / license.get('recurring', {}).get('renewal_period_years', 2)
+        budget = license['cost_totals']['initial_estimated']
+        actual = license['cost_totals']['actual_spent']
+        variance = actual - budget
+        
+        variance_str = f"${variance:,.2f}" if variance >= 0 else f"-${abs(variance):,.2f}"
+        
+        if account == 'director':
+            license_data.append([
+                license.get('holder_name', ''),
+                license['jurisdiction'],
+                f"${budget:,.2f}",
+                f"${actual:,.2f}",
+                variance_str,
+                f"${annual_rec:,.2f}"
+            ])
+        else:
+            license_data.append([
+                license['jurisdiction'],
+                license.get('license_type', ''),
+                f"${budget:,.2f}",
+                f"${actual:,.2f}",
+                variance_str,
+                f"${annual_rec:,.2f}"
+            ])
+    
+    license_table = Table(license_data, colWidths=[1.2*inch, 1.2*inch, 0.9*inch, 0.9*inch, 0.9*inch, 0.9*inch])
+    license_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a2634')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('SPAN', (0, 0), (-1, 0)),
+        ('ALIGN', (0, 0), (1, -1), 'LEFT'),
+        ('ALIGN', (2, 0), (-1, -1), 'RIGHT'),
+        ('FONTNAME', (0, 0), (-1, 1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor('#f8fafc')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+    ]))
+    
+    elements.append(license_table)
+    
+    # Build PDF
+    doc.build(elements)
+    
+    buffer.seek(0)
+    return send_file(buffer, as_attachment=True, download_name=f'cost_analytics_{datetime.now().strftime("%Y-%m-%d")}.pdf', mimetype='application/pdf')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

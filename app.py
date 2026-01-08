@@ -1342,6 +1342,22 @@ def remove_cost():
     
     return jsonify({'success': False, 'error': 'Invalid cost index'}), 400
 
+
+@app.route('/generate-cost-pdf', methods=['POST'])
+def generate_cost_pdf():
+    """Generate PDF cost analytics report - POST version"""
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import letter, landscape
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+    from io import BytesIO
+    from datetime import datetime
+    
+    # Just redirect to the GET version for now
+    return redirect('/export-cost-report')
+
 @app.route('/settings/update-estimated-costs/<license_id>', methods=['POST'])
 def update_estimated_costs(license_id):
     """Update estimated costs for budget planning"""
@@ -2812,6 +2828,7 @@ def clear_license_goal(user_id):
 
 
 
+@app.route('/export-cost-report')
 @app.route('/cost-analytics/export-pdf')
 def export_cost_analytics_pdf():
     """Generate PDF cost analytics report"""

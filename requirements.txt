@@ -8,3 +8,5 @@ python-dotenv
 gunicorn
 reportlab
 openpyxl
+reportlab
+openpyxl

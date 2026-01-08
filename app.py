@@ -12,6 +12,11 @@ from models import (
     SessionLocal, RSLicenseHolder, RSLicense, RSLicenseCost,
     RSLicenseBudget, RSCompanyCoverage, RSBioData
 )
+from db_write_functions import (
+    save_license_holder_data, add_license_to_db, update_license_in_db,
+    delete_license_from_db, add_cost_to_db, delete_cost_from_db,
+    update_estimated_costs_in_db
+)
 from sqlalchemy import func
 from decimal import Decimal
 
@@ -1295,13 +1300,13 @@ def update_license(license_id):
     if 'renewal_period_years' in request.form:
         license_data['recurring']['renewal_period_years'] = int(request.form.get('renewal_period_years') or 2)
     
-    # Save to file
-    import os
-    file_path = os.path.join('data', 'license_holders', f'{account}.json')
-    with open(file_path, 'w') as f:
-        json.dump(holder_data, f, indent=2)
+    # Save to database
+    success = update_license_in_db(account, license_id, license_data)
     
-    return redirect(f'/manage-licenses?account={account}')
+    if success:
+        return redirect(f'/manage-licenses?account={account}')
+    else:
+        return "Error updating license", 500
 
 
 
@@ -1337,63 +1342,51 @@ def add_license_form():
 @app.route('/settings/add-license', methods=['POST'])
 def add_license():
     """Add a new license"""
-    account = request.form.get('account', 'bhambrick')
+    account = get_allowed_account()
     holder_data = load_license_holder_data(account)
     
     if not holder_data:
         return "License holder not found", 404
     
-    state_abbr = request.form.get('state_abbr').upper()
+    state_abbr = request.form.get('jurisdiction_abbr', '').upper()
+    jurisdiction = request.form.get('jurisdiction')
     
-    # Check if already exists
-    if state_abbr in holder_data.get('states', {}):
-        return f"License for {state_abbr} already exists", 400
+    # Generate license ID
+    existing_count = len(holder_data.get('licenses', []))
+    license_id = f"{state_abbr}-{existing_count + 1:03d}"
     
-    # Get state name
-    state_names = {
-        'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas',
-        'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware',
-        'FL': 'Florida', 'GA': 'Georgia', 'HI': 'Hawaii', 'ID': 'Idaho',
-        'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa', 'KS': 'Kansas',
-        'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
-        'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi',
-        'MO': 'Missouri', 'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada',
-        'NH': 'New Hampshire', 'NJ': 'New Jersey', 'NM': 'New Mexico', 'NY': 'New York',
-        'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma',
-        'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina',
-        'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah',
-        'VT': 'Vermont', 'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia',
-        'WI': 'Wisconsin', 'WY': 'Wyoming'
-    }
-    
-    # Create new license entry
+    # Create new license data
     new_license = {
-        'name': state_names.get(state_abbr, state_abbr),
-        'status': request.form.get('status'),
-        'license_type': request.form.get('license_type') or None,
+        'license_id': license_id,
+        'jurisdiction': jurisdiction or state_abbr,
+        'jurisdiction_abbr': state_abbr,
+        'jurisdiction_type': request.form.get('jurisdiction_type', 'state'),
+        'license_type': request.form.get('license_type', 'Master Plumber'),
         'license_number': request.form.get('license_number') or None,
+        'status': request.form.get('status', 'not_licensed'),
         'issued_on': request.form.get('issued_on') or None,
         'expires_on': request.form.get('expires_on') or None,
-        'renewal_cost': float(request.form.get('renewal_cost')) if request.form.get('renewal_cost') else None,
         'board_name': request.form.get('board_name') or None,
         'board_phone': request.form.get('board_phone') or None,
         'board_url': request.form.get('board_url') or None,
-        'notes': request.form.get('notes') or None,
-        'coverage_level': 'draft'
+        'designated_role': request.form.get('designated_role') or None,
+        'recurring': {
+            'renewal_fee': float(request.form.get('renewal_fee', 0) or 0),
+            'renewal_period_years': int(request.form.get('renewal_period_years', 2) or 2)
+        },
+        'estimated_costs': {
+            'application_fee': float(request.form.get('application_fee', 0) or 0),
+            'test_fee': float(request.form.get('test_fee', 0) or 0)
+        }
     }
     
-    # Add to holder data
-    holder_data['states'][state_abbr] = new_license
+    # Save to database
+    success = add_license_to_db(account, new_license)
     
-    # Save to file
-    import os
-    file_path = os.path.join('data', 'license_holders', f'{account}.json')
-    with open(file_path, 'w') as f:
-        json.dump(holder_data, f, indent=2)
-    
-    return redirect(f'/manage-licenses?account={account}')
-
-
+    if success:
+        return redirect(f'/manage-licenses?account={account}')
+    else:
+        return "Error adding license", 500
 
 @app.route('/settings/cost-details/<license_id>')
 def cost_details(license_id):
@@ -1452,13 +1445,13 @@ def add_cost(license_id):
     
     license_data['actual_costs'].append(new_cost)
     
-    # Save to file
-    import os
-    file_path = os.path.join('data', 'license_holders', f'{account}.json')
-    with open(file_path, 'w') as f:
-        json.dump(holder_data, f, indent=2)
+    # Save to database
+    success = update_estimated_costs_in_db(account, license_id, license_data['estimated_costs'])
     
-    return redirect(f'/settings/cost-details/{license_id}?account={account}')
+    if success:
+        return redirect(f'/settings/cost-details/{license_id}?account={account}')
+    else:
+        return "Error updating estimated costs", 500
 
 @app.route('/settings/remove-cost', methods=['POST'])
 def remove_cost():
@@ -1551,13 +1544,13 @@ def update_estimated_costs(license_id):
         'test_duration_hours': float(request.form.get('test_duration_hours') or 0)
     }
     
-    # Save to file
-    import os
-    file_path = os.path.join('data', 'license_holders', f'{account}.json')
-    with open(file_path, 'w') as f:
-        json.dump(holder_data, f, indent=2)
+    # Save to database
+    success = update_estimated_costs_in_db(account, license_id, license_data['estimated_costs'])
     
-    return redirect(f'/settings/cost-details/{license_id}?account={account}')
+    if success:
+        return redirect(f'/settings/cost-details/{license_id}?account={account}')
+    else:
+        return "Error updating estimated costs", 500
 
 
 

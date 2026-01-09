@@ -202,6 +202,7 @@ function clearGoal() {
                                         <td>
                                             <a href="/settings/edit-license/{{ license.license_id }}" class="btn-table-action">Edit</a>
                                             <a href="/settings/cost-details/{{ license.license_id }}" class="btn-table-action text-success">💰 Costs</a>
+                                            <button onclick="confirmDelete('{{ license.license_id }}', '{{ license.jurisdiction }}')" class="btn-table-action text-danger" style="border: none; background: none; cursor: pointer;">🗑️ Delete</button>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -292,6 +293,31 @@ function clearGoal() {
                 alert('Error clearing goal');
             }
         });
+    }
+}
+</script>
+
+
+<script>
+function confirmDelete(licenseId, jurisdiction) {
+    if (confirm(`Are you sure you want to delete the ${jurisdiction} license (${licenseId})? This cannot be undone.`)) {
+        // Create form and submit
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/settings/delete-license/' + licenseId;
+        
+        // Add CSRF token if needed
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'csrf_token';
+            input.value = csrfToken.content;
+            form.appendChild(input);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
     }
 }
 </script>

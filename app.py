@@ -1420,6 +1420,19 @@ def add_license():
     else:
         return "Error adding license", 500
 
+@app.route('/settings/delete-license/<license_id>', methods=['POST'])
+def delete_license_route(license_id):
+    """Delete a license"""
+    account = get_allowed_account()
+    
+    # Delete from database
+    success = delete_license_from_db(account, license_id)
+    
+    if success:
+        return redirect(f'/manage-licenses?account={account}')
+    else:
+        return "Error deleting license", 500
+
 @app.route('/settings/cost-details/<license_id>')
 def cost_details(license_id):
     """View cost details for a license"""

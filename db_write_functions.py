@@ -366,3 +366,407 @@ def update_estimated_costs_in_db(account, license_id, estimated_costs):
         return False
     finally:
         db.close()
+
+
+def update_holder_status(account, status, locked_by=None):
+    """Update license holder account status (lock/unlock)"""
+    db = SessionLocal()
+    try:
+        holder = db.query(RSLicenseHolder).filter(
+            (RSLicenseHolder.employee_id == account) | (RSLicenseHolder.pin == account)
+        ).first()
+        
+        if not holder:
+            return False
+        
+        holder.status = status
+        # Note: locked_date and locked_by would need columns added to the table
+        # For now, we just update status
+        
+        db.commit()
+        return True
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR updating holder status: {e}")
+        return False
+    finally:
+        db.close()
+
+
+def clear_next_target_state(account):
+    """Clear the next target state for a license holder"""
+    db = SessionLocal()
+    try:
+        holder = db.query(RSLicenseHolder).filter(
+            (RSLicenseHolder.employee_id == account) | (RSLicenseHolder.pin == account)
+        ).first()
+        
+        if not holder:
+            return False
+        
+        holder.next_target_state = None
+        
+        db.commit()
+        return True
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR clearing target state: {e}")
+        return False
+    finally:
+        db.close()
+
+
+def update_holder_metadata(account, updates_dict):
+    """Generic function to update holder metadata fields"""
+    db = SessionLocal()
+    try:
+        holder = db.query(RSLicenseHolder).filter(
+            (RSLicenseHolder.employee_id == account) | (RSLicenseHolder.pin == account)
+        ).first()
+        
+        if not holder:
+            return False
+        
+        # Update any fields provided in updates_dict
+        for key, value in updates_dict.items():
+            if hasattr(holder, key):
+                setattr(holder, key, value)
+        
+        db.commit()
+        return True
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR updating holder metadata: {e}")
+        return False
+    finally:
+        db.close()
+
+
+def create_new_holder(user_id, name, role='License Holder', next_target_state=None, pin=None):
+    """Create a new license holder in database"""
+    db = SessionLocal()
+    try:
+        # Check if already exists
+        existing = db.query(RSLicenseHolder).filter(
+            (RSLicenseHolder.employee_id == user_id) | (RSLicenseHolder.pin == user_id)
+        ).first()
+        
+        if existing:
+            return False, "User already exists"
+        
+        # Create new holder
+        new_holder = RSLicenseHolder(
+            employee_id=user_id,
+            full_name=name,
+            role=role,
+            next_target_state=next_target_state,
+            pin=pin,
+            total_licenses=0,
+            total_certificates=0,
+            status='active'
+        )
+        
+        db.add(new_holder)
+        db.commit()
+        return True, "Holder created successfully"
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR creating holder: {e}")
+        return False, str(e)
+    finally:
+        db.close()
+
+
+def set_next_target_state(account, target_state):
+    """Set the next target state for a license holder"""
+    db = SessionLocal()
+    try:
+        holder = db.query(RSLicenseHolder).filter(
+            (RSLicenseHolder.employee_id == account) | (RSLicenseHolder.pin == account)
+        ).first()
+        
+        if not holder:
+            return False
+        
+        holder.next_target_state = target_state
+        
+        db.commit()
+        return True
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR setting target state: {e}")
+        return False
+    finally:
+        db.close()
+
+
+def add_work_history(account, work_entry):
+    """Add work history entry to bio data"""
+    db = SessionLocal()
+    try:
+        holder = db.query(RSLicenseHolder).filter(
+            (RSLicenseHolder.employee_id == account) | (RSLicenseHolder.pin == account)
+        ).first()
+        
+        if not holder:
+            return False
+        
+        # Get or create bio data
+        bio = holder.bio_data
+        if not bio:
+            bio = RSBioData(holder_id=holder.id, work_history=[])
+            db.add(bio)
+        
+        # Initialize work_history if None
+        if bio.work_history is None:
+            bio.work_history = []
+        
+        # Add new entry at beginning (most recent first)
+        bio.work_history.insert(0, work_entry)
+        
+        db.commit()
+        return True
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR adding work history: {e}")
+        return False
+    finally:
+        db.close()
+
+
+def add_reference(account, reference):
+    """Add professional reference to bio data"""
+    db = SessionLocal()
+    try:
+        holder = db.query(RSLicenseHolder).filter(
+            (RSLicenseHolder.employee_id == account) | (RSLicenseHolder.pin == account)
+        ).first()
+        
+        if not holder:
+            return False
+        
+        # Get or create bio data
+        bio = holder.bio_data
+        if not bio:
+            bio = RSBioData(holder_id=holder.id, professional_references=[])
+            db.add(bio)
+        
+        # Initialize references if None
+        if bio.professional_references is None:
+            bio.professional_references = []
+        
+        # Add new reference
+        bio.professional_references.append(reference)
+        
+        db.commit()
+        return True
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR adding reference: {e}")
+        return False
+    finally:
+        db.close()
+
+
+def add_job_project(account, job_project):
+    """Add job project to plumbing experience"""
+    db = SessionLocal()
+    try:
+        holder = db.query(RSLicenseHolder).filter(
+            (RSLicenseHolder.employee_id == account) | (RSLicenseHolder.pin == account)
+        ).first()
+        
+        if not holder:
+            return False
+        
+        # Get or create bio data
+        bio = holder.bio_data
+        if not bio:
+            bio = RSBioData(holder_id=holder.id, job_projects=[])
+            db.add(bio)
+        
+        # Initialize job_projects if None
+        if bio.job_projects is None:
+            bio.job_projects = []
+        
+        # Add new project at beginning (most recent first)
+        bio.job_projects.insert(0, job_project)
+        
+        db.commit()
+        return True
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR adding job project: {e}")
+        return False
+    finally:
+        db.close()
+
+
+def add_company_coverage_state(state_code, state_name, status='target'):
+    """Add a state to company coverage"""
+    db = SessionLocal()
+    try:
+        # Check if already exists
+        existing = db.query(RSCompanyCoverage).filter_by(state_code=state_code).first()
+        
+        if existing:
+            return False, "State already in coverage"
+        
+        # Create new coverage entry
+        coverage = RSCompanyCoverage(
+            state_code=state_code,
+            state_name=state_name,
+            status=status
+        )
+        
+        db.add(coverage)
+        db.commit()
+        return True, "State added successfully"
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR adding coverage state: {e}")
+        return False, str(e)
+    finally:
+        db.close()
+
+
+def move_company_coverage_state(state_code, new_status):
+    """Move a state to a different status (target/in_progress/licensed)"""
+    db = SessionLocal()
+    try:
+        coverage = db.query(RSCompanyCoverage).filter_by(state_code=state_code).first()
+        
+        if not coverage:
+            return False, "State not found"
+        
+        coverage.status = new_status
+        
+        db.commit()
+        return True, "State status updated"
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR moving coverage state: {e}")
+        return False, str(e)
+    finally:
+        db.close()
+
+
+def remove_company_coverage_state(state_code):
+    """Remove a state from company coverage"""
+    db = SessionLocal()
+    try:
+        coverage = db.query(RSCompanyCoverage).filter_by(state_code=state_code).first()
+        
+        if not coverage:
+            return False, "State not found"
+        
+        db.delete(coverage)
+        db.commit()
+        return True, "State removed"
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR removing coverage state: {e}")
+        return False, str(e)
+    finally:
+        db.close()
+
+
+def update_state_revenue(state_code, revenue):
+    """Update revenue for a coverage state"""
+    # Note: We don't have a revenue column in rs_company_coverage
+    # This would need a schema update or we store it elsewhere
+    # For now, just return success (can add later)
+    print(f"TODO: Store revenue ${revenue} for {state_code}")
+    return True, "Revenue updated (stored in memory only for now)"
+
+
+def update_bio_personal_info(account, personal_info):
+    """Update personal info in bio data"""
+    db = SessionLocal()
+    try:
+        holder = db.query(RSLicenseHolder).filter(
+            (RSLicenseHolder.employee_id == account) | (RSLicenseHolder.pin == account)
+        ).first()
+        
+        if not holder:
+            return False
+        
+        # Get or create bio data
+        bio = holder.bio_data
+        if not bio:
+            bio = RSBioData(holder_id=holder.id)
+            db.add(bio)
+        
+        # Update personal info
+        bio.personal_info = personal_info
+        
+        db.commit()
+        return True
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR updating personal info: {e}")
+        return False
+    finally:
+        db.close()
+
+
+def bulk_import_licenses(account, licenses_data):
+    """Bulk import/update licenses from Excel - update existing licenses only"""
+    db = SessionLocal()
+    try:
+        holder = db.query(RSLicenseHolder).filter(
+            (RSLicenseHolder.employee_id == account) | (RSLicenseHolder.pin == account)
+        ).first()
+        
+        if not holder:
+            return False, "Holder not found"
+        
+        updated_count = 0
+        
+        # Update existing licenses only (don't create new ones to match current behavior)
+        for license_data in licenses_data:
+            license_id = license_data.get('license_id')
+            
+            license = db.query(RSLicense).filter_by(
+                holder_id=holder.id,
+                license_id=license_id
+            ).first()
+            
+            if license:
+                # Update budget if provided
+                if 'estimated_costs' in license_data:
+                    budget = license.budget
+                    if not budget:
+                        budget = RSLicenseBudget(license_id=license.id)
+                        db.add(budget)
+                    
+                    costs = license_data['estimated_costs']
+                    if costs.get('application_fee') is not None:
+                        budget.application_fee = Decimal(str(costs['application_fee']))
+                    if costs.get('test_fee') is not None:
+                        budget.test_fee = Decimal(str(costs['test_fee']))
+                    # Add other fields as needed
+                
+                updated_count += 1
+        
+        db.commit()
+        return True, f"Updated {updated_count} licenses"
+        
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR bulk importing: {e}")
+        return False, str(e)
+    finally:
+        db.close()

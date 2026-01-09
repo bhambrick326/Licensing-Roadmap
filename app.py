@@ -15,7 +15,12 @@ from models import (
 from db_write_functions import (
     save_license_holder_data, add_license_to_db, update_license_in_db,
     delete_license_from_db, add_cost_to_db, delete_cost_from_db,
-    update_estimated_costs_in_db
+    update_estimated_costs_in_db, update_holder_status, clear_next_target_state,
+    update_holder_metadata, create_new_holder, set_next_target_state,
+    add_work_history, add_reference, add_job_project,
+    add_company_coverage_state, move_company_coverage_state, 
+    remove_company_coverage_state, update_state_revenue,
+    update_bio_personal_info, bulk_import_licenses
 )
 from sqlalchemy import func
 from decimal import Decimal
@@ -1067,11 +1072,13 @@ def leadership_data():
 
 
 # DELETE COST ROUTES - MOVED TO TOP
-@app.route('/settings/test-delete/<string:license_id>/<int:cost_index>', methods=['POST', 'GET'])
+# DEPRECATED ROUTE - Using /settings/remove-cost instead
+# @app.route('/settings/test-delete/<string:license_id>/<int:cost_index>', methods=['POST', 'GET'])
 def test_delete_cost(license_id, cost_index):
     return jsonify({'test': 'success', 'license_id': license_id, 'cost_index': cost_index, 'type': type(cost_index).__name__})
 
-@app.route('/settings/delete-cost/<license_id>/<cost_index>', methods=['POST'])
+# DEPRECATED ROUTE - Using /settings/remove-cost instead
+# @app.route('/settings/delete-cost/<license_id>/<cost_index>', methods=['POST'])
 def delete_cost(license_id, cost_index):
     """Delete a cost entry"""
     cost_index = int(cost_index)  # Convert to int
@@ -1177,7 +1184,8 @@ def manage_licenses():
                          licenses=enhanced_licenses,
                          is_director=False)
 
-@app.route('/api/save-license', methods=['POST'])
+# DEPRECATED ROUTE - Not used
+# @app.route('/api/save-license', methods=['POST'])
 def save_license():
     """Save/update a license"""
     data = request.get_json()
@@ -1207,7 +1215,8 @@ def save_license():
     
     return jsonify({'success': True, 'message': 'License saved successfully'})
 
-@app.route('/api/delete-license', methods=['POST'])
+# DEPRECATED ROUTE - Not used
+# @app.route('/api/delete-license', methods=['POST'])
 def delete_license():
     """Delete a license"""
     data = request.get_json()
@@ -1737,15 +1746,11 @@ def add_holder():
         'licenses': []
     }
     
-    # Save to file
-    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
+    # Create in database
+    success, message = create_new_holder(user_id, name, role, next_target)
     
-    # Check if already exists
-    if os.path.exists(file_path):
-        return "User ID already exists", 400
-    
-    with open(file_path, 'w') as f:
-        json.dump(new_holder, f, indent=2)
+    if not success:
+        return message, 400
     
     return redirect('/team/manage')
 
@@ -1771,17 +1776,19 @@ def update_holder(user_id):
     if not holder_data:
         return "License holder not found", 404
     
-    # Update fields
-    holder_data['name'] = request.form.get('name')
-    holder_data['role'] = request.form.get('role')
-    holder_data['total_licenses'] = int(request.form.get('total_licenses') or 0)
-    holder_data['total_certificates'] = int(request.form.get('total_certificates') or 0)
-    holder_data['next_target_state'] = request.form.get('next_target_state') if request.form.get('next_target_state') else None
+    # Update fields in database
+    updates = {
+        'full_name': request.form.get('name'),
+        'role': request.form.get('role'),
+        'total_licenses': int(request.form.get('total_licenses') or 0),
+        'total_certificates': int(request.form.get('total_certificates') or 0),
+        'next_target_state': request.form.get('next_target_state') if request.form.get('next_target_state') else None
+    }
     
-    # Save to file
-    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
-    with open(file_path, 'w') as f:
-        json.dump(holder_data, f, indent=2)
+    success = update_holder_metadata(user_id, updates)
+    
+    if not success:
+        return "Failed to update holder", 500
     
     return redirect('/team/manage')
 
@@ -1962,10 +1969,11 @@ def update_bio_section(user_id, section):
             'email_primary': request.form.get('email_primary')
         }
     
-    # Save to file
-    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
-    with open(file_path, 'w') as f:
-        json.dump(holder_data, f, indent=2)
+    # Save to database
+    success = update_bio_personal_info(user_id, holder_data['bio']['personal_info'])
+    
+    if not success:
+        return "Failed to update personal info", 500
     
     return redirect(f'/bio/{user_id}')
 
@@ -2031,13 +2039,11 @@ def add_work_history(user_id):
         }
     }
     
-    # Add to work history (most recent first)
-    holder_data['bio']['work_history'].insert(0, work_entry)
+    # Add to database
+    success = add_work_history(user_id, work_entry)
     
-    # Save to file
-    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
-    with open(file_path, 'w') as f:
-        json.dump(holder_data, f, indent=2)
+    if not success:
+        return "Failed to add work history", 500
     
     return redirect(f'/bio/{user_id}#work')
 
@@ -2122,13 +2128,11 @@ def add_reference(user_id):
         'notes': request.form.get('notes')
     }
     
-    # Add to references
-    holder_data['bio']['references'].append(reference)
+    # Add to database
+    success = add_reference(user_id, reference)
     
-    # Save to file
-    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
-    with open(file_path, 'w') as f:
-        json.dump(holder_data, f, indent=2)
+    if not success:
+        return "Failed to add reference", 500
     
     return redirect(f'/bio/{user_id}#references')
 
@@ -2178,13 +2182,11 @@ def add_job_project(user_id):
         'have_photos': 'have_photos' in request.form
     }
     
-    # Add to job projects (most recent first)
-    holder_data['bio']['plumbing_experience']['job_projects'].insert(0, job_project)
+    # Add to database
+    success = add_job_project(user_id, job_project)
     
-    # Save to file
-    file_path = os.path.join('data', 'license_holders', f'{user_id}.json')
-    with open(file_path, 'w') as f:
-        json.dump(holder_data, f, indent=2)
+    if not success:
+        return "Failed to add job project", 500
     
     return redirect(f'/bio/{user_id}#experience')
 
@@ -2347,10 +2349,11 @@ def import_csv():
         if overwrite or not planning.get('test_duration_hours'):
             planning['test_duration_hours'] = parse_hours(row.get('Test Duration', 0))
     
-    # Save to file
-    file_path = os.path.join('data', 'license_holders', f'{license_holder}.json')
-    with open(file_path, 'w') as f:
-        json.dump(holder_data, f, indent=2)
+    # Bulk import to database
+    success, message = bulk_import_licenses(license_holder, holder_data.get('licenses', []))
+    
+    if not success:
+        print(f"Bulk import warning: {message}")
     
     # Redirect to cost analytics with success message
     return f'''
@@ -2678,13 +2681,14 @@ def admin_active_states_add():
         if state not in coverage['target_states']:
             coverage['target_states'].append(state)
     
-    coverage['total_states_covered'] = len(coverage['covered_states'])
-    coverage['total_states_in_progress'] = len(coverage['in_progress_states'])
+    # Map status to database status
+    status_map = {'covered': 'licensed', 'in_progress': 'in_progress', 'target': 'target'}
+    db_status = status_map.get(status, 'target')
     
-    with open(coverage_file, 'w') as f:
-        json.dump(coverage, f, indent=2)
+    # Add to database
+    success, message = add_company_coverage_state(state, state, db_status)
     
-    return jsonify({'success': True})
+    return jsonify({'success': success, 'message': message if not success else 'State added'})
 
 @app.route('/admin/active-states/move', methods=['POST'])
 def admin_active_states_move():
@@ -2715,13 +2719,14 @@ def admin_active_states_move():
     elif to_status == 'target' and state not in coverage['target_states']:
         coverage['target_states'].append(state)
     
-    coverage['total_states_covered'] = len(coverage['covered_states'])
-    coverage['total_states_in_progress'] = len(coverage['in_progress_states'])
+    # Map status to database status
+    status_map = {'covered': 'licensed', 'in_progress': 'in_progress', 'target': 'target'}
+    db_status = status_map.get(status, 'target')
     
-    with open(coverage_file, 'w') as f:
-        json.dump(coverage, f, indent=2)
+    # Add to database
+    success, message = add_company_coverage_state(state, state, db_status)
     
-    return jsonify({'success': True})
+    return jsonify({'success': success, 'message': message if not success else 'State added'})
 
 @app.route('/admin/active-states/remove', methods=['POST'])
 def admin_active_states_remove():
@@ -2744,13 +2749,14 @@ def admin_active_states_remove():
     elif status == 'target' and state in coverage['target_states']:
         coverage['target_states'].remove(state)
     
-    coverage['total_states_covered'] = len(coverage['covered_states'])
-    coverage['total_states_in_progress'] = len(coverage['in_progress_states'])
+    # Map status to database status
+    status_map = {'covered': 'licensed', 'in_progress': 'in_progress', 'target': 'target'}
+    db_status = status_map.get(status, 'target')
     
-    with open(coverage_file, 'w') as f:
-        json.dump(coverage, f, indent=2)
+    # Add to database
+    success, message = add_company_coverage_state(state, state, db_status)
     
-    return jsonify({'success': True})
+    return jsonify({'success': success, 'message': message if not success else 'State added'})
 
 @app.route('/admin/active-states/update-revenue', methods=['POST'])
 def admin_active_states_update_revenue():
@@ -2766,13 +2772,8 @@ def admin_active_states_update_revenue():
     with open(coverage_file, 'r') as f:
         coverage = json.load(f)
     
-    if 'state_revenues' not in coverage:
-        coverage['state_revenues'] = {}
-    
-    coverage['state_revenues'][state] = revenue
-    
-    with open(coverage_file, 'w') as f:
-        json.dump(coverage, f, indent=2)
+    # Update revenue in database (TODO: need revenue column)
+    success, message = update_state_revenue(state, revenue)
     
     return jsonify({'success': True})
 
@@ -2795,12 +2796,11 @@ def lock_account(user_id):
     with open(holder_file, 'r') as f:
         holder = json.load(f)
     
-    holder['account_status'] = 'locked'
-    holder['locked_date'] = datetime.now().strftime('%Y-%m-%d')
-    holder['locked_by'] = session.get('name', 'Manager')
+    # Update status in database
+    success = update_holder_status(user_id, 'locked', session.get('name', 'Manager'))
     
-    with open(holder_file, 'w') as f:
-        json.dump(holder, f, indent=2)
+    if not success:
+        return jsonify({'success': False, 'error': 'Failed to lock account'}), 500
     
     return jsonify({'success': True, 'message': f"Account locked for {holder['name']}"})
 
@@ -2817,12 +2817,11 @@ def unlock_account(user_id):
     with open(holder_file, 'r') as f:
         holder = json.load(f)
     
-    holder['account_status'] = 'active'
-    holder['locked_date'] = None
-    holder['locked_by'] = None
+    # Update status in database
+    success = update_holder_status(user_id, 'active')
     
-    with open(holder_file, 'w') as f:
-        json.dump(holder, f, indent=2)
+    if not success:
+        return jsonify({'success': False, 'error': 'Failed to unlock account'}), 500
     
     return jsonify({'success': True, 'message': f"Account unlocked for {holder['name']}"})
 
@@ -2906,9 +2905,11 @@ def create_account():
         'created_by': session.get('name', 'Manager')
     }
     
-    # Save to file
-    with open(holder_file, 'w') as f:
-        json.dump(holder, f, indent=2)
+    # Save to database
+    success, message = create_new_holder(user_id, name, role, pin=pin)
+    
+    if not success:
+        return f"Error: {message}", 400
     
     # Add to USERS dict
     USERS[pin] = {
@@ -2955,10 +2956,11 @@ def set_license_goal(user_id):
     with open(holder_file, 'r') as f:
         holder = json.load(f)
     
-    holder['next_target_state'] = target_state
+    # Set in database
+    success = set_next_target_state(user_id, target_state)
     
-    with open(holder_file, 'w') as f:
-        json.dump(holder, f, indent=2)
+    if not success:
+        return jsonify({'success': False, 'error': 'Failed to set goal'}), 500
     
     return redirect(f'/manage-licenses?account={user_id}')
 
@@ -2975,10 +2977,11 @@ def clear_license_goal(user_id):
     with open(holder_file, 'r') as f:
         holder = json.load(f)
     
-    holder['next_target_state'] = None
+    # Clear goal in database
+    success = clear_next_target_state(user_id)
     
-    with open(holder_file, 'w') as f:
-        json.dump(holder, f, indent=2)
+    if not success:
+        return jsonify({'success': False, 'error': 'Failed to clear goal'}), 500
     
     return jsonify({'success': True})
 

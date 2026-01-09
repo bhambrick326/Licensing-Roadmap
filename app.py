@@ -1362,17 +1362,35 @@ def add_license():
     if not holder_data:
         return "License holder not found", 404
     
-    state_abbr = request.form.get('jurisdiction_abbr', '').upper()
-    jurisdiction = request.form.get('jurisdiction')
+    # Get state from form (uses 'state_abbr' field name)
+    state_abbr = request.form.get('state_abbr', '').upper()
     
-    # Generate license ID
+    # Get state name from all_states mapping
+    state_names = dict([
+        ('AL', 'Alabama'), ('AK', 'Alaska'), ('AZ', 'Arizona'), ('AR', 'Arkansas'),
+        ('CA', 'California'), ('CO', 'Colorado'), ('CT', 'Connecticut'), ('DE', 'Delaware'),
+        ('FL', 'Florida'), ('GA', 'Georgia'), ('HI', 'Hawaii'), ('ID', 'Idaho'),
+        ('IL', 'Illinois'), ('IN', 'Indiana'), ('IA', 'Iowa'), ('KS', 'Kansas'),
+        ('KY', 'Kentucky'), ('LA', 'Louisiana'), ('ME', 'Maine'), ('MD', 'Maryland'),
+        ('MA', 'Massachusetts'), ('MI', 'Michigan'), ('MN', 'Minnesota'), ('MS', 'Mississippi'),
+        ('MO', 'Missouri'), ('MT', 'Montana'), ('NE', 'Nebraska'), ('NV', 'Nevada'),
+        ('NH', 'New Hampshire'), ('NJ', 'New Jersey'), ('NM', 'New Mexico'), ('NY', 'New York'),
+        ('NC', 'North Carolina'), ('ND', 'North Dakota'), ('OH', 'Ohio'), ('OK', 'Oklahoma'),
+        ('OR', 'Oregon'), ('PA', 'Pennsylvania'), ('RI', 'Rhode Island'), ('SC', 'South Carolina'),
+        ('SD', 'South Dakota'), ('TN', 'Tennessee'), ('TX', 'Texas'), ('UT', 'Utah'),
+        ('VT', 'Vermont'), ('VA', 'Virginia'), ('WA', 'Washington'), ('WV', 'West Virginia'),
+        ('WI', 'Wisconsin'), ('WY', 'Wyoming')
+    ])
+    jurisdiction = state_names.get(state_abbr, state_abbr)
+    
+    # Generate license ID using holder_id to ensure uniqueness
     existing_count = len(holder_data.get('licenses', []))
     license_id = f"{state_abbr}-{existing_count + 1:03d}"
     
     # Create new license data
     new_license = {
         'license_id': license_id,
-        'jurisdiction': jurisdiction or state_abbr,
+        'jurisdiction': jurisdiction,
         'jurisdiction_abbr': state_abbr,
         'jurisdiction_type': request.form.get('jurisdiction_type', 'state'),
         'license_type': request.form.get('license_type', 'Master Plumber'),
